@@ -23,6 +23,12 @@ Frontend
 🎨 shadcn/ui
  — Componentes acessíveis e estilizados com Tailwind CSS
 
+📝 React Hook Form
+ — Manipulação de formulários performática
+
+✅ Zod
+ — Validação de dados com tipagem segura
+
 Backend
 
 ⚙️ .NET 8
@@ -43,3 +49,7 @@ Backend
 ✔️ Gerenciamento de dados assíncronos com TanStack Query
 
 ✔️ UI acessível e consistente com shadcnui
+
+✔️ Formulários performáticos com React Hook Form
+
+✔️ Validação confiável com Zod
