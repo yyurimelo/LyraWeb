@@ -31,9 +31,15 @@ Backend
 🛠️ Boas Práticas
 
 ✔️ Organização de pastas clara para escalabilidade
+
 ✔️ Componentização para reaproveitamento e manutenção
+
 ✔️ Gerenciamento de estado global com Zustand
+
 ✔️ Consumo de API centralizado com Axios
+
 ✔️ Roteamento declarativo com TanStack Router
+
 ✔️ Gerenciamento de dados assíncronos com TanStack Query
+
 ✔️ UI acessível e consistente com shadcnui
