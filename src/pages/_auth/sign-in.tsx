@@ -1,13 +1,13 @@
 import z from "zod";
-import { useId, useState } from 'react';
+import { useId } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InputPassword } from "@/components/ui/input-passowrd";
+import { useAuth } from "@/contexts/auth-provider";
 
 const signInFormSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -28,7 +28,7 @@ export const Route = createFileRoute('/_auth/sign-in')({
 })
 
 export function SignIn() {
-  const [isLoading, setIsLoading] = useState(false)
+  const { login } = useAuth()
   const id = useId();
 
   const form = useForm<SignInFormSchema>({
@@ -39,11 +39,10 @@ export function SignIn() {
     },
   });
 
-  async function handleSubmit(data: SignInFormSchema) {
-    setIsLoading(true)
-    console.log(data)
-  }
 
+  async function handleSubmit(data: SignInFormSchema) {
+    await login({ ...data })
+  }
 
   return (
 
@@ -54,16 +53,6 @@ export function SignIn() {
         className="space-y-6"
       >
         <div className="grid gap-6">
-          {/* <div>
-                  <GoogleAuthButton />
-                </div>
-                <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                  <span className="bg-card text-muted-foreground relative z-10 px-2">
-                    Ou continue com
-                  </span>
-                </div> */}
-
-          {/* form login */}
           <FormField
             control={form.control}
             name="email"
@@ -96,15 +85,12 @@ export function SignIn() {
           />
 
           <Button
-            // disabled={isLoading}
+
             form={id}
             type="submit"
             className="w-full"
           >
-            {isLoading && (
-              <LoaderCircle className="w-4 h-4 text-primary-foreground animate-spin mr-2" />
-            )}
-            {isLoading ? isLoading : "Entrar"}
+            Entrar
           </Button>
 
           <div className="text-center text-sm">

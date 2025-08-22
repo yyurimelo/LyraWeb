@@ -1,0 +1,19 @@
+{
+  "name": "@lyra/react-query-config",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tanstack/react-query": "^5.85.5",
+    "@tanstack/react-query-devtools": "^5.85.5"
+  },
+  "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.83.1"
+  }
+}

@@ -1,14 +1,14 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider, queryClient } from "@lyra/react-query-config"
 import { routeTree } from './routeTree.gen';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { ThemeProvider } from './components/ui/theme-provider';
 import { createHttp } from "@lyra/axios-config";
 import { env } from './env';
+import { Toaster } from "sonner";
+import { AuthProvider } from "./contexts/auth-provider";
 
-// Create a new router instance
 const router = createRouter({ routeTree })
 
-// Register the router instance for type safety
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router
@@ -18,12 +18,15 @@ declare module '@tanstack/react-router' {
 createHttp(env.VITE_API_URL)
 
 function App() {
-  const queryClient = new QueryClient()
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <Toaster />
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+
+        </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )
