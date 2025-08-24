@@ -5,9 +5,13 @@ import { ThemeProvider } from './components/ui/theme-provider';
 import { createHttp } from "@lyra/axios-config";
 import { env } from './env';
 import { Toaster } from "sonner";
-import { AuthProvider } from "./contexts/auth-provider";
+import { AuthProvider, useAuth } from "./contexts/auth-provider";
 
-const router = createRouter({ routeTree })
+const router = createRouter({
+  routeTree, context: {
+    auth: undefined!,
+  },
+})
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -17,6 +21,11 @@ declare module '@tanstack/react-router' {
 
 createHttp(env.VITE_API_URL)
 
+function InnerApp() {
+  const auth = useAuth()
+  return <RouterProvider router={router} context={{ auth }} />
+}
+
 function App() {
 
   return (
@@ -24,8 +33,7 @@ function App() {
       <Toaster />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <RouterProvider router={router} />
-
+          <InnerApp />
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

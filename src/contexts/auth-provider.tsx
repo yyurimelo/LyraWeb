@@ -1,57 +1,89 @@
-import type { AuthFormModel } from "@/@types/auth/auth-form-model";
-import type { AuthUserDataModel } from "@/@types/auth/auth-user-data-model";
-import { authenticate } from "@/http/services/auth.service";
-import { createContext, useContext, useEffect, useState } from "react";
-import { toast } from "sonner";
+import type { AuthFormModel } from '@/@types/auth/auth-form-model'
+import type { AuthUserDataModel } from '@/@types/auth/auth-user-data-model'
+import { authenticate, getLoggedUser } from '@/http/services/auth.service'
+import { http } from '@lyra/axios-config'
+import { LoaderCircle } from 'lucide-react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { toast } from 'sonner'
 
-interface AuthContextProps {
-  user: AuthUserDataModel | null;
+
+interface AuthState {
+  isAuthenticated: boolean
+  user: AuthUserDataModel | null
   login: (credentials: AuthFormModel) => Promise<void>;
-  logout: () => void;
-  isLogged: boolean;
+  logout: () => void
 }
 
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
-
+const AuthContext = createContext<AuthState | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUserDataModel | null>(null);
+  const [user, setUser] = useState<AuthUserDataModel | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth-token')
+    if (!token) {
+      setIsLoading(false)
+      return
+    }
+
+    http.defaults.headers.Authorization = `Bearer ${token}`
+
+    getLoggedUser()
+      .then((userData) => {
+        setUser(userData)
+        setIsAuthenticated(true)
+      })
+      .catch(() => {
+        localStorage.removeItem('auth-token')
+        setUser(null)
+        setIsAuthenticated(false)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center backdrop-blur-lg z-50">
+        <LoaderCircle className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    )
+  }
 
   const login = async (credentials: AuthFormModel) => {
     try {
-      const user = await authenticate(credentials);
-      setUser(user.data);
-      localStorage.setItem("token", user.data.token)
+      const response = await authenticate(credentials);
+
+      setUser(response);
+      setIsAuthenticated(true);
+      localStorage.setItem("auth-token", response.token);
+      toast.success("Autenticado com sucesso!")
     } catch (error: any) {
-      toast.error(error.message || "Erro ao autenticar");
+      toast.error("Erro no login:", error);
+      throw error;
     }
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token && !user) {
-      setUser({ token } as AuthUserDataModel);
-      window.location.href = '/';
-    }
-  }, [user]);
-
-  console.log(user)
-
+  }
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem("token")
+    setIsAuthenticated(false)
+    localStorage.removeItem('auth-token')
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLogged: !!user }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth deve ser usado dentro do AuthProvider");
-  return context;
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
 }

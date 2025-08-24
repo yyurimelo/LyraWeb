@@ -7,9 +7,7 @@ const prefix = "/shared/auth";
 export async function authenticate({
   email,
   password,
-}: AuthFormModel): Promise<{
-  data: AuthUserDataModel;
-}> {
+}: AuthFormModel): Promise<AuthUserDataModel> {
   let response: any;
   try {
     response = await http.post(`${prefix}`, {
@@ -21,5 +19,11 @@ export async function authenticate({
       throw new Error(error.response?.data);
     }
   }
+  return response.data;
+}
+
+export async function getLoggedUser(): Promise<AuthUserDataModel> {
+  const response = await http.get(`${prefix}/me`);
+
   return response.data;
 }
