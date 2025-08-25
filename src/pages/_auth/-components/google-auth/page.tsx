@@ -4,7 +4,7 @@ export function GoogleAuthButton() {
   return (
     <Button
       variant="outline"
-      className="w-full"
+      className="w-full py-5"
       type="button"
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -13,7 +13,7 @@ export function GoogleAuthButton() {
           fill="currentColor"
         />
       </svg>
-      Entre com sua conta Google
+      Sign in with Google
     </Button>
   );
 }

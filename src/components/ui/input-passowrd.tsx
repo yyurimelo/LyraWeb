@@ -19,10 +19,10 @@ export function InputPassword({ id, field, error, isNormalInputPassword }: Props
 
   const checkStrength = (pass: string) => {
     const requirements = [
-      { regex: /.{8,}/, text: "Pelo menos 8 caracteres" },
-      { regex: /[0-9]/, text: "Pelo menos 1 número" },
-      { regex: /[a-z]/, text: "Pelo menos 1 letra minúscula" },
-      { regex: /[A-Z]/, text: "Pelo menos 1 letra maiúscula" },
+      { regex: /.{8,}/, text: "At least 8 characters" },
+      { regex: /[0-9]/, text: "At least 1 number" },
+      { regex: /[a-z]/, text: "At least 1 lowercase letter" },
+      { regex: /[A-Z]/, text: "At least 1 uppercase letter" },
     ];
     return requirements.map((req) => ({
       met: req.regex.test(pass),
@@ -45,10 +45,10 @@ export function InputPassword({ id, field, error, isNormalInputPassword }: Props
   };
 
   const getStrengthText = (score: number) => {
-    if (score === 0) return "Sua senha deve conter:";
-    if (score <= 2) return "Senha fraca";
-    if (score === 3) return "Senha média";
-    return "Senha forte";
+    if (score === 0) return "Your password must contain:";
+    if (score <= 2) return "Weak password";
+    if (score === 3) return "Medium password";
+    return "Strong password";
   };
 
   return (
@@ -59,7 +59,7 @@ export function InputPassword({ id, field, error, isNormalInputPassword }: Props
             id={id}
             className={`pe-9 ${error ? "border-destructive ring-destructive/20" : ""
               }`}
-            placeholder="Senha"
+            placeholder="Password"
             type={isVisible ? "text" : "password"}
             aria-invalid={!!error}
             aria-describedby={`${id}-description`}

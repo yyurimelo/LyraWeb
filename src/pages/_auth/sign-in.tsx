@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { InputPassword } from "@/components/ui/input-passowrd";
 import { toast } from "sonner";
-import { LoaderCircle } from "lucide-react";
+import { ArrowRight, LoaderCircle } from "lucide-react";
 
 const signInFormSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -82,9 +82,9 @@ function SignIn() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>E-mail</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} placeholder="john@example.com" />
                 </FormControl>
               </FormItem>
             )}
@@ -95,7 +95,7 @@ function SignIn() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Senha</FormLabel>
+                <FormLabel>Password</FormLabel>
                 <FormControl>
                   <InputPassword
                     id={id}
@@ -117,13 +117,18 @@ function SignIn() {
             {isLoading && (
               <LoaderCircle className="w-4 h-4 text-primary-foreground animate-spin mr-2" />
             )}
-            {isLoading ? isLoading : "Entrar"}
+            {isLoading ? isLoading : "Continue"}
+
+            {!isLoading && (
+              <ArrowRight className="h-4 w-4" />
+            )}
+
           </Button>
 
-          <div className="text-center text-sm">
-            Não possui uma conta?{" "}
-            <Link to="/sign-up" className="underline underline-offset-4">
-              Registre-se
+          <div className="text-center text-sm text-foreground/50">
+            Don't have an account?{" "}
+            <Link to="/sign-up" className="text-foreground hover:underline">
+              Sign up
             </Link>
           </div>
         </div>

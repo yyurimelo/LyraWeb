@@ -29,7 +29,7 @@ function InnerApp() {
 function App() {
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <Toaster />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>

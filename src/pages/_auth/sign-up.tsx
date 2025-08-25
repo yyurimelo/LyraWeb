@@ -33,6 +33,13 @@ type SignUpForm = z.infer<typeof signUpForm>;
 
 export const Route = createFileRoute('/_auth/sign-up')({
   component: SignUp,
+    head: () => ({
+    meta: [
+      {
+        title: 'Sign-up | Lyra Chat'
+      },
+    ],
+  }),
 })
 
 export function SignUp() {
@@ -73,9 +80,9 @@ export function SignUp() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome de usuário</FormLabel>
+              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} placeholder="John Doe"/>
               </FormControl>
             </FormItem>
           )}
@@ -86,9 +93,9 @@ export function SignUp() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>E-mail</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} placeholder="john@example.com"/>
               </FormControl>
             </FormItem>
           )}
@@ -99,7 +106,7 @@ export function SignUp() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Senha</FormLabel>
+              <FormLabel>Password</FormLabel>
               <FormControl>
                 <InputPassword
                   id={id}
@@ -116,7 +123,7 @@ export function SignUp() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirmar senha</FormLabel>
+              <FormLabel>Confirm password</FormLabel>
               <FormControl>
                 <InputPassword
                   id={id}
@@ -138,12 +145,12 @@ export function SignUp() {
           {isPending && (
             <LoaderCircle className="w-4 h-4 text-primary-foreground animate-spin mr-2" />
           )}
-          {isPending ? isPending : "Cadastrar"}
+          {isPending ? isPending : "Register"}
         </Button>
-        <div className="text-center text-sm">
-          Já tem uma conta?{" "}
-          <Link to="/sign-in" className="underline underline-offset-4">
-            Entrar
+        <div className="text-center text-sm text-foreground/50">
+          Already have an account?{" "}
+          <Link to="/sign-in" className="text-foreground hover:underline">
+            Sign in
           </Link>
         </div>
       </form>
