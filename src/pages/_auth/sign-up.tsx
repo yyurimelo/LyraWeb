@@ -1,13 +1,14 @@
 import z from "zod";
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useId, useState } from "react";
+import { useId } from "react";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { InputPassword } from "@/components/ui/input-passowrd";
+import { useCreateUserMutation } from "@/http/hooks/user.hooks";
 
 const signUpForm = z
   .object({
@@ -35,7 +36,7 @@ export const Route = createFileRoute('/_auth/sign-up')({
 })
 
 export function SignUp() {
-  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
   const id = useId();
 
   const form = useForm<SignUpForm>({
@@ -49,9 +50,13 @@ export function SignUp() {
 
   });
 
+  const { mutateAsync: createUserFn, isPending } = useCreateUserMutation()
+
   async function handleSubmit(data: SignUpForm) {
-    setIsLoading(true)
-    console.log(data)
+    await createUserFn({ ...data })
+    await navigate({
+      to: "/sign-in"
+    })
   }
 
 
@@ -125,15 +130,15 @@ export function SignUp() {
         />
 
         <Button
-          disabled={isLoading}
+          disabled={isPending}
           form={id}
           type="submit"
           className="w-full"
         >
-          {isLoading && (
+          {isPending && (
             <LoaderCircle className="w-4 h-4 text-primary-foreground animate-spin mr-2" />
           )}
-          {isLoading ? isLoading : "Cadastrar"}
+          {isPending ? isPending : "Cadastrar"}
         </Button>
         <div className="text-center text-sm">
           Já tem uma conta?{" "}

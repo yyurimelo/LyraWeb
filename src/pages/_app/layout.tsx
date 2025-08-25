@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button'
+import { Header } from '@/components/header'
 import { useAuth } from '@/contexts/auth-provider'
-import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Navigate, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: ({ context, location }) => {
@@ -17,34 +17,17 @@ export const Route = createFileRoute('/_app')({
 })
 
 export function AuthenticatedLayout() {
-  const navigate = useNavigate()
+  const { user } = useAuth()
 
-  const handleLogout = () => {
-    auth.logout()
-    navigate({
-      to: "/sign-in"
-    })
+  if (user === null) {
+    return <Navigate to='/sign-in' replace />
   }
 
 
-  const auth = useAuth()
-
   return (
-    <div>
-      <p>
-        Olá {auth.user?.name}
-      </p>
-      <p>
-        Você está na dashboard e está logado
-      </p>
-
+    <div className='flex flex-col min-h-dvh '>
+      <Header />
       <Outlet />
-
-      <div className='flex justify-end w-full'>
-        <Button onClick={handleLogout}>
-          Sair
-        </Button>
-      </div>
     </div>
   )
 

@@ -12,10 +12,10 @@ import { Route as rootRouteImport } from './pages/__root'
 import { Route as AuthenticatedRouteImport } from './pages/_authenticated'
 import { Route as AuthLayoutRouteImport } from './pages/_auth/layout'
 import { Route as AppLayoutRouteImport } from './pages/_app/layout'
-import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as AuthSignUpRouteImport } from './pages/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './pages/_auth/sign-in'
-import { Route as AppSettingsRouteImport } from './pages/_app/settings'
+import { Route as AppDashboardIndexRouteImport } from './pages/_app/_dashboard/index'
+import { Route as AppDashboardChar126SettingsIndexRouteImport } from './pages/_app/_dashboard/~/settings/index'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -29,11 +29,6 @@ const AppLayoutRoute = AppLayoutRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppLayoutRoute,
-} as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
@@ -44,48 +39,54 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
+  id: '/_dashboard/',
+  path: '/',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const AppDashboardChar126SettingsIndexRoute =
+  AppDashboardChar126SettingsIndexRouteImport.update({
+    id: '/_dashboard/~/settings/',
+    path: '/~/settings/',
+    getParentRoute: () => AppLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/settings': typeof AppSettingsRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
-  '/': typeof AppIndexRoute
+  '/': typeof AppDashboardIndexRoute
+  '/~/settings': typeof AppDashboardChar126SettingsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/settings': typeof AppSettingsRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
-  '/': typeof AppIndexRoute
+  '/': typeof AppDashboardIndexRoute
+  '/~/settings': typeof AppDashboardChar126SettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppLayoutRouteWithChildren
   '/_auth': typeof AuthLayoutRouteWithChildren
   '/_authenticated': typeof AuthenticatedRoute
-  '/_app/settings': typeof AppSettingsRoute
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
-  '/_app/': typeof AppIndexRoute
+  '/_app/_dashboard/': typeof AppDashboardIndexRoute
+  '/_app/_dashboard/~/settings/': typeof AppDashboardChar126SettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/settings' | '/sign-in' | '/sign-up' | '/'
+  fullPaths: '/sign-in' | '/sign-up' | '/' | '/~/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/settings' | '/sign-in' | '/sign-up' | '/'
+  to: '/sign-in' | '/sign-up' | '/' | '/~/settings'
   id:
     | '__root__'
     | '/_app'
     | '/_auth'
     | '/_authenticated'
-    | '/_app/settings'
     | '/_auth/sign-in'
     | '/_auth/sign-up'
-    | '/_app/'
+    | '/_app/_dashboard/'
+    | '/_app/_dashboard/~/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,13 +118,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/': {
-      id: '/_app/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppLayoutRoute
-    }
     '/_auth/sign-up': {
       id: '/_auth/sign-up'
       path: '/sign-up'
@@ -138,24 +132,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
-    '/_app/settings': {
-      id: '/_app/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
+    '/_app/_dashboard/': {
+      id: '/_app/_dashboard/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppDashboardIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/_dashboard/~/settings/': {
+      id: '/_app/_dashboard/~/settings/'
+      path: '/~/settings'
+      fullPath: '/~/settings'
+      preLoaderRoute: typeof AppDashboardChar126SettingsIndexRouteImport
       parentRoute: typeof AppLayoutRoute
     }
   }
 }
 
 interface AppLayoutRouteChildren {
-  AppSettingsRoute: typeof AppSettingsRoute
-  AppIndexRoute: typeof AppIndexRoute
+  AppDashboardIndexRoute: typeof AppDashboardIndexRoute
+  AppDashboardChar126SettingsIndexRoute: typeof AppDashboardChar126SettingsIndexRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
-  AppSettingsRoute: AppSettingsRoute,
-  AppIndexRoute: AppIndexRoute,
+  AppDashboardIndexRoute: AppDashboardIndexRoute,
+  AppDashboardChar126SettingsIndexRoute: AppDashboardChar126SettingsIndexRoute,
 }
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
