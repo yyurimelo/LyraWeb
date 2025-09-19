@@ -1,6 +1,6 @@
 import type { AuthFormModel } from '@/@types/auth/auth-form-model'
 import type { AuthUserDataModel } from '@/@types/auth/auth-user-data-model'
-import { authenticate, getLoggedUser } from '@/http/services/auth.service'
+import { authenticate, getLoggedUser, googleAuthenticate } from '@/http/services/auth.service'
 import { http } from '@lyra/axios-config'
 import { LoaderCircle } from 'lucide-react'
 import React, { createContext, useContext, useState, useEffect } from 'react'
@@ -12,6 +12,7 @@ interface AuthState {
   user: AuthUserDataModel | null
   login: (credentials: AuthFormModel) => Promise<void>;
   logout: () => void
+  loginWithGoogle: (googleAccessToken: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined)
@@ -73,8 +74,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('auth-token')
   }
 
+  const loginWithGoogle = async (email: string) => {
+    try {
+      const res = await googleAuthenticate(email);
+      const response = res;
+
+      setUser(response);
+      setIsAuthenticated(true);
+      localStorage.setItem("auth-token", response.token);
+      toast.success("Autenticado com Google!");
+    } catch (error: any) {
+      toast.error("Erro no login com Google");
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   )

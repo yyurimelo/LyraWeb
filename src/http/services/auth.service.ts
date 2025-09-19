@@ -21,6 +21,19 @@ export async function authenticate({
   }
   return response.data;
 }
+export async function googleAuthenticate(email: string): Promise<AuthUserDataModel> {
+  let response: any;
+  try {
+    response = await http.post(`${prefix}/google`, {
+      email,
+    });
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data);
+    }
+  }
+  return response.data;
+}
 
 export async function getLoggedUser(): Promise<AuthUserDataModel> {
   const response = await http.get(`${prefix}/me`);

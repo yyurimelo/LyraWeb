@@ -6,6 +6,7 @@ import { createHttp } from "@lyra/axios-config";
 import { env } from './env';
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "./contexts/auth-provider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const router = createRouter({
   routeTree, context: {
@@ -32,9 +33,11 @@ function App() {
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <Toaster />
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <InnerApp />
-        </AuthProvider>
+        <GoogleOAuthProvider clientId={env.VITE_GOOGLE_CLIENT_ID}>
+          <AuthProvider>
+            <InnerApp />
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )

@@ -26,7 +26,6 @@ export function AvatarImageUser({
   const colorUserPublic = appearancePrimaryColor
     ? oklchToHex(appearancePrimaryColor)
     : null;
-
   return (
     <>
       {src && alt ? (

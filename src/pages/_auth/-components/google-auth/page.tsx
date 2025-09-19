@@ -1,11 +1,40 @@
 import { Button } from "@/components/ui/button";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useAuth } from "@/contexts/auth-provider";
+import { useNavigate } from "@tanstack/react-router";
 
 export function GoogleAuthButton() {
+  const { loginWithGoogle } = useAuth();
+  const navigate = useNavigate()
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: {
+            Authorization: `Bearer ${tokenResponse.access_token}`,
+          },
+        });
+        const profile = await res.json();
+
+        await loginWithGoogle(profile.email);
+        navigate({
+          to: "/"
+        })
+      } catch (err) {
+        console.error("Erro ao processar login Google:", err);
+      }
+    },
+    onError: (err) => console.error("Erro no Google Login:", err),
+  });
+
+
   return (
     <Button
       variant="outline"
       className="w-full py-5"
       type="button"
+      onClick={() => googleLogin()}
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <path
