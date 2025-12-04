@@ -1,6 +1,7 @@
-import { queryClient, useMutation } from "@lyra/react-query-config";
-import { createUser } from "../services/user.service";
+import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
+import { createUser, getAllFriends } from "../services/user.service";
 import { toast } from "sonner";
+
 
 export const useCreateUserMutation = () =>
   useMutation({
@@ -15,3 +16,10 @@ export const useCreateUserMutation = () =>
       toast.error(error.message);
     },
   });
+
+
+export const useGetAllFriendsQuery = () =>
+  useQuery({
+    queryKey: ["chat"],
+    queryFn: () => getAllFriends(),
+  })

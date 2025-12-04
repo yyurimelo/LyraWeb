@@ -2,7 +2,7 @@ import { http, isAxiosError } from "@lyra/axios-config";
 import type { AuthFormModel } from "@/@types/auth/auth-form-model";
 import type { AuthUserDataModel } from "@/@types/auth/auth-user-data-model";
 
-const prefix = "/shared/auth";
+const prefix = "/auth";
 
 export async function authenticate({
   email,

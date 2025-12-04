@@ -13,7 +13,7 @@ export function Header() {
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center space-x-4">
           <div className="hidden md:block">
-            <LyraIcon height="h-7" />
+            <LyraIcon height="h-7 text-primary" />
           </div>
           <div className="hidden md:block h-6 w-px bg-border" />
           <HeaderFriends />
