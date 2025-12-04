@@ -135,7 +135,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
               <ChevronLeft className='text-foreground' />
             </Button>
           )}
-          <Avatar className="size-11 rounded-full transition-transform">
+          <Avatar className="size-11 rounded-full transition-transform mr-3">
             <AvatarImage
               src={selectedUser.AvatarUser}
               alt={selectedUser.name}
@@ -148,8 +148,8 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
               {getInitialName(selectedUser.name)}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h3 className="font-semibold ml-2">{selectedUser.name}</h3>
+          <div className="flex-1">
+            <h3 className="font-semibold">{selectedUser.name}</h3>
           </div>
         </div>
       </div>
