@@ -122,7 +122,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full max-h-full">
       {/* Header do chat */}
       <div className="p-4 border-b bg-background">
         <div className="flex items-center">
