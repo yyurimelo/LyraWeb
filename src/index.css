@@ -120,3 +120,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Esconder a barra de scroll mas manter a funcionalidade */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;     /* Firefox */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;             /* Safari and Chrome */
+  }
+}
+

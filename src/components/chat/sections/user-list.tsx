@@ -75,20 +75,15 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
   if (users.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-            <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </div>
-          <div className="text-muted-foreground text-sm">Nenhuma conversa encontrada</div>
+        <div className="flex flex-col items-center gap-2 mt-5">
+          <div className="text-muted-foreground text-sm">Nenhuma conversa, contato ou mensagem encontrada</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="overflow-y-auto h-full space-y-1 p-2">
+    <div className="overflow-y-auto h-full space-y-1 px-4 dark:[color-scheme:dark]">
       {users.map((user) => (
         <div
           key={user.id}
@@ -118,7 +113,7 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
           <div className="flex-1 min-w-0 ml-3">
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-2 min-w-0">
-                <h3 className="font-semibold text-foreground text-sm truncate">
+                <h3 className="font-mono text-foreground text-sm truncate">
                   {user.name}
                 </h3>
               </div>
@@ -132,7 +127,7 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
             <div className="flex items-center justify-between gap-2 -mt-1">
               <p className="text-sm text-muted-foreground truncate leading-relaxed">
                 {user.lastMessage
-                  ? user.lastMessage.slice(0, 45) + (user.lastMessage.length > 45 ? "..." : "")
+                  ? user.lastMessage.slice(0, 200) + (user.lastMessage.length > 45 ? "..." : "")
                   : user.description || <span className="text-muted-foreground/60">Sem mensagens</span>
                 }
               </p>

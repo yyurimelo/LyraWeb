@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { UserGetAllFriendsDataModel } from '../../../@types/user/user-get-all-friends'
 import { LyraIcon } from '@/components/logos/lyra-icon'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, ChevronDown } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitialName } from '@/lib/get-initial-name'
 
@@ -62,6 +62,9 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   const [messages, setMessages] = useState<MockMessage[]>(
     selectedUser ? mockMessages[selectedUser.id] || [] : []
   )
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const [showScrollButton, setShowScrollButton] = useState(false)
 
   // Atualizar mensagens quando o usuário selecionado mudar
   if (selectedUser && messages.length === 0) {
@@ -84,7 +87,6 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     setMessages([...messages, newMessage])
     setMessageInput('')
 
-    // Simular resposta após 1 segundo
     setTimeout(() => {
       const responseMessage: MockMessage = {
         id: (Date.now() + 1).toString(),
@@ -102,6 +104,39 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
       minute: '2-digit'
     })
   }
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  useEffect(() => {
+    if (selectedUser) {
+      scrollToBottom()
+    }
+  }, [selectedUser])
+
+  // Monitorar scroll para mostrar/esconder botão
+  useEffect(() => {
+    const container = messagesContainerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container
+      const threshold = 200 // pixels do final para considerar "no final"
+      const isAtBottom = scrollHeight - scrollTop <= clientHeight + threshold
+
+      setShowScrollButton(!isAtBottom)
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // verificação inicial
+
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [messages])
 
   if (!selectedUser) {
     return (
@@ -122,7 +157,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full max-h-full">
+    <div className="flex-1 flex flex-col h-full max-h-full no-scrollbar">
       {/* Header do chat */}
       <div className="p-4 border-b bg-background">
         <div className="flex items-center">
@@ -155,7 +190,10 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
       </div>
 
       {/* Área de mensagens */}
-      <div className="flex-1 overflow-y-auto p-4 bg-background">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 bg-background no-scrollbar relative"
+      >
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -181,8 +219,23 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
+
+        {/* Botão flutuante para rolar para baixo */}
       </div>
+
+        {showScrollButton && (
+          <Button
+            onClick={scrollToBottom}
+            size="icon"
+            variant="secondary"
+            className="absolute cursor-pointer bottom-25 right-4 size-10 rounded-full shadow-lg backdrop-blur-sm border hover:bg-background/70 transition-all duration-200 hover:scale-105 z-10"
+            aria-label="Rolar para o final"
+          >
+            <ChevronDown className="size-5 text-primary" />
+          </Button>
+        )}
 
       {/* Área de input de mensagem */}
       <div className="p-4 border-t bg-background">
