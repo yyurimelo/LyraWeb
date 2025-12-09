@@ -8,6 +8,7 @@ import { getInitialName } from '@/lib/get-initial-name'
 import { ChatUserDetails } from './chat-user-details'
 import { useGetMessagesQuery, useSendMessageMutation } from '@/http/hooks/message.hooks'
 import { useSignalRMessages } from '@/http/hooks/use-signalr-messages'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/auth-provider'
 
 interface ChatAreaProps {
@@ -21,6 +22,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   const [messageInput, setMessageInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const queryClient = useQueryClient()
   const [showScrollButton, setShowScrollButton] = useState(false)
   const { user } = useAuth()
 
@@ -37,23 +39,47 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   )
 
   // ---------------------------
-  // LIMPA MENSAGENS AO TROCAR DE USUÁRIO
+  // LIMPA E INVALIDA MENSAGENS AO TROCAR DE USUÁRIO
   // ---------------------------
   useEffect(() => {
     // Limpa as mensagens locais ao trocar de usuário
     setLocalMessages([])
-  }, [selectedUser?.id])
+
+    // Invalida o cache para forçar busca do servidor
+    if (selectedUser?.id) {
+      queryClient.invalidateQueries({
+        queryKey: ['messages', selectedUser.id]
+      })
+    }
+  }, [selectedUser?.id, queryClient])
 
   // ---------------------------
   // CARREGA MENSAGENS DO USUÁRIO SELECIONADO
   // ---------------------------
   useEffect(() => {
-    if (!messages || !selectedUser) return
-    setLocalMessages(() => {
-      // Usa as mensagens da API diretamente, já filtradas por usuário
-      return messages.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
-    })
-  }, [messages, selectedUser])
+    if (!selectedUser) return
+
+    // Pega as mensagens do cache do React Query (que podem incluir mensagens recebidas via SignalR)
+    const cachedMessages = queryClient.getQueryData<any[]>(['messages', selectedUser.id]) || []
+
+    // Se não tem mensagens da API ainda, usa só as do cache
+    if (!messages) {
+      setLocalMessages(cachedMessages.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()))
+      return
+    }
+
+    // Combina mensagens da API com as do cache, removendo duplicatas
+    const allMessageIds = new Set()
+    const combinedMessages = [...messages, ...cachedMessages]
+      .filter(msg => {
+        if (allMessageIds.has(msg.id)) return false
+        allMessageIds.add(msg.id)
+        return true
+      })
+      .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
+
+    setLocalMessages(combinedMessages)
+  }, [messages, selectedUser, queryClient])
 
   // ---------------------------
   // SIGNALR RECEBENDO MENSAGENS EM TEMPO REAL

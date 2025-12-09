@@ -104,21 +104,10 @@ export const useSendMessageMutation = () => {
         }
       )
 
-      // Atualiza a lista de amigos com a mensagem enviada
-      queryClient.setQueryData(['chat'], (oldFriends: any[] | undefined) => {
-        if (!oldFriends) return oldFriends
-
-        return oldFriends.map(friend => {
-          // Verifica se este amigo é o destinatário da mensagem
-          if (friend.id === variables.receiverId) {
-            return {
-              ...friend,
-              lastMessage: data.content,
-              lastMessageAt: data.sentAt
-            }
-          }
-          return friend
-        })
+      // Invalida a query para buscar novamente a lista do servidor
+      // Isso garante que a última mensagem seja atualizada corretamente
+      queryClient.invalidateQueries({
+        queryKey: ['chat']
       })
     },
     onSettled: (_data, error, variables) => {
