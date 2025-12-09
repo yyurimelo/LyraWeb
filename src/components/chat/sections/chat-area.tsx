@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronDown } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitialName } from '@/lib/get-initial-name'
+import { ChatUserDetails } from './chat-user-details'
 
 interface ChatAreaProps {
   selectedUser: UserGetAllFriendsDataModel | null
@@ -58,6 +59,7 @@ const mockMessages: Record<string, MockMessage[]> = {
 }
 
 export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps) {
+	const [open, setOpen] = useState(false)
   const [messageInput, setMessageInput] = useState('')
   const [messages, setMessages] = useState<MockMessage[]>(
     selectedUser ? mockMessages[selectedUser.id] || [] : []
@@ -138,6 +140,10 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     return () => container.removeEventListener('scroll', handleScroll)
   }, [messages])
 
+	function openUserDetails() {
+		setOpen(true)
+	}
+
   if (!selectedUser) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -159,11 +165,11 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   return (
     <div className="flex-1 flex flex-col h-full max-h-full no-scrollbar">
       {/* Header do chat */}
-      <div className="p-4 border-b bg-background">
+      <div className="p-4 border-b bg-background cursor-pointer" onClick={() => openUserDetails()}>
         <div className="flex items-center">
           {isMobile && onBackToList && (
             <Button
-              onClick={onBackToList}
+              onClick={(e) => { onBackToList(); e.stopPropagation(); }}
               size={"icon"}
               className="bg-transparent hover:bg-transparent shadow-none"
             >
@@ -257,6 +263,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
           </button>
         </div>
       </div>
+			<ChatUserDetails open={open} setOpen={setOpen} user={selectedUser} />
     </div>
   )
 }
