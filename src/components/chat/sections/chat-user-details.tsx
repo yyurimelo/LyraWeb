@@ -33,7 +33,7 @@ export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="w-24 h-24">
               <AvatarImage
-                src={user.AvatarUser}
+                src={user.avatarUser}
                 alt={user.name}
                 className="object-cover"
               />

@@ -1,7 +1,7 @@
 export type UserGetAllFriendsDataModel = {
   id: string;
   userIdentifier: string;
-  AvatarUser: string;
+  avatarUser: string;
   name: string;
   email: string;
   description: string;

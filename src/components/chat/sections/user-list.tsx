@@ -98,7 +98,7 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
 
           <Avatar className="size-11 rounded-full transition-transform">
             <AvatarImage
-              src={user.AvatarUser}
+              src={user.avatarUser}
               alt={user.name}
               className="object-cover"
             />

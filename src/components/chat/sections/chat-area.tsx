@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import type { UserGetAllFriendsDataModel } from '../../../@types/user/user-get-all-friends'
 import { LyraIcon } from '@/components/logos/lyra-icon'
 import { Button } from '@/components/ui/button'
@@ -6,6 +6,9 @@ import { ChevronLeft, ChevronDown } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitialName } from '@/lib/get-initial-name'
 import { ChatUserDetails } from './chat-user-details'
+import { useGetMessagesQuery, useSendMessageMutation } from '@/http/hooks/message.hooks'
+import { useSignalRMessages } from '@/http/hooks/use-signalr-messages'
+import { useAuth } from '@/contexts/auth-provider'
 
 interface ChatAreaProps {
   selectedUser: UserGetAllFriendsDataModel | null
@@ -13,136 +16,149 @@ interface ChatAreaProps {
   isMobile?: boolean
 }
 
-interface MockMessage {
-  id: string
-  content: string
-  sentAt: Date
-  isFromMe: boolean
-}
-
-// Mock de mensagens para demonstração
-const mockMessages: Record<string, MockMessage[]> = {
-  '1': [
-    {
-      id: '1',
-      content: 'Oi! Como você está?',
-      sentAt: new Date(Date.now() - 3600000),
-      isFromMe: false
-    },
-    {
-      id: '2',
-      content: 'Estou ótimo! E você?',
-      sentAt: new Date(Date.now() - 3000000),
-      isFromMe: true
-    },
-    {
-      id: '3',
-      content: 'Ótimo também! Quer conversar sobre o projeto?',
-      sentAt: new Date(Date.now() - 1800000),
-      isFromMe: false
-    }
-  ],
-  '2': [
-    {
-      id: '1',
-      content: 'Bom dia! Já viu o novo update?',
-      sentAt: new Date(Date.now() - 7200000),
-      isFromMe: true
-    },
-    {
-      id: '2',
-      content: 'Sim! Está muito bom, né?',
-      sentAt: new Date(Date.now() - 6000000),
-      isFromMe: false
-    }
-  ]
-}
-
 export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps) {
-	const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [messageInput, setMessageInput] = useState('')
-  const [messages, setMessages] = useState<MockMessage[]>(
-    selectedUser ? mockMessages[selectedUser.id] || [] : []
-  )
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const { user } = useAuth()
 
-  // Atualizar mensagens quando o usuário selecionado mudar
-  if (selectedUser && messages.length === 0) {
-    const userMessages = mockMessages[selectedUser.id] || []
-    if (userMessages.length > 0) {
-      setMessages(userMessages)
+  // ---------------------------
+  // ESTADO LOCAL PARA TODAS AS MENSAGENS (API + SignalR + otimistas)
+  // ---------------------------
+  const [localMessages, setLocalMessages] = useState<any[]>([])
+
+  // ---------------------------
+  // FETCH DAS MENSAGENS INICIAIS
+  // ---------------------------
+  const { data: messages = [], isLoading, error } = useGetMessagesQuery(
+    selectedUser?.id || null
+  )
+
+  // ---------------------------
+  // LIMPA MENSAGENS AO TROCAR DE USUÁRIO
+  // ---------------------------
+  useEffect(() => {
+    // Limpa as mensagens locais ao trocar de usuário
+    setLocalMessages([])
+  }, [selectedUser?.id])
+
+  // ---------------------------
+  // CARREGA MENSAGENS DO USUÁRIO SELECIONADO
+  // ---------------------------
+  useEffect(() => {
+    if (!messages || !selectedUser) return
+    setLocalMessages(() => {
+      // Usa as mensagens da API diretamente, já filtradas por usuário
+      return messages.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
+    })
+  }, [messages, selectedUser])
+
+  // ---------------------------
+  // SIGNALR RECEBENDO MENSAGENS EM TEMPO REAL
+  // ---------------------------
+  const handleMessageReceived = useCallback((incomingMessage: any) => {
+    // Só adiciona a mensagem se pertencer ao usuário selecionado
+    if (!selectedUser || (incomingMessage.senderId !== selectedUser.id && incomingMessage.receiverId !== selectedUser.id)) {
+      return
     }
-  }
+
+    setLocalMessages(prev => {
+      const exists = prev.some(m => m.id === incomingMessage.id)
+      if (exists) return prev
+      return [...prev, incomingMessage]
+    })
+  }, [selectedUser])
+
+  useSignalRMessages({ onMessage: handleMessageReceived })
+
+  const sendMessageMutation = useSendMessageMutation()
 
   const handleSendMessage = () => {
-    if (!messageInput.trim() || !selectedUser) return
+    if (!messageInput.trim() || !selectedUser || !user?.id) return
 
-    const newMessage: MockMessage = {
-      id: Date.now().toString(),
-      content: messageInput,
-      sentAt: new Date(),
-      isFromMe: true
-    }
-
-    setMessages([...messages, newMessage])
+    const messageContent = messageInput.trim()
     setMessageInput('')
 
-    setTimeout(() => {
-      const responseMessage: MockMessage = {
-        id: (Date.now() + 1).toString(),
-        content: 'Recebido! 😊',
-        sentAt: new Date(),
-        isFromMe: false
-      }
-      setMessages(prev => [...prev, responseMessage])
-    }, 1000)
+    // ---------------------------
+    // MENSAGEM OTIMISTA
+    // ---------------------------
+    const optimisticMessage = {
+      id: `temp-${Date.now()}`,
+      senderId: user.id,
+      receiverId: selectedUser.id,
+      content: messageContent,
+      sentAt: new Date().toISOString(),
+      isOptimistic: true
+    }
+
+    setLocalMessages(prev => [...prev, optimisticMessage])
+
+    // ENVIA PRO BACKEND
+    sendMessageMutation.mutate({
+      receiverId: String(selectedUser.id),
+      content: messageContent
+    })
   }
 
-  const formatMessageTime = (date: Date) => {
-    return date.toLocaleTimeString('pt-BR', {
+  const formatMessageTime = (date: string | Date) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    return dateObj.toLocaleTimeString('pt-BR', {
       hour: '2-digit',
       minute: '2-digit'
     })
   }
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  const scrollToBottom = (smooth: boolean = true) => {
+    messagesEndRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' })
+  }
+
+  const scrollToBottomInstant = () => {
+    scrollToBottom(false)
   }
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  useEffect(() => {
-    if (selectedUser) {
-      scrollToBottom()
-    }
+    if (selectedUser) scrollToBottomInstant()
   }, [selectedUser])
 
-  // Monitorar scroll para mostrar/esconder botão
+  // Scroll para baixo quando novas mensagens chegam (apenas se já estiver no final)
+  useEffect(() => {
+    if (!localMessages.length || !selectedUser) return
+
+    const container = messagesContainerRef.current
+    if (!container) return
+
+    const { scrollTop, scrollHeight, clientHeight } = container
+    const threshold = 100
+    const isAtBottom = scrollHeight - scrollTop <= clientHeight + threshold
+
+    // Apenas faz scroll se já estiver perto do final
+    if (isAtBottom) {
+      scrollToBottom(false) // Scroll instantâneo para novas mensagens
+    }
+  }, [localMessages, selectedUser])
+
   useEffect(() => {
     const container = messagesContainerRef.current
     if (!container) return
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container
-      const threshold = 200 // pixels do final para considerar "no final"
+      const threshold = 200
       const isAtBottom = scrollHeight - scrollTop <= clientHeight + threshold
-
       setShowScrollButton(!isAtBottom)
     }
 
     container.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll() // verificação inicial
+    handleScroll()
 
     return () => container.removeEventListener('scroll', handleScroll)
-  }, [messages])
+  }, []) // Removido localMessages do array de dependências
 
-	function openUserDetails() {
-		setOpen(true)
-	}
+  function openUserDetails() {
+    setOpen(true)
+  }
 
   if (!selectedUser) {
     return (
@@ -151,9 +167,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
           <div className="flex items-center justify-center">
             <LyraIcon height="size-20 text-primary" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">
-            Bem-vindo ao Lyra
-          </h2>
+          <h2 className="text-xl font-semibold mb-2">Bem-vindo ao Lyra</h2>
           <p className="text-muted-foreground">
             Selecione uma conversa da lista para começar a conversar
           </p>
@@ -164,31 +178,42 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
   return (
     <div className="flex-1 flex flex-col h-full max-h-full no-scrollbar">
-      {/* Header do chat */}
-      <div className="p-4 border-b bg-background cursor-pointer" onClick={() => openUserDetails()}>
+      {/* Header */}
+      <div
+        className="p-4 border-b bg-background cursor-pointer"
+        onClick={() => openUserDetails()}
+      >
         <div className="flex items-center">
           {isMobile && onBackToList && (
             <Button
-              onClick={(e) => { onBackToList(); e.stopPropagation(); }}
-              size={"icon"}
+              onClick={(e) => {
+                onBackToList()
+                e.stopPropagation()
+              }}
+              size="icon"
               className="bg-transparent hover:bg-transparent shadow-none"
             >
-              <ChevronLeft className='text-foreground' />
+              <ChevronLeft className="text-foreground" />
             </Button>
           )}
-          <Avatar className="size-11 rounded-full transition-transform mr-3">
+
+          <Avatar className="size-11 rounded-full mr-3">
             <AvatarImage
-              src={selectedUser.AvatarUser}
+              src={selectedUser.avatarUser}
               alt={selectedUser.name}
               className="object-cover"
             />
             <AvatarFallback
-              style={{ backgroundColor: selectedUser.appearancePrimaryColor || 'hsl(var(--primary))' }}
+              style={{
+                backgroundColor:
+                  selectedUser.appearancePrimaryColor || 'hsl(var(--primary))'
+              }}
               className="text-secondary-foreground font-semibold text-sm"
             >
               {getInitialName(selectedUser.name)}
             </AvatarFallback>
           </Avatar>
+
           <div className="flex-1">
             <h3 className="font-semibold">{selectedUser.name}</h3>
           </div>
@@ -200,50 +225,62 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 bg-background no-scrollbar relative"
       >
+        {isLoading && (
+          <div className="flex justify-center">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center text-destructive">
+            Erro ao carregar mensagens
+          </div>
+        )}
+
         <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.isFromMe ? 'justify-end' : 'justify-start'}`}
-            >
+          {localMessages.map((message) => {
+            const isFromMe = message.senderId === user?.id
+
+            return (
               <div
-                className={`
-                  max-w-xs lg:max-w-md px-4 py-2 rounded-2xl
-                  ${message.isFromMe
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-foreground border'
-                  }
-                `}
+                key={message.id}
+                className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}
               >
-                <p className="text-sm">{message.content}</p>
-                <p className={`
-                  text-xs mt-1 justify-end flex
-                  ${message.isFromMe ? 'text-primary-foreground/70' : 'text-muted-foreground'}
-                `}>
-                  {formatMessageTime(message.sentAt)}
-                </p>
+                <div
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                    isFromMe
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-foreground border'
+                  }`}
+                >
+                  <p className="text-sm">{message.content}</p>
+                  <p
+                    className={`text-xs mt-1 justify-end flex ${
+                      isFromMe ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {formatMessageTime(message.sentAt)}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Botão flutuante para rolar para baixo */}
-      </div>
-
         {showScrollButton && (
           <Button
-            onClick={scrollToBottom}
+            onClick={() => scrollToBottom(true)} // Scroll suave ao clicar no botão
             size="icon"
             variant="secondary"
-            className="absolute cursor-pointer bottom-25 right-4 size-10 rounded-full shadow-lg backdrop-blur-sm border hover:bg-background/70 transition-all duration-200 hover:scale-105 z-10"
-            aria-label="Rolar para o final"
+            className="absolute bottom-20 right-4 size-11 rounded-full shadow-lg backdrop-blur-sm bg-background/90 border hover:bg-background hover:scale-110 transition-all duration-200 z-20"
           >
             <ChevronDown className="size-5 text-primary" />
           </Button>
         )}
+      </div>
 
-      {/* Área de input de mensagem */}
+      {/* Input */}
       <div className="p-4 border-t bg-background">
         <div className="flex items-center space-x-2">
           <input
@@ -252,18 +289,23 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Digite uma mensagem..."
-            className="flex-1 px-4 py-2 border border-input rounded-full bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+            className="flex-1 px-4 py-2 border border-input rounded-full bg-background focus:ring-2 focus:ring-primary"
           />
+
           <button
             onClick={handleSendMessage}
-            disabled={!messageInput.trim()}
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors"
+            disabled={!messageInput.trim() || sendMessageMutation.isPending}
+            className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:bg-muted transition-colors flex items-center gap-2"
           >
+            {sendMessageMutation.isPending && (
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            )}
             Enviar
           </button>
         </div>
       </div>
-			<ChatUserDetails open={open} setOpen={setOpen} user={selectedUser} />
+
+      <ChatUserDetails open={open} setOpen={setOpen} user={selectedUser} />
     </div>
   )
 }
