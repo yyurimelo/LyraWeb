@@ -36,6 +36,5 @@ export async function getMessagesWithUser(
     }
   }
 
-  console.log('📡 Mensagens da API:', response.data);
   return response.data;
 }

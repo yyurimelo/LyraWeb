@@ -32,7 +32,7 @@ const formatLastMessageTime = (date: Date | string) => {
   const diffInHours = now.diff(messageDate, 'hour')
 
   if (diffInHours < 1) {
-    return "agora"
+    return "Agora"
   } else if (diffInHours < 24) {
     return `${diffInHours}h`
   } else {

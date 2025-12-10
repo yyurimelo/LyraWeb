@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useGetAllFriendsQuery } from '../../http/hooks/user.hooks'
-import { useAuth } from '@/contexts/auth-provider'
 
 import { UserList } from './sections/user-list'
 import { ChatArea } from './sections/chat-area'
@@ -16,7 +15,6 @@ export function ChatLayout({ className }: ChatLayoutProps) {
   const [isMobile, setIsMobile] = useState(false)
   const [currentView, setCurrentView] = useState<'list' | 'chat'>('list')
   const [searchQuery, setSearchQuery] = useState('')
-  const { user } = useAuth()
   const { data: friends, isLoading, error } = useGetAllFriendsQuery()
 
   // A lista de amigos será atualizada automaticamente pelo SignalR no ChatArea

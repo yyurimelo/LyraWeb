@@ -2,14 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import type { UserGetAllFriendsDataModel } from '../../../@types/user/user-get-all-friends'
 import { LyraIcon } from '@/components/logos/lyra-icon'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronDown, Wifi, WifiOff } from 'lucide-react'
+import { ChevronLeft, ChevronDown } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitialName } from '@/lib/get-initial-name'
 import { ChatUserDetails } from './chat-user-details'
 import { useGetMessagesQuery, useSendMessageMutation } from '@/http/hooks/message.hooks'
 import { useAuth } from '@/contexts/auth-provider'
 import { useSignalR } from '@/http/hooks/use-signalr-messages'
-import { ChatSkeleton } from './chat-skeleton'
 
 interface ChatAreaProps {
   selectedUser: UserGetAllFriendsDataModel | null
@@ -26,30 +25,17 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   const [showScrollButton, setShowScrollButton] = useState(false)
   const { user } = useAuth()
 
-  // ---------------------------
-  // SIGNALR CONNECTION
-  // ---------------------------
-  const { sendMessage, connectionState, isConnected } = useSignalR({
+  const { sendMessage } = useSignalR({
     userId: user?.id || '',
-    onMessage: (message) => {
-      // Message is automatically added to React Query cache in the hook
-      // No need for optimistic updates anymore
+    onMessage: () => {
     }
   })
 
-  // ---------------------------
-  // FETCH DAS MENSAGENS DO REACT QUERY (ÚNICA FONTE DA VERDADE)
-  // ---------------------------
-  const { data: messages = [], isPending, isFetching } = useGetMessagesQuery(
+  const { data: messages = [], isPending } = useGetMessagesQuery(
     selectedUser?.id || null
   )
 
-  // No more optimistic messages - messages come from React Query updated by SignalR
   const allMessages = messages
-
-  // ---------------------------
-  // COM SIGNALR - Sistema funciona via real-time updates
-  // ---------------------------
 
   const sendMessageMutation = useSendMessageMutation()
 
@@ -61,12 +47,9 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     setIsSending(true)
 
     try {
-      // Envia via SignalR hook (que usa HTTP API por baixo)
       await sendMessage(String(selectedUser.id), messageContent)
-      // A mensagem será recebida via SignalR e adicionada automaticamente ao cache
     } catch (error) {
       console.error('Error sending message:', error)
-      // Fallback para mutation se SignalR falhar
       await sendMessageMutation.mutateAsync({
         receiverId: String(selectedUser.id),
         content: messageContent
@@ -143,7 +126,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     handleScroll()
 
     return () => container.removeEventListener('scroll', handleScroll)
-  }, []) // Removido localMessages do array de dependências
+  }, [])
 
   function openUserDetails() {
     setOpen(true)
@@ -208,21 +191,6 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
           <div className="flex-1 flex items-center gap-2">
             <h3 className="font-semibold">{selectedUser.name}</h3>
-            {isFetching && allMessages.length > 0 && (
-              <div className="w-2 h-2 bg-primary/50 rounded-full animate-pulse" />
-            )}
-            {/* SignalR Connection Status */}
-            <div className="flex items-center gap-1">
-              {connectionState === 'connected' ? (
-                <Wifi className="w-4 h-4 text-green-500" title="Conectado" />
-              ) : connectionState === 'connecting' ? (
-                <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" title="Conectando..." />
-              ) : connectionState === 'reconnecting' ? (
-                <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" title="Reconectando..." />
-              ) : (
-                <WifiOff className="w-4 h-4 text-red-500" title="Desconectado" />
-              )}
-            </div>
           </div>
         </div>
       </div>

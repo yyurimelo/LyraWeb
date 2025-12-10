@@ -34,15 +34,12 @@ export const useGetMessagesQuery = (friendId: string | null) =>
     queryKey: ["messages", friendId],
     queryFn: async () => {
       const messages = friendId ? await getMessagesWithUser(friendId) : []
-      console.log('📋 useGetMessagesQuery - Mensagens carregadas da API:', messages.length, 'mensagens')
-      // Backend já ordena por data, então retornamos diretamente
       return messages
     },
     enabled: !!friendId,
     staleTime: 0, // Sempre considera desatualizado
     refetchOnWindowFocus: false, // Não refazer ao focar
     refetchOnMount: true, // Sempre refazer ao montar
-    cacheTime: 0, // Não manter cache
   })
 
 export const useSendMessageMutation = () =>
