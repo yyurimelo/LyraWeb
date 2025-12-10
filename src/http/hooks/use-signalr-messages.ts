@@ -1,114 +1,268 @@
-import { useEffect, useState, useCallback } from "react"
-import { HubConnectionBuilder, HubConnection, LogLevel } from "@microsoft/signalr"
-import { useQueryClient } from "@tanstack/react-query"
-import { useAuth } from "@/contexts/auth-provider"
-import type { MessageResponseDto } from "@/@types/signalr/hub-types"
+import { HubConnectionBuilder, LogLevel, HubConnection, HttpTransportType } from '@microsoft/signalr'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import type { MessageResponseDto } from '@/@types/message/message-types'
+import type { UserGetAllFriendsDataModel } from '@/@types/user/user-get-all-friends'
+import { queryClient } from '@lyra/react-query-config'
+import type { ConnectionState } from '@/@types/signalr/hub-types'
+import { toast } from 'sonner'
+import { sendMessage as sendMessageService } from '../services/message.service'
 
-interface UseSignalRMessagesProps {
-  onMessage?: (msg: MessageResponseDto) => void
+// Helper function to update last message in friends cache
+const updateFriendLastMessage = (message: MessageResponseDto, currentUserId: string) => {
+  queryClient.setQueryData<UserGetAllFriendsDataModel[]>(
+    ["chat"],
+    (oldFriends = []) => {
+      return oldFriends.map((friend) => {
+        // Check if this friend is either the sender or receiver of the message
+        const isFriendSender = friend.id === message.senderId
+        const isFriendReceiver = friend.id === message.receiverId
+
+        if (isFriendSender || isFriendReceiver) {
+          console.log(`📝 Updating last message for friend ${friend.name}:`, message.content)
+          return {
+            ...friend,
+            lastMessage: message.content,
+            lastMessageAt: message.sentAt
+          }
+        }
+
+        return friend
+      })
+    }
+  )
 }
 
-// Global references to ensure only one connection
-const globalConnectionRef = { current: null as HubConnection | null }
-const globalConnectionStateRef = { current: null as 'Disconnected' | 'Connecting' | 'Connected' | null }
-const subscribers = new Set<(msg: MessageResponseDto) => void>()
+interface UseSignalRProps {
+  userId: string
+  onMessage?: (message: MessageResponseDto) => void
+  onFriendUpdate?: (data: {
+    friendId: string
+    lastMessage: string
+    sentAt: string
+    senderId: string
+    receiverId: string
+  }) => void
+}
 
-export function useSignalRMessages({ onMessage }: UseSignalRMessagesProps = {}) {
-  const queryClient = useQueryClient()
-  const { user } = useAuth()
-  const [, forceUpdate] = useState({})
-  const token = typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null
+export function useSignalR({ userId, onMessage, onFriendUpdate }: UseSignalRProps) {
+  const connectionRef = useRef<HubConnection | null>(null)
+  const reconnectAttemptsRef = useRef(0)
+  const maxReconnectAttempts = 5
+  const isMountedRef = useRef(true)
+  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected')
+  const hasInitializedRef = useRef(false)
 
-  const getConnectionState = useCallback(() => {
-    return globalConnectionStateRef.current || 'Disconnected'
-  }, [])
+  const startConnection = useCallback(async () => {
+    if (!userId || !isMountedRef.current) return
 
-  const setConnectionState = useCallback((state: 'Disconnected' | 'Connecting' | 'Connected') => {
-    globalConnectionStateRef.current = state
-    forceUpdate({})
-  }, [])
+    // Get token from localStorage
+    const token = localStorage.getItem('auth-token')
+    if (!token) {
+      console.error('No auth token found in localStorage')
+      if (isMountedRef.current) setConnectionState('error')
+      return
+    }
 
-  // Subscribe to messages
-  useEffect(() => {
-    if (onMessage) {
-      subscribers.add(onMessage)
-      return () => {
-        subscribers.delete(onMessage)
+    // Stop existing connection if any
+    if (connectionRef.current) {
+      try {
+        await connectionRef.current.stop()
+        connectionRef.current = null
+      } catch (e) {
+        console.log('Error stopping existing connection:', e)
       }
     }
-  }, [onMessage])
 
-  useEffect(() => {
-    if (!token || globalConnectionRef.current) return // já conectado ou sem token
+    try {
+      if (isMountedRef.current) setConnectionState('connecting')
 
-    setConnectionState('Connecting')
+      const backendUrl = import.meta.env.VITE_API_URL
+      console.log(`Attempting to connect to SignalR at: ${backendUrl}/hubs/message`)
+      console.log('User ID:', userId)
+      console.log('Token exists:', !!token)
 
-    const signalRUrl = import.meta.env.VITE_API_URL.replace('/api', '')
-
-    const connection = new HubConnectionBuilder()
-      .withUrl(`${signalRUrl}/hubs/message`, {
-        accessTokenFactory: () => token
-      })
-      .withAutomaticReconnect()
-      .configureLogging(LogLevel.Information)
-      .build()
-
-    globalConnectionRef.current = connection
-
-    connection.onreconnecting(() => setConnectionState('Connecting'))
-    connection.onreconnected(() => setConnectionState('Connected'))
-    connection.onclose(() => {
-      setConnectionState('Disconnected')
-      globalConnectionRef.current = null
-    })
-
-    connection.on("ReceiveMessage", (msg: MessageResponseDto) => {
-      // Determina o friendId correto
-      const friendId = msg.senderId === user?.id ? msg.receiverId : msg.senderId
-
-      // Atualiza mensagens no React Query sem duplicar
-      queryClient.setQueryData(["messages", friendId], (old: MessageResponseDto[] | undefined) => {
-        if (!old) return [msg]
-        if (old.some(m => m.id === msg.id)) return old
-        return [...old, msg]
-      })
-
-      // Atualiza a lista de amigos com otimização local em vez de invalidar
-      queryClient.setQueryData(["chat"], (oldFriends: any[] | undefined) => {
-        if (!oldFriends) return oldFriends
-
-        return oldFriends.map(friend => {
-          // Verifica se este amigo é o remetente ou destinatário da mensagem
-          if (friend.id === msg.senderId || friend.id === msg.receiverId) {
-            return {
-              ...friend,
-              lastMessage: msg.content,
-              lastMessageAt: msg.sentAt
-            }
+      const connection = new HubConnectionBuilder()
+        .withUrl(`${backendUrl}/hubs/message`, {
+          accessTokenFactory: () => {
+            const currentToken = localStorage.getItem('auth-token')
+            console.log('Providing token for SignalR connection')
+            return currentToken || ''
+          },
+          transport: HttpTransportType.WebSockets | HttpTransportType.LongPolling
+        })
+        .withAutomaticReconnect({
+          nextRetryDelayInMilliseconds: retryContext => {
+            console.log(`SignalR retry attempt ${retryContext.previousRetryCount + 1}`)
+            return Math.min(1000 * Math.pow(2, retryContext.previousRetryCount), 30000)
           }
-          return friend
+        })
+        .configureLogging(LogLevel.Information)
+        .build();
+
+      // Event handlers
+      connection.onreconnecting(error => {
+        console.log('SignalR reconnecting... Error:', error)
+        if (isMountedRef.current) setConnectionState('reconnecting')
+      })
+
+      connection.onreconnected(connectionId => {
+        console.log('SignalR reconnected with connectionId:', connectionId)
+        if (isMountedRef.current) {
+          setConnectionState('connected')
+          reconnectAttemptsRef.current = 0
+        }
+      })
+
+      connection.onclose(error => {
+        console.log('SignalR connection closed. Error:', error)
+        if (isMountedRef.current) setConnectionState('disconnected')
+      })
+
+      // Listen for new messages
+      connection.on('ReceiveMessage', (message: MessageResponseDto) => {
+        console.log('📨 Received message via SignalR:', message)
+
+        // Update React Query cache
+        const isMyMessage = message.senderId === userId
+        const chatPartnerId = isMyMessage ? message.receiverId : message.senderId
+
+        // Update messages cache for the chat
+        queryClient.setQueryData<MessageResponseDto[]>(
+          ["messages", chatPartnerId],
+          (oldMessages = []) => {
+            // Check if message already exists
+            const messageExists = oldMessages.some(msg => msg.id === message.id)
+            if (messageExists) {
+              console.log('Message already exists, skipping...')
+              return oldMessages
+            }
+
+            console.log('Adding new message to cache:', message)
+            // Adiciona nova mensagem no final (backend já ordena por data)
+            return [...oldMessages, message]
+          }
+        )
+
+        // Update last message in friends list for real-time update
+        updateFriendLastMessage(message, userId)
+
+        // Call custom handler if provided
+        onMessage?.(message)
+      })
+
+      // Listen for friend list updates
+      connection.on('UpdateFriendLastMessage', (message: MessageResponseDto) => {
+        console.log('Friend last message updated:', message)
+
+        // Determine which friend to update based on the current user
+        const isMyMessage = message.senderId === userId
+        const friendId = isMyMessage ? message.receiverId : message.senderId
+
+        // Update last message in friends list for real-time update
+        updateFriendLastMessage(message, userId)
+
+        // Call custom handler if provided
+        onFriendUpdate?.({
+          friendId,
+          lastMessage: message.content,
+          sentAt: message.sentAt,
+          senderId: message.senderId,
+          receiverId: message.receiverId
         })
       })
 
-      // Notifica todos os subscribers
-      subscribers.forEach(callback => callback(msg))
-    })
+      // Start connection
+      console.log('Starting SignalR connection...')
+      await connection.start()
 
-    connection.start()
-      .then(() => setConnectionState('Connected'))
-      .catch(err => {
-        console.error("Erro ao conectar SignalR:", err)
-        setConnectionState('Disconnected')
+      if (isMountedRef.current) {
+        console.log('✅ SignalR connected successfully!')
+        setConnectionState('connected')
+        connectionRef.current = connection
+        reconnectAttemptsRef.current = 0
+      }
+
+    } catch (error) {
+      console.error('❌ Error starting SignalR connection:', error)
+      console.error('Connection error details:', {
+        name: error?.name,
+        message: error?.message,
+        statusCode: error?.statusCode
       })
 
-    return () => {
-      // Só limpa se não houver mais subscribers
-      if (subscribers.size === 0) {
-        connection.stop().catch(() => null)
-        globalConnectionRef.current = null
+      reconnectAttemptsRef.current++
+
+      if (isMountedRef.current) {
+        if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+          console.error('Max reconnection attempts reached')
+          setConnectionState('error')
+          toast.error('Falha ao conectar ao chat. Verifique sua conexão.')
+          // Reset counter after some time to allow retries
+          setTimeout(() => {
+            if (isMountedRef.current && connectionState === 'error') {
+              reconnectAttemptsRef.current = 0
+              console.log('Resetting reconnection attempts - retrying...')
+              startConnection()
+            }
+          }, 30000)
+        } else {
+          setConnectionState('disconnected')
+          console.log(`Retrying connection in ${5 * reconnectAttemptsRef.current} seconds...`)
+          // Retry after delay
+          setTimeout(() => {
+            if (isMountedRef.current) startConnection()
+          }, 5000 * reconnectAttemptsRef.current)
+        }
       }
     }
-  }, [token, user?.id, queryClient, setConnectionState])
+  }, [userId, onMessage, onFriendUpdate])
 
-  return { connectionState: getConnectionState() }
+  const stopConnection = useCallback(async () => {
+    if (connectionRef.current) {
+      try {
+        await connectionRef.current.stop()
+        console.log('SignalR connection stopped')
+      } catch (error) {
+        console.error('Error stopping SignalR connection:', error)
+      }
+      connectionRef.current = null
+    }
+    if (isMountedRef.current) setConnectionState('disconnected')
+  }, [])
+
+  // Initialize connection
+  useEffect(() => {
+    if (hasInitializedRef.current && connectionRef.current) {
+      console.log('📡 SignalR already initialized, skipping...')
+      return
+    }
+
+    isMountedRef.current = true
+
+    if (userId) {
+      console.log('📡 Initializing SignalR connection for userId:', userId)
+      hasInitializedRef.current = true
+      startConnection()
+    } else {
+      console.log('⚠️ No userId provided, skipping SignalR connection')
+    }
+
+    return () => {
+      console.log('🧹 Cleaning up SignalR connection...')
+      isMountedRef.current = false
+      hasInitializedRef.current = false
+      stopConnection()
+    }
+  }, [userId])
+
+  const sendMessage = async (receiverId: string, content: string) => {
+    // Send via HTTP API using the properly configured message service
+    return await sendMessageService({ receiverId, content })
+  }
+
+  return {
+    sendMessage,
+    connectionState,
+    isConnected: connectionState === 'connected'
+  }
 }

@@ -1,4 +1,4 @@
-import type { MessageResponseDto, SendMessageRequest } from "@/@types/signalr/hub-types";
+import type { MessageResponseDto, SendMessageRequest } from "@/@types/message/message-types";
 import { http, isAxiosError } from "@lyra/axios-config";
 
 const prefix = "/message";
@@ -36,5 +36,6 @@ export async function getMessagesWithUser(
     }
   }
 
+  console.log('📡 Mensagens da API:', response.data);
   return response.data;
 }

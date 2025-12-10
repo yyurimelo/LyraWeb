@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { UserGetAllFriendsDataModel } from '../../../@types/user/user-get-all-friends'
 import { LyraIcon } from '@/components/logos/lyra-icon'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronDown } from 'lucide-react'
+import { ChevronLeft, ChevronDown, Wifi, WifiOff } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitialName } from '@/lib/get-initial-name'
 import { ChatUserDetails } from './chat-user-details'
 import { useGetMessagesQuery, useSendMessageMutation } from '@/http/hooks/message.hooks'
-import { useSignalRMessages } from '@/http/hooks/use-signalr-messages'
-import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/auth-provider'
+import { useSignalR } from '@/http/hooks/use-signalr-messages'
+import { ChatSkeleton } from './chat-skeleton'
 
 interface ChatAreaProps {
   selectedUser: UserGetAllFriendsDataModel | null
@@ -20,112 +20,60 @@ interface ChatAreaProps {
 export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps) {
   const [open, setOpen] = useState(false)
   const [messageInput, setMessageInput] = useState('')
+  const [isSending, setIsSending] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
-  const queryClient = useQueryClient()
   const [showScrollButton, setShowScrollButton] = useState(false)
   const { user } = useAuth()
 
   // ---------------------------
-  // ESTADO LOCAL PARA TODAS AS MENSAGENS (API + SignalR + otimistas)
+  // SIGNALR CONNECTION
   // ---------------------------
-  const [localMessages, setLocalMessages] = useState<any[]>([])
+  const { sendMessage, connectionState, isConnected } = useSignalR({
+    userId: user?.id || '',
+    onMessage: (message) => {
+      // Message is automatically added to React Query cache in the hook
+      // No need for optimistic updates anymore
+    }
+  })
 
   // ---------------------------
-  // FETCH DAS MENSAGENS INICIAIS
+  // FETCH DAS MENSAGENS DO REACT QUERY (ÚNICA FONTE DA VERDADE)
   // ---------------------------
-  const { data: messages = [], isLoading, error } = useGetMessagesQuery(
+  const { data: messages = [], isPending, isFetching } = useGetMessagesQuery(
     selectedUser?.id || null
   )
 
-  // ---------------------------
-  // LIMPA E INVALIDA MENSAGENS AO TROCAR DE USUÁRIO
-  // ---------------------------
-  useEffect(() => {
-    // Limpa as mensagens locais ao trocar de usuário
-    setLocalMessages([])
-
-    // Invalida o cache para forçar busca do servidor
-    if (selectedUser?.id) {
-      queryClient.invalidateQueries({
-        queryKey: ['messages', selectedUser.id]
-      })
-    }
-  }, [selectedUser?.id, queryClient])
+  // No more optimistic messages - messages come from React Query updated by SignalR
+  const allMessages = messages
 
   // ---------------------------
-  // CARREGA MENSAGENS DO USUÁRIO SELECIONADO
+  // COM SIGNALR - Sistema funciona via real-time updates
   // ---------------------------
-  useEffect(() => {
-    if (!selectedUser) return
-
-    // Pega as mensagens do cache do React Query (que podem incluir mensagens recebidas via SignalR)
-    const cachedMessages = queryClient.getQueryData<any[]>(['messages', selectedUser.id]) || []
-
-    // Se não tem mensagens da API ainda, usa só as do cache
-    if (!messages) {
-      setLocalMessages(cachedMessages.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()))
-      return
-    }
-
-    // Combina mensagens da API com as do cache, removendo duplicatas
-    const allMessageIds = new Set()
-    const combinedMessages = [...messages, ...cachedMessages]
-      .filter(msg => {
-        if (allMessageIds.has(msg.id)) return false
-        allMessageIds.add(msg.id)
-        return true
-      })
-      .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
-
-    setLocalMessages(combinedMessages)
-  }, [messages, selectedUser, queryClient])
-
-  // ---------------------------
-  // SIGNALR RECEBENDO MENSAGENS EM TEMPO REAL
-  // ---------------------------
-  const handleMessageReceived = useCallback((incomingMessage: any) => {
-    // Só adiciona a mensagem se pertencer ao usuário selecionado
-    if (!selectedUser || (incomingMessage.senderId !== selectedUser.id && incomingMessage.receiverId !== selectedUser.id)) {
-      return
-    }
-
-    setLocalMessages(prev => {
-      const exists = prev.some(m => m.id === incomingMessage.id)
-      if (exists) return prev
-      return [...prev, incomingMessage]
-    })
-  }, [selectedUser])
-
-  useSignalRMessages({ onMessage: handleMessageReceived })
 
   const sendMessageMutation = useSendMessageMutation()
 
-  const handleSendMessage = () => {
-    if (!messageInput.trim() || !selectedUser || !user?.id) return
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || !selectedUser || !user?.id || isSending) return
 
     const messageContent = messageInput.trim()
     setMessageInput('')
+    setIsSending(true)
 
-    // ---------------------------
-    // MENSAGEM OTIMISTA
-    // ---------------------------
-    const optimisticMessage = {
-      id: `temp-${Date.now()}`,
-      senderId: user.id,
-      receiverId: selectedUser.id,
-      content: messageContent,
-      sentAt: new Date().toISOString(),
-      isOptimistic: true
+    try {
+      // Envia via SignalR hook (que usa HTTP API por baixo)
+      await sendMessage(String(selectedUser.id), messageContent)
+      // A mensagem será recebida via SignalR e adicionada automaticamente ao cache
+    } catch (error) {
+      console.error('Error sending message:', error)
+      // Fallback para mutation se SignalR falhar
+      await sendMessageMutation.mutateAsync({
+        receiverId: String(selectedUser.id),
+        content: messageContent
+      })
+    } finally {
+      setIsSending(false)
     }
-
-    setLocalMessages(prev => [...prev, optimisticMessage])
-
-    // ENVIA PRO BACKEND
-    sendMessageMutation.mutate({
-      receiverId: String(selectedUser.id),
-      content: messageContent
-    })
   }
 
   const formatMessageTime = (date: string | Date) => {
@@ -148,10 +96,26 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     if (selectedUser) scrollToBottomInstant()
   }, [selectedUser])
 
-  // Scroll para baixo quando novas mensagens chegam (apenas se já estiver no final)
+  // Scroll para baixo quando novas mensagens chegam
   useEffect(() => {
-    if (!localMessages.length || !selectedUser) return
+    if (!allMessages.length || !selectedUser) return
 
+    // Se for a primeira mensagem, sempre vai para o final
+    if (allMessages.length === 1) {
+      scrollToBottomInstant()
+      return
+    }
+
+    const lastMessage = allMessages[allMessages.length - 1]
+    const isMyMessage = lastMessage.senderId === user?.id
+
+    // Se for minha mensagem, sempre faz scroll
+    if (isMyMessage) {
+      scrollToBottom(false)
+      return
+    }
+
+    // Se for mensagem de outra pessoa, só faz scroll se já estiver perto do final
     const container = messagesContainerRef.current
     if (!container) return
 
@@ -159,11 +123,10 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     const threshold = 100
     const isAtBottom = scrollHeight - scrollTop <= clientHeight + threshold
 
-    // Apenas faz scroll se já estiver perto do final
     if (isAtBottom) {
-      scrollToBottom(false) // Scroll instantâneo para novas mensagens
+      scrollToBottom(false)
     }
-  }, [localMessages, selectedUser])
+  }, [allMessages, selectedUser, user?.id])
 
   useEffect(() => {
     const container = messagesContainerRef.current
@@ -171,7 +134,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container
-      const threshold = 200
+      const threshold = 100
       const isAtBottom = scrollHeight - scrollTop <= clientHeight + threshold
       setShowScrollButton(!isAtBottom)
     }
@@ -201,6 +164,9 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
       </div>
     )
   }
+
+  // Não mostra nada enquanto carrega - a tela só aparece quando os dados da API chegarem
+  if (isPending) return null
 
   return (
     <div className="flex-1 flex flex-col h-full max-h-full no-scrollbar">
@@ -240,8 +206,23 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
             </AvatarFallback>
           </Avatar>
 
-          <div className="flex-1">
+          <div className="flex-1 flex items-center gap-2">
             <h3 className="font-semibold">{selectedUser.name}</h3>
+            {isFetching && allMessages.length > 0 && (
+              <div className="w-2 h-2 bg-primary/50 rounded-full animate-pulse" />
+            )}
+            {/* SignalR Connection Status */}
+            <div className="flex items-center gap-1">
+              {connectionState === 'connected' ? (
+                <Wifi className="w-4 h-4 text-green-500" title="Conectado" />
+              ) : connectionState === 'connecting' ? (
+                <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" title="Conectando..." />
+              ) : connectionState === 'reconnecting' ? (
+                <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" title="Reconectando..." />
+              ) : (
+                <WifiOff className="w-4 h-4 text-red-500" title="Desconectado" />
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -251,20 +232,8 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 bg-background no-scrollbar relative"
       >
-        {isLoading && (
-          <div className="flex justify-center">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center text-destructive">
-            Erro ao carregar mensagens
-          </div>
-        )}
-
         <div className="space-y-4">
-          {localMessages.map((message) => {
+          {allMessages.map((message) => {
             const isFromMe = message.senderId === user?.id
 
             return (
@@ -320,10 +289,10 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
           <button
             onClick={handleSendMessage}
-            disabled={!messageInput.trim() || sendMessageMutation.isPending}
+            disabled={!messageInput.trim() || isSending}
             className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:bg-muted transition-colors flex items-center gap-2"
           >
-            {sendMessageMutation.isPending && (
+            {isSending && (
               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
             )}
             Enviar

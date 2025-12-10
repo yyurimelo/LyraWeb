@@ -1,19 +1,16 @@
-export interface MessageResponseDto {
-  id: string
-  senderId: string
-  senderName: string
-  receiverId: string
-  receiverName: string
-  content: string
-  sentAt: string
+import type { MessageResponseDto } from '../message/message-types'
+
+export interface MessageHub {
+  on(event: 'ReceiveMessage', callback: (message: MessageResponseDto) => void): void
+  on(event: 'UpdateFriendLastMessage', callback: (message: MessageResponseDto) => void): void
+  off(event: 'ReceiveMessage', callback: (message: MessageResponseDto) => void): void
+  off(event: 'UpdateFriendLastMessage', callback: (message: MessageResponseDto) => void): void
 }
 
-export interface SendMessageRequest {
-  receiverId: string
-  content: string
-}
-
-export interface SignalREventMap {
-  ReceiveMessage: (message: MessageResponseDto) => void
-  UpdateFriendList: () => void
+export enum ConnectionState {
+  Disconnected = 'disconnected',
+  Connecting = 'connecting',
+  Connected = 'connected',
+  Reconnecting = 'reconnecting',
+  Error = 'error'
 }

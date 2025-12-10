@@ -1,133 +1,74 @@
-import { useMutation, useQuery, useQueryClient } from '@lyra/react-query-config'
-import { getMessagesWithUser, sendMessage } from '../services/message.service'
+import { queryClient, useMutation, useQuery } from "@lyra/react-query-config"
+import { sendMessage, getMessagesWithUser } from "../services/message.service"
+import type { MessageResponseDto } from "@/@types/message/message-types"
+import type { UserGetAllFriendsDataModel } from "@/@types/user/user-get-all-friends"
+import { toast } from "sonner"
 
-import { toast } from 'sonner'
-import { useAuth } from '@/contexts/auth-provider'
-import type { MessageResponseDto, SendMessageRequest } from '@/@types/signalr/hub-types'
+// Helper function to update last message in friends cache
+const updateFriendLastMessage = (message: MessageResponseDto) => {
+  queryClient.setQueryData<UserGetAllFriendsDataModel[]>(
+    ["chat"],
+    (oldFriends = []) => {
+      return oldFriends.map((friend) => {
+        // Check if this friend is either the sender or receiver of the message
+        const isFriendSender = friend.id === message.senderId
+        const isFriendReceiver = friend.id === message.receiverId
 
-// Helper function to get user ID from token
-const getCurrentUserId = () => {
-  if (typeof window === 'undefined') return null
-  const token = localStorage.getItem('auth-token')
-  if (!token) return null
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload.nameid || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
-  } catch {
-    return null
-  }
-}
-
-export const useGetMessagesQuery = (friendId: string | null) => {
-  return useQuery({
-    queryKey: ['messages', friendId],
-    queryFn: () => friendId ? getMessagesWithUser(friendId) : [],
-    enabled: friendId !== null,
-    staleTime: 1000 * 60, // 1 minute
-    gcTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: false,
-  })
-}
-
-export const useSendMessageMutation = () => {
-  const queryClient = useQueryClient()
-  const { user } = useAuth()
-
-  return useMutation({
-    mutationFn: ({ receiverId, content }: SendMessageRequest) =>
-      sendMessage({ receiverId, content }),
-    onMutate: async (newMessage) => {
-      await queryClient.cancelQueries({
-        queryKey: ['messages', newMessage.receiverId]
-      })
-
-      const previousMessages = queryClient.getQueryData<MessageResponseDto[]>(
-        ['messages', newMessage.receiverId]
-      )
-
-      const optimisticMessage: MessageResponseDto = {
-        id: `temp-${Date.now()}-${Math.random()}`,
-        senderId: getCurrentUserId() || '',
-        senderName: user?.name || 'You',
-        receiverId: newMessage.receiverId,
-        receiverName: '',
-        content: newMessage.content,
-        sentAt: new Date().toISOString()
-      }
-
-      queryClient.setQueryData<MessageResponseDto[]>(
-        ['messages', newMessage.receiverId],
-        (old = []) => [...old, optimisticMessage]
-      )
-
-      // Atualiza a lista de amigos de forma otimista
-      queryClient.setQueryData(['chat'], (oldFriends: any[] | undefined) => {
-        if (!oldFriends) return oldFriends
-
-        return oldFriends.map(friend => {
-          // Verifica se este amigo é o destinatário da mensagem
-          if (friend.id === newMessage.receiverId) {
-            return {
-              ...friend,
-              lastMessage: newMessage.content,
-              lastMessageAt: optimisticMessage.sentAt
-            }
+        if (isFriendSender || isFriendReceiver) {
+          console.log(`📝 Updating last message for friend:`, message.content)
+          return {
+            ...friend,
+            lastMessage: message.content,
+            lastMessageAt: message.sentAt
           }
-          return friend
-        })
+        }
+
+        return friend
       })
+    }
+  )
+}
 
-      return {
-        previousMessages,
-        optimisticMessageId: optimisticMessage.id,
-        receiverId: newMessage.receiverId
-      }
+export const useGetMessagesQuery = (friendId: string | null) =>
+  useQuery({
+    queryKey: ["messages", friendId],
+    queryFn: async () => {
+      const messages = friendId ? await getMessagesWithUser(friendId) : []
+      console.log('📋 useGetMessagesQuery - Mensagens carregadas da API:', messages.length, 'mensagens')
+      // Backend já ordena por data, então retornamos diretamente
+      return messages
     },
-    onError: (_err, _newMessage, context) => {
-      if (context?.previousMessages) {
-        queryClient.setQueryData(
-          ['messages', context.receiverId],
-          context.previousMessages
-        )
-      }
-      toast.error('Falha ao enviar mensagem')
-    },
-    onSuccess: (data, variables, context) => {
+    enabled: !!friendId,
+    staleTime: 0, // Sempre considera desatualizado
+    refetchOnWindowFocus: false, // Não refazer ao focar
+    refetchOnMount: true, // Sempre refazer ao montar
+    cacheTime: 0, // Não manter cache
+  })
+
+export const useSendMessageMutation = () =>
+  useMutation({
+    mutationFn: sendMessage,
+    onSuccess: (newMessage) => {
+      // Update React Query cache with the new message
+      const receiverId = newMessage.receiverId
+
       queryClient.setQueryData<MessageResponseDto[]>(
-        ['messages', variables.receiverId],
-        (old = []) => {
-          // remove apenas a mensagem otimista referente a esta mutation
-          const filtered = old.filter(m => m.id !== context?.optimisticMessageId)
+        ["messages", receiverId],
+        (oldMessages = []) => {
+          // Check if message already exists to avoid duplicates
+          const messageExists = oldMessages.some(msg => msg.id === newMessage.id)
+          if (messageExists) return oldMessages
 
-          // adiciona a mensagem real
-          return [...filtered, data]
+          // Adiciona nova mensagem no final (backend já ordena por data)
+          return [...oldMessages, newMessage]
         }
       )
 
-      // Invalida a query para buscar novamente a lista do servidor
-      // Isso garante que a última mensagem seja atualizada corretamente
-      queryClient.invalidateQueries({
-        queryKey: ['chat']
-      })
+      // Update last message in friends list for real-time update
+      updateFriendLastMessage(newMessage)
     },
-    onSettled: (_data, error, variables) => {
-      if (error) {
-        queryClient.invalidateQueries({
-          queryKey: ['messages', variables.receiverId]
-        })
-      }
-    },
+    onError: (error) => {
+      toast.error("Falha ao enviar mensagem")
+      console.error("Error sending message:", error)
+    }
   })
-}
-
-export const useInfiniteMessagesQuery = (friendId: string | null) => {
-  return useQuery({
-    queryKey: ['messages', 'infinite', friendId],
-    queryFn: () => {
-      return friendId ? getMessagesWithUser(friendId) : []
-    },
-    enabled: !!friendId,
-    staleTime: 1000 * 60,
-    gcTime: 1000 * 60 * 5,
-  })
-}

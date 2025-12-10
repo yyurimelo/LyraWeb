@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useGetAllFriendsQuery } from '../../http/hooks/user.hooks'
+import { useAuth } from '@/contexts/auth-provider'
 
 import { UserList } from './sections/user-list'
 import { ChatArea } from './sections/chat-area'
 import { Input } from '@/components/ui/input'
 import type { UserGetAllFriendsDataModel } from '../../@types/user/user-get-all-friends'
-import { useSignalRMessages } from '@/http/hooks/use-signalr-messages'
 
 interface ChatLayoutProps {
   className?: string;
@@ -16,9 +16,10 @@ export function ChatLayout({ className }: ChatLayoutProps) {
   const [isMobile, setIsMobile] = useState(false)
   const [currentView, setCurrentView] = useState<'list' | 'chat'>('list')
   const [searchQuery, setSearchQuery] = useState('')
+  const { user } = useAuth()
   const { data: friends, isLoading, error } = useGetAllFriendsQuery()
 
-  const { connectionState } = useSignalRMessages()
+  // A lista de amigos será atualizada automaticamente pelo SignalR no ChatArea
   
   useEffect(() => {
     const checkMobile = () => {
@@ -73,25 +74,8 @@ export function ChatLayout({ className }: ChatLayoutProps) {
         ${isMobile && currentView !== 'list' ? 'hidden' : 'flex'}
       `}>
         <div className="p-4 flex-shrink-0 mb-3">
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3">
             <h2 className="text-xl font-semibold">Conversas</h2>
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${
-                connectionState === 'Connected'
-                  ? 'bg-green-500'
-                  : connectionState === 'Connecting'
-                  ? 'bg-yellow-500 animate-pulse'
-                  : 'bg-red-500'
-              }`}></div>
-              <span className="text-xs text-muted-foreground">
-                {connectionState === 'Connected'
-                  ? 'Conectado'
-                  : connectionState === 'Connecting'
-                  ? 'Conectando...'
-                  : 'Desconectado'
-                }
-              </span>
-            </div>
           </div>
           <div className="relative">
             <Input
