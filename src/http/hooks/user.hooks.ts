@@ -1,5 +1,5 @@
 import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
-import { createUser, getAllFriends } from "../services/user.service";
+import { createUser, getAllFriends, getUser } from "../services/user.service";
 import { toast } from "sonner";
 
 
@@ -23,3 +23,9 @@ export const useGetAllFriendsQuery = () =>
     queryKey: ["chat"],
     queryFn: () => getAllFriends(),
   })
+
+export const useGetUserQuery = (userId: string) => useQuery({
+  queryKey: ["user-details", userId],
+  queryFn: () => getUser(userId),
+  enabled: userId !== null,
+});

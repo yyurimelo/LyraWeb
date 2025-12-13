@@ -30,3 +30,9 @@ export async function getAllFriends(): Promise<UserGetAllFriendsDataModel> {
 
   return response.data;
 }
+
+export async function getUser(id: string): Promise<UserDataModel> {
+  const response = await http.get(`${prefix}/get/${id}`);
+  return response.data;
+}
+

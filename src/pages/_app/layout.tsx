@@ -24,11 +24,14 @@ export function AuthenticatedLayout() {
   }
 
 
-  return (
-    <div className='flex flex-col h-dvh overflow-hidden'>
-      <Header />
+return (
+  <div className="flex flex-col h-dvh">
+    <Header />
+    <main className="flex-1 overflow-y-auto">
       <Outlet />
-    </div>
-  )
+    </main>
+  </div>
+)
+
 
 }

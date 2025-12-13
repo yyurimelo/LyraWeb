@@ -17,7 +17,7 @@ import { Route as AuthSignInRouteImport } from './pages/_auth/sign-in'
 import { Route as AppDashboardIndexRouteImport } from './pages/_app/_dashboard/index'
 import { Route as AppDashboardChar126SettingsLayoutRouteImport } from './pages/_app/_dashboard/~/settings/layout'
 import { Route as AppDashboardChar126SettingsRequestsIndexRouteImport } from './pages/_app/_dashboard/~/settings/requests/index'
-import { Route as AppDashboardChar126SettingsGeneralIndexRouteImport } from './pages/_app/_dashboard/~/settings/general/index'
+import { Route as AppDashboardChar126SettingsProfileIndexRouteImport } from './pages/_app/_dashboard/~/settings/profile/index'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -58,10 +58,10 @@ const AppDashboardChar126SettingsRequestsIndexRoute =
     path: '/requests/',
     getParentRoute: () => AppDashboardChar126SettingsLayoutRoute,
   } as any)
-const AppDashboardChar126SettingsGeneralIndexRoute =
-  AppDashboardChar126SettingsGeneralIndexRouteImport.update({
-    id: '/general/',
-    path: '/general/',
+const AppDashboardChar126SettingsProfileIndexRoute =
+  AppDashboardChar126SettingsProfileIndexRouteImport.update({
+    id: '/profile/',
+    path: '/profile/',
     getParentRoute: () => AppDashboardChar126SettingsLayoutRoute,
   } as any)
 
@@ -70,7 +70,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof AuthSignUpRoute
   '/': typeof AppDashboardIndexRoute
   '/~/settings': typeof AppDashboardChar126SettingsLayoutRouteWithChildren
-  '/~/settings/general': typeof AppDashboardChar126SettingsGeneralIndexRoute
+  '/~/settings/profile': typeof AppDashboardChar126SettingsProfileIndexRoute
   '/~/settings/requests': typeof AppDashboardChar126SettingsRequestsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -78,7 +78,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof AuthSignUpRoute
   '/': typeof AppDashboardIndexRoute
   '/~/settings': typeof AppDashboardChar126SettingsLayoutRouteWithChildren
-  '/~/settings/general': typeof AppDashboardChar126SettingsGeneralIndexRoute
+  '/~/settings/profile': typeof AppDashboardChar126SettingsProfileIndexRoute
   '/~/settings/requests': typeof AppDashboardChar126SettingsRequestsIndexRoute
 }
 export interface FileRoutesById {
@@ -90,7 +90,7 @@ export interface FileRoutesById {
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_app/_dashboard/': typeof AppDashboardIndexRoute
   '/_app/_dashboard/~/settings': typeof AppDashboardChar126SettingsLayoutRouteWithChildren
-  '/_app/_dashboard/~/settings/general/': typeof AppDashboardChar126SettingsGeneralIndexRoute
+  '/_app/_dashboard/~/settings/profile/': typeof AppDashboardChar126SettingsProfileIndexRoute
   '/_app/_dashboard/~/settings/requests/': typeof AppDashboardChar126SettingsRequestsIndexRoute
 }
 export interface FileRouteTypes {
@@ -100,7 +100,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/'
     | '/~/settings'
-    | '/~/settings/general'
+    | '/~/settings/profile'
     | '/~/settings/requests'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -108,7 +108,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/'
     | '/~/settings'
-    | '/~/settings/general'
+    | '/~/settings/profile'
     | '/~/settings/requests'
   id:
     | '__root__'
@@ -119,7 +119,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-up'
     | '/_app/_dashboard/'
     | '/_app/_dashboard/~/settings'
-    | '/_app/_dashboard/~/settings/general/'
+    | '/_app/_dashboard/~/settings/profile/'
     | '/_app/_dashboard/~/settings/requests/'
   fileRoutesById: FileRoutesById
 }
@@ -187,25 +187,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardChar126SettingsRequestsIndexRouteImport
       parentRoute: typeof AppDashboardChar126SettingsLayoutRoute
     }
-    '/_app/_dashboard/~/settings/general/': {
-      id: '/_app/_dashboard/~/settings/general/'
-      path: '/general'
-      fullPath: '/~/settings/general'
-      preLoaderRoute: typeof AppDashboardChar126SettingsGeneralIndexRouteImport
+    '/_app/_dashboard/~/settings/profile/': {
+      id: '/_app/_dashboard/~/settings/profile/'
+      path: '/profile'
+      fullPath: '/~/settings/profile'
+      preLoaderRoute: typeof AppDashboardChar126SettingsProfileIndexRouteImport
       parentRoute: typeof AppDashboardChar126SettingsLayoutRoute
     }
   }
 }
 
 interface AppDashboardChar126SettingsLayoutRouteChildren {
-  AppDashboardChar126SettingsGeneralIndexRoute: typeof AppDashboardChar126SettingsGeneralIndexRoute
+  AppDashboardChar126SettingsProfileIndexRoute: typeof AppDashboardChar126SettingsProfileIndexRoute
   AppDashboardChar126SettingsRequestsIndexRoute: typeof AppDashboardChar126SettingsRequestsIndexRoute
 }
 
 const AppDashboardChar126SettingsLayoutRouteChildren: AppDashboardChar126SettingsLayoutRouteChildren =
   {
-    AppDashboardChar126SettingsGeneralIndexRoute:
-      AppDashboardChar126SettingsGeneralIndexRoute,
+    AppDashboardChar126SettingsProfileIndexRoute:
+      AppDashboardChar126SettingsProfileIndexRoute,
     AppDashboardChar126SettingsRequestsIndexRoute:
       AppDashboardChar126SettingsRequestsIndexRoute,
   }
