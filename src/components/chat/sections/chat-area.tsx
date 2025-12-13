@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import type { UserGetAllFriendsDataModel } from '../../../@types/user/user-get-all-friends'
 import { LyraIcon } from '@/components/logos/lyra-icon'
 import { Button } from '@/components/ui/button'
@@ -25,15 +25,19 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   const [showScrollButton, setShowScrollButton] = useState(false)
   const { user } = useAuth()
 
+  const hasInitialScrollRef = useRef(false)
+
+  const lastScrollTopRef = useRef(0)
+
+  const { data: messages, isPending, isFetched } = useGetMessagesQuery(
+    selectedUser?.id ?? null
+  )
+
   const { sendMessage } = useSignalR({
     userId: user?.id || '',
-    onMessage: () => {
-    }
+    enabled: isFetched, // 👈 só depois da API
   })
 
-  const { data: messages = [], isPending } = useGetMessagesQuery(
-    selectedUser?.id || null
-  )
 
   const allMessages = messages
 
@@ -68,7 +72,13 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   }
 
   const scrollToBottom = (smooth: boolean = true) => {
-    messagesEndRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' })
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: smooth ? 'smooth' : 'auto',
+        block: 'end',
+        inline: 'nearest'
+      })
+    }
   }
 
   const scrollToBottomInstant = () => {
@@ -76,32 +86,23 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   }
 
   useEffect(() => {
-    if (selectedUser) scrollToBottomInstant()
-  }, [selectedUser])
+    if (!selectedUser || allMessages?.length === 0) return
 
-  // Scroll para baixo quando novas mensagens chegam
-  useEffect(() => {
-    if (!allMessages.length || !selectedUser) return
+    const container = messagesContainerRef.current
+    if (!container) return
 
-    // Se for a primeira mensagem, sempre vai para o final
-    if (allMessages.length === 1) {
-      scrollToBottomInstant()
-      return
-    }
+    if (!allMessages || allMessages.length === 0) return
 
     const lastMessage = allMessages[allMessages.length - 1]
     const isMyMessage = lastMessage.senderId === user?.id
 
-    // Se for minha mensagem, sempre faz scroll
+    // Sempre rola se for minha mensagem
     if (isMyMessage) {
       scrollToBottom(false)
       return
     }
 
-    // Se for mensagem de outra pessoa, só faz scroll se já estiver perto do final
-    const container = messagesContainerRef.current
-    if (!container) return
-
+    // Se for mensagem recebida, só rola se estiver perto do final
     const { scrollTop, scrollHeight, clientHeight } = container
     const threshold = 100
     const isAtBottom = scrollHeight - scrollTop <= clientHeight + threshold
@@ -109,7 +110,22 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     if (isAtBottom) {
       scrollToBottom(false)
     }
-  }, [allMessages, selectedUser, user?.id])
+  }, [allMessages?.length, selectedUser?.id, user?.id])
+
+  useLayoutEffect(() => {
+    if (!selectedUser) return
+    if (!allMessages || allMessages.length === 0) return
+
+    if (!hasInitialScrollRef.current) {
+      scrollToBottomInstant()
+      hasInitialScrollRef.current = true
+    }
+  }, [selectedUser?.id, allMessages?.length])
+
+  useEffect(() => {
+    hasInitialScrollRef.current = false
+  }, [selectedUser?.id])
+
 
   useEffect(() => {
     const container = messagesContainerRef.current
@@ -117,19 +133,63 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container
-      const threshold = 100
-      const isAtBottom = scrollHeight - scrollTop <= clientHeight + threshold
-      setShowScrollButton(!isAtBottom)
+
+      // Se não tiver scroll, nunca mostra o botão
+      if (scrollHeight <= clientHeight) {
+        setShowScrollButton(false)
+        lastScrollTopRef.current = scrollTop
+        return
+      }
+
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight
+      const thresholdFromBottom = 80
+
+      const isScrollingUp = scrollTop < lastScrollTopRef.current
+
+      // Só mostra se:
+      // 1. Usuário estiver SUBINDO
+      // 2. Estiver afastado do final
+      if (isScrollingUp && distanceFromBottom > thresholdFromBottom) {
+        setShowScrollButton(true)
+      }
+
+      // Esconde automaticamente quando chega no final
+      if (distanceFromBottom <= thresholdFromBottom) {
+        setShowScrollButton(false)
+      }
+
+      lastScrollTopRef.current = scrollTop
     }
 
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
 
-    return () => container.removeEventListener('scroll', handleScroll)
-  }, [])
+    // Adiciona um delay inicial para garantir que o container tenha conteúdo
+    const initialTimer = setTimeout(() => {
+      handleScroll()
+      container.addEventListener('scroll', handleScroll, { passive: true })
+    }, 100)
+
+    // Também recalcula quando as mensagens mudam
+    const messagesTimer = setTimeout(() => {
+      handleScroll()
+    }, 300)
+
+    return () => {
+      clearTimeout(initialTimer)
+      clearTimeout(messagesTimer)
+      container.removeEventListener('scroll', handleScroll)
+    }
+  }, [allMessages?.length, selectedUser]) // Adiciona selectedUser para recalcular ao mudar de conversa
 
   function openUserDetails() {
     setOpen(true)
+  }
+
+  if (isPending || !messages) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <span className="text-muted-foreground">Carregando conversa...</span>
+      </div>
+    )
   }
 
   if (!selectedUser) {
@@ -148,8 +208,11 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     )
   }
 
-  // Não mostra nada enquanto carrega - a tela só aparece quando os dados da API chegarem
-  if (isPending) return null
+  if (isPending) {
+    <div className='bg-red-500 h-screen w-screen'>
+      OI
+    </div>
+  }
 
   return (
     <div className="flex-1 flex flex-col h-full max-h-full no-scrollbar">
@@ -201,7 +264,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
         className="flex-1 overflow-y-auto p-4 bg-background no-scrollbar relative"
       >
         <div className="space-y-4">
-          {allMessages.map((message) => {
+          {messages?.map((message) => {
             const isFromMe = message.senderId === user?.id
 
             return (
@@ -210,17 +273,15 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
                 className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                    isFromMe
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground border'
-                  }`}
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${isFromMe
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-foreground border'
+                    }`}
                 >
                   <p className="text-sm">{message.content}</p>
                   <p
-                    className={`text-xs mt-1 justify-end flex ${
-                      isFromMe ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                    }`}
+                    className={`text-xs mt-1 justify-end flex ${isFromMe ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                      }`}
                   >
                     {formatMessageTime(message.sentAt)}
                   </p>
@@ -230,18 +291,19 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
           })}
           <div ref={messagesEndRef} />
         </div>
-
-        {showScrollButton && (
-          <Button
-            onClick={() => scrollToBottom(true)} // Scroll suave ao clicar no botão
-            size="icon"
-            variant="secondary"
-            className="absolute bottom-20 right-4 size-11 rounded-full shadow-lg backdrop-blur-sm bg-background/90 border hover:bg-background hover:scale-110 transition-all duration-200 z-20"
-          >
-            <ChevronDown className="size-5 text-primary" />
-          </Button>
-        )}
       </div>
+
+      {showScrollButton && (
+        <Button
+          onClick={() => scrollToBottom(true)}
+          size="icon"
+          variant="secondary"
+          className="absolute bottom-25 right-4 size-12 rounded-full shadow-lg backdrop-blur-sm bg-background/90 border border-border hover:bg-background hover:scale-110 transition-all duration-200 z-50"
+          aria-label="Rolar para baixo"
+        >
+          <ChevronDown className="size-6 text-primary" />
+        </Button>
+      )}
 
       {/* Input */}
       <div className="p-4 border-t bg-background">

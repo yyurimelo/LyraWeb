@@ -32,6 +32,7 @@ const updateFriendLastMessage = (message: MessageResponseDto) => {
 
 interface UseSignalRProps {
   userId: string
+  enabled?: boolean
   onMessage?: (message: MessageResponseDto) => void
   onFriendUpdate?: (data: {
     friendId: string
@@ -42,13 +43,24 @@ interface UseSignalRProps {
   }) => void
 }
 
-export function useSignalR({ userId, onMessage, onFriendUpdate }: UseSignalRProps) {
+export function useSignalR({ userId, onMessage, onFriendUpdate, enabled }: UseSignalRProps) {
   const connectionRef = useRef<HubConnection | null>(null)
   const reconnectAttemptsRef = useRef(0)
   const maxReconnectAttempts = 5
   const isMountedRef = useRef(true)
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.Disconnected)
   const hasInitializedRef = useRef(false)
+
+  useEffect(() => {
+    if (!enabled) return
+    if (!userId) return
+
+    startConnection()
+
+    return () => {
+      stopConnection()
+    }
+  }, [userId, enabled])
 
   const startConnection = useCallback(async () => {
     if (!userId || !isMountedRef.current) return
@@ -122,13 +134,12 @@ export function useSignalR({ userId, onMessage, onFriendUpdate }: UseSignalRProp
         queryClient.setQueryData<MessageResponseDto[]>(
           ["messages", chatPartnerId],
           (oldMessages = []) => {
-            // Check if message already exists
-            const messageExists = oldMessages.some(msg => msg.id === message.id)
-            if (messageExists) {
-              return oldMessages
-            }
+            // Se ainda não veio a lista completa, não mexe
+            if (oldMessages.length === 0) return oldMessages
 
-            // Adiciona nova mensagem no final (backend já ordena por data)
+            const exists = oldMessages.some(m => m.id === message.id)
+            if (exists) return oldMessages
+
             return [...oldMessages, message]
           }
         )
