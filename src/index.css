@@ -131,5 +131,73 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;             /* Safari and Chrome */
   }
+
+  /* Scrollbar personalizado com cores do tema */
+  .custom-scrollbar {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-foreground) var(--background);
+  }
+
+  /* Chrome, Safari, Edge */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--background);
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--secondary-foreground);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-foreground);
+    opacity: 0.8;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background: var(--secondary-foreground);
+    opacity: 0.6;
+  }
+
+  /* Scrollbar personalizado mais fino */
+  .custom-scrollbar-thin {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-foreground) var(--background);
+  }
+
+  /* Chrome, Safari, Edge */
+  .custom-scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar-thin::-webkit-scrollbar-track {
+    background: var(--background);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--secondary-foreground);
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+
+  .custom-scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-foreground);
+    opacity: 0.8;
+  }
+
+  .custom-scrollbar-thin::-webkit-scrollbar-thumb:active {
+    background: var(--secondary-foreground);
+    opacity: 0.6;
+  }
 }
 
