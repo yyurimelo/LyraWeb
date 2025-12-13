@@ -191,9 +191,9 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
           <div className="flex items-center justify-center">
             <LyraIcon height="size-20 text-primary" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Bem-vindo ao Lyra</h2>
+          <h2 className="text-xl font-semibold mb-2">Welcome to Lyra</h2>
           <p className="text-muted-foreground">
-            Selecione uma conversa da lista para começar a conversar
+            Select a conversation from the list to start chatting.
           </p>
         </div>
       </div>

@@ -73,11 +73,11 @@ export function ChatLayout({ className }: ChatLayoutProps) {
       `}>
         <div className="p-4 flex-shrink-0 mb-3">
           <div className="mb-3">
-            <h2 className="text-xl font-semibold">Conversas</h2>
+            <h2 className="text-xl font-semibold">Chats</h2>
           </div>
           <div className="relative">
             <Input
-              placeholder="Buscar conversas..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pr-10" // espaço pro icon

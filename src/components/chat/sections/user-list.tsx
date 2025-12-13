@@ -26,24 +26,37 @@ interface UserListProps {
   error: any
 }
 
+const pluralize = (value: number, singular: string) => {
+  return value === 1 ? singular : `${singular}s`
+}
+
 const formatLastMessageTime = (date: Date | string) => {
   const messageDate = dayjs(date)
   const now = dayjs()
-  const diffInHours = now.diff(messageDate, 'hour')
 
-  if (diffInHours < 1) {
-    return "Agora"
-  } else if (diffInHours < 24) {
-    return `${diffInHours}h`
-  } else {
-    const diffInDays = now.diff(messageDate, 'day')
-    if (diffInDays < 7) {
-      return `${diffInDays}d`
-    } else {
-      return messageDate.format('DD/MM')
-    }
+  const diffInMinutes = now.diff(messageDate, 'minute')
+  const diffInHours = now.diff(messageDate, 'hour')
+  const diffInDays = now.diff(messageDate, 'day')
+
+  if (diffInMinutes < 1) {
+    return 'Now'
   }
+
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} ${pluralize(diffInMinutes, 'minute')}`
+  }
+
+  if (diffInHours < 24) {
+    return `${diffInHours} ${pluralize(diffInHours, 'hour')}`
+  }
+
+  if (diffInDays < 7) {
+    return `${diffInDays} ${pluralize(diffInDays, 'day')}`
+  }
+
+  return messageDate.format('DD/MM')
 }
+
 
 export function UserList({ users, selectedUser, onUserSelect, isLoading, error }: UserListProps) {
   if (isLoading) {
@@ -89,10 +102,10 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
           key={user.id}
           onClick={() => onUserSelect(user)}
           className={cn(
-            "group relative flex items-start p-3 rounded-lg transition-all duration-200",
-            "border border-transparent hover:bg-primary/20 hover:border hover:border-primary/50",
+            "group relative flex items-start p-3 rounded-lg",
+            "border border-transparent hover:bg-primary/20 hover:border hover:border-primary/20",
             "cursor-pointer",
-            selectedUser?.id === user.id && "bg-primary/20 border border-primary/50"
+            selectedUser?.id === user.id && "bg-primary/20 border border-primary/20"
           )}
         >
 
