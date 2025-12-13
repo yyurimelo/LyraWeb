@@ -45,7 +45,7 @@ export function ClickCopy({ content, variant }: Props) {
           <Button
             variant={variant}
             size="icon"
-            className="disabled:opacity-100"
+            className="disabled:opacity-100 relative"
             onClick={handleCopy}
             type="button"
             aria-label={copied ? "Copied" : "Copy to clipboard"}
@@ -53,7 +53,7 @@ export function ClickCopy({ content, variant }: Props) {
           >
             <div
               className={cn(
-                "transition-all",
+                "absolute inset-0 flex items-center justify-center transition-all",
                 copied ? "scale-100 opacity-100" : "scale-0 opacity-0"
               )}
             >
@@ -65,7 +65,7 @@ export function ClickCopy({ content, variant }: Props) {
             </div>
             <div
               className={cn(
-                "absolute transition-all",
+                "absolute inset-0 flex items-center justify-center transition-all",
                 copied ? "scale-0 opacity-0" : "scale-100 opacity-100"
               )}
             >

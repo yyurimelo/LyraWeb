@@ -43,7 +43,9 @@ function SettingsLayout() {
     <div className="container mx-auto p-4 lg:p-6 max-w-6xl">
       <div className='flex flex-col space-y-1 mb-6'>
         <h1 className="text-2xl font-bold">Settings</h1>
-        <p className='text-muted-foreground'>Manage your account settings and set e-mail preferences.</p>
+        <p className='text-muted-foreground'>
+          Manage your account settings and set your preferences.
+        </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4">

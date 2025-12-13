@@ -187,7 +187,7 @@ function Profile() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome*</FormLabel>
+                  <FormLabel>Name*</FormLabel>
                   <FormControl>
                     <Input
                       className="w-full"
@@ -206,7 +206,7 @@ function Profile() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
@@ -229,8 +229,8 @@ function Profile() {
               render={({ field }) => (
                 <FormItem>
                   <div>
-                    <FormLabel>Cor da fonte</FormLabel>
-                    <FormDescription>Tema claro</FormDescription>
+                    <FormLabel>Font color</FormLabel>
+                    <FormDescription>Theme: White</FormDescription>
                   </div>
                   <FormControl>
                     <Combo
@@ -260,8 +260,8 @@ function Profile() {
               render={({ field }) => (
                 <FormItem>
                   <div>
-                    <FormLabel>Cor da fonte</FormLabel>
-                    <FormDescription>Tema escuro</FormDescription>
+                    <FormLabel>Font color</FormLabel>
+                    <FormDescription>Theme: Dark</FormDescription>
                   </div>
                   <FormControl>
                     <Combo
@@ -291,8 +291,8 @@ function Profile() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <div>
-                    <FormLabel>Cor primária</FormLabel>
-                    <FormDescription>Valor</FormDescription>
+                    <FormLabel>Primary color</FormLabel>
+                    <FormDescription>Value: HEX</FormDescription>
                   </div>
                   <FormControl>
                     <div className="flex gap-3 w-full">

@@ -27,7 +27,7 @@ export function AuthenticatedLayout() {
 return (
   <div className="flex flex-col h-dvh">
     <Header />
-    <main className="flex-1 overflow-y-auto">
+    <main className="flex-1 overflow-y-auto dark:[color-scheme:dark]">
       <Outlet />
     </main>
   </div>
