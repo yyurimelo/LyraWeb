@@ -29,7 +29,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
   const lastScrollTopRef = useRef(0)
 
-  const { data: messages, isPending, isFetched } = useGetMessagesQuery(
+  const { data: messages, isFetched } = useGetMessagesQuery(
     selectedUser?.id ?? null
   )
 
@@ -184,14 +184,6 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     setOpen(true)
   }
 
-  if (isPending || !messages) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <span className="text-muted-foreground">Carregando conversa...</span>
-      </div>
-    )
-  }
-
   if (!selectedUser) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -208,15 +200,8 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     )
   }
 
-  if (isPending) {
-    <div className='bg-red-500 h-screen w-screen'>
-      OI
-    </div>
-  }
-
   return (
     <div className="flex-1 flex flex-col h-full max-h-full no-scrollbar">
-      {/* Header */}
       <div
         className="p-4 border-b bg-background cursor-pointer"
         onClick={() => openUserDetails()}
