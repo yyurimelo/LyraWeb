@@ -127,7 +127,7 @@ function Profile() {
       <div className="flex items-center gap-4">
         <Avatar className="w-20 h-20">
           <AvatarImage src={user?.avatarUser} alt={user?.name} />
-          <AvatarFallback className="text-lg">
+          <AvatarFallback className="text-lg bg-primary text-primary-foreground">
             {getInitialName(user!.name)}
           </AvatarFallback>
         </Avatar>

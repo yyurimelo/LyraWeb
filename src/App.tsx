@@ -7,6 +7,7 @@ import { env } from './env';
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "./contexts/auth-provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { UserColorProvider } from "./contexts/user-color-provider";
 
 const router = createRouter({
   routeTree, context: {
@@ -35,7 +36,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <GoogleOAuthProvider clientId={env.VITE_GOOGLE_CLIENT_ID}>
           <AuthProvider>
-            <InnerApp />
+            <UserColorProvider>
+              <InnerApp />
+            </UserColorProvider>
           </AuthProvider>
         </GoogleOAuthProvider>
       </QueryClientProvider>

@@ -5,7 +5,6 @@ import { http } from '@lyra/axios-config'
 import { LoaderCircle } from 'lucide-react'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import { applyThemeColors } from '@/utils/apply-theme-colors'
 
 
 interface AuthState {
@@ -23,16 +22,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUserDataModel | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    if (user) {
-      applyThemeColors({
-        appearancePrimaryColor: user.appearancePrimaryColor,
-        appearanceTextPrimaryLight: user.appearanceTextPrimaryLight,
-        appearanceTextPrimaryDark: user.appearanceTextPrimaryDark,
-      });
-    }
-  }, [user]);
 
   useEffect(() => {
     const token = localStorage.getItem('auth-token')
