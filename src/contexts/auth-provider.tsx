@@ -5,6 +5,7 @@ import { http } from '@lyra/axios-config'
 import { LoaderCircle } from 'lucide-react'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { toast } from 'sonner'
+import { applyThemeColors } from '@/utils/apply-theme-colors'
 
 
 interface AuthState {
@@ -13,6 +14,7 @@ interface AuthState {
   login: (credentials: AuthFormModel) => Promise<void>;
   logout: () => void
   loginWithGoogle: (googleAccessToken: string) => Promise<void>
+  updateUser: (userData: Partial<AuthUserDataModel>) => void
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined)
@@ -21,6 +23,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUserDataModel | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    if (user) {
+      applyThemeColors({
+        appearancePrimaryColor: user.appearancePrimaryColor,
+        appearanceTextPrimaryLight: user.appearanceTextPrimaryLight,
+        appearanceTextPrimaryDark: user.appearanceTextPrimaryDark,
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     const token = localStorage.getItem('auth-token')
@@ -89,8 +101,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateUser = (userData: Partial<AuthUserDataModel>) => {
+    if (!user) {
+      console.warn('Attempted to update user but no user is logged in');
+      return;
+    }
+    const newUser = { ...user, ...userData };
+    setUser(newUser);
+  }
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, loginWithGoogle }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, loginWithGoogle, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

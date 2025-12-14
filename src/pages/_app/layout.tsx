@@ -24,14 +24,14 @@ export function AuthenticatedLayout() {
   }
 
 
-return (
-  <div className="flex flex-col h-dvh">
-    <Header />
-    <main className="flex-1 overflow-y-auto custom-scrollbar">
-      <Outlet />
-    </main>
-  </div>
-)
+  return (
+    <div className="flex flex-col h-dvh">
+      <Header />
+      <main className="flex-1 overflow-y-auto custom-scrollbar">
+        <Outlet />
+      </main>
+    </div>
+  )
 
 
 }

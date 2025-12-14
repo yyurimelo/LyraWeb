@@ -5,9 +5,10 @@ import { getInitialName } from "@/lib/get-initial-name"
 import z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useGetUserQuery } from "@/http/hooks/user.hooks"
-import { useEffect, useId, useState } from "react"
-import { oklchToHex } from "@/utils/color"
+import { useGetUserQuery, useUpdateUserProfileMutation } from "@/http/hooks/user.hooks"
+import { useEffect, useId, useState, useCallback } from "react"
+import { oklchToHex, hexToOKLCH } from "@/utils/color"
+import { applyThemeColors } from "@/utils/apply-theme-colors"
 import {
   Form,
   FormControl,
@@ -45,7 +46,7 @@ type ProfileFormSchema = z.infer<typeof profileFormSchema>;
 function Profile() {
   const id = useId();
   const [edit, setEdit] = useState(false);
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
 
   const form = useForm<ProfileFormSchema>({
     resolver: zodResolver(profileFormSchema),
@@ -58,21 +59,45 @@ function Profile() {
     },
   });
 
-  const { data: userData } = useGetUserQuery(user?.id ?? "")
+  // Only fetch user data when user ID is available
+  const { data: userData } = useGetUserQuery(user?.id || '');
+
+  const updateUserMutation = useUpdateUserProfileMutation(
+    user?.id || '',
+    setEdit,
+    updateUser,
+    user
+  );
+
+  const resetFormToUserData = useCallback(() => {
+    if (!userData) return;
+
+    form.reset({
+      name: userData.name || "",
+      description: userData.description || "",
+      appearancePrimaryColor: userData.appearancePrimaryColor
+        ? oklchToHex(userData.appearancePrimaryColor)
+        : "",
+      appearanceTextPrimaryLight: userData.appearanceTextPrimaryLight || null,
+      appearanceTextPrimaryDark: userData.appearanceTextPrimaryDark || null,
+    });
+  }, [userData, form]);
 
   useEffect(() => {
-    if (user) {
-      form.reset({
-        name: userData?.name || "",
-        description: userData?.description || "",
-        appearancePrimaryColor: userData?.appearancePrimaryColor
-          ? oklchToHex(userData?.appearancePrimaryColor)
-          : "",
-        appearanceTextPrimaryLight: userData?.appearanceTextPrimaryLight || null,
-        appearanceTextPrimaryDark: userData?.appearanceTextPrimaryDark || null,
+    resetFormToUserData();
+  }, [resetFormToUserData]);
+
+  // Apply theme colors only when not editing (showing saved colors)
+  useEffect(() => {
+    if (!edit && userData) {
+      // Apply only the saved colors from userData
+      applyThemeColors({
+        appearancePrimaryColor: userData.appearancePrimaryColor,
+        appearanceTextPrimaryLight: userData.appearanceTextPrimaryLight,
+        appearanceTextPrimaryDark: userData.appearanceTextPrimaryDark,
       });
     }
-  }, [user, form]);
+  }, [edit, userData]);
 
   function handleEdit() {
     setEdit(true);
@@ -80,18 +105,22 @@ function Profile() {
 
   function handleCancelEdit() {
     setEdit(false);
-    form.reset({
-      name: userData?.name || "",
-      description: userData?.description || "",
-      appearancePrimaryColor: userData?.appearancePrimaryColor
-        ? oklchToHex(userData.appearancePrimaryColor)
-        : "",
-      appearanceTextPrimaryLight: userData?.appearanceTextPrimaryLight || null,
-      appearanceTextPrimaryDark: userData?.appearanceTextPrimaryDark || null,
-    });
+    resetFormToUserData();
   }
 
-  const isPending = false;
+  async function handleSubmit(data: ProfileFormSchema) {
+    const updateData = {
+      name: data.name,
+      description: data.description || undefined,
+      appearancePrimaryColor: data.appearancePrimaryColor ? hexToOKLCH(data.appearancePrimaryColor) : null,
+      appearanceTextPrimaryLight: data.appearanceTextPrimaryLight || undefined,
+      appearanceTextPrimaryDark: data.appearanceTextPrimaryDark || undefined,
+    };
+
+    updateUserMutation.mutate(updateData);
+  }
+
+  const isPending = updateUserMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -106,7 +135,7 @@ function Profile() {
         <Avatar className="w-20 h-20">
           <AvatarImage src={user?.avatarUser} alt={user?.name} />
           <AvatarFallback className="text-lg">
-            {getInitialName(user?.name)}
+            {getInitialName(user!.name)}
           </AvatarFallback>
         </Avatar>
       </div>
@@ -114,7 +143,7 @@ function Profile() {
       <Form {...form}>
         <form
           id={id}
-          // onSubmit={form.handleSubmit(handleSubmit)}
+          onSubmit={form.handleSubmit(handleSubmit)}
           className="space-y-4"
         >
           <header className="w-full flex items-center justify-end">
@@ -237,7 +266,6 @@ function Profile() {
                       className="w-full"
                       value={field.value}
                       onSelect={(selectedValue) => {
-                        form.setValue("appearanceTextPrimaryLight", "");
                         field.onChange(selectedValue);
                       }}
                       itens={[
@@ -268,7 +296,6 @@ function Profile() {
                       className="w-full"
                       value={field.value}
                       onSelect={(selectedValue) => {
-                        form.setValue("appearanceTextPrimaryDark", "");
                         field.onChange(selectedValue);
                       }}
                       itens={[

@@ -11,7 +11,7 @@ export function HeaderFriends() {
   return (
     <div className="flex items-center space-x-2">
       <div>
-        <Avatar className="bg-primary flex items-center justify-center w-[1.9em] h-[1.9em] text-[12px] text-secondary">
+        <Avatar className="bg-primary flex items-center justify-center w-[1.9em] h-[1.9em] text-[12px] text-primary-foreground">
           <AvatarFallback>
             {initialName}
           </AvatarFallback>

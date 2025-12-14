@@ -1,6 +1,6 @@
 export type UserDataModel = {
   id: string,
-  userIdenfitier: string,
+  userIdentifier: string,
   name: string,
   email: string,
   description: string,
