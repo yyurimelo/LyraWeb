@@ -45,7 +45,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getLoggedUser()
       .then((userData) => {
-        setUser(userData)
+        setUser((prev) => {
+          if (!prev) return userData
+          return prev
+        })
         setIsAuthenticated(true)
       })
       .catch(() => {
@@ -102,12 +105,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateUser = (userData: Partial<AuthUserDataModel>) => {
-    if (!user) {
-      console.warn('Attempted to update user but no user is logged in');
-      return;
-    }
-    const newUser = { ...user, ...userData };
-    setUser(newUser);
+    setUser((prev) => {
+      if (!prev) return prev
+
+      const cleanedData = Object.fromEntries(
+        Object.entries(userData).filter(([, value]) => value !== undefined)
+      )
+
+      return {
+        ...prev,
+        ...cleanedData,
+      }
+    })
   }
 
   return (

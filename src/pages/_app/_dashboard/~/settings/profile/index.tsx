@@ -5,10 +5,9 @@ import { getInitialName } from "@/lib/get-initial-name"
 import z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useGetUserQuery, useUpdateUserProfileMutation } from "@/http/hooks/user.hooks"
+import { useUpdateUserProfileMutation } from "@/http/hooks/user.hooks"
 import { useEffect, useId, useState, useCallback } from "react"
 import { oklchToHex, hexToOKLCH } from "@/utils/color"
-import { applyThemeColors } from "@/utils/apply-theme-colors"
 import {
   Form,
   FormControl,
@@ -59,45 +58,29 @@ function Profile() {
     },
   });
 
-  // Only fetch user data when user ID is available
-  const { data: userData } = useGetUserQuery(user?.id || '');
-
   const updateUserMutation = useUpdateUserProfileMutation(
     user?.id || '',
     setEdit,
     updateUser,
-    user
   );
 
   const resetFormToUserData = useCallback(() => {
-    if (!userData) return;
+    if (!user) return;
 
     form.reset({
-      name: userData.name || "",
-      description: userData.description || "",
-      appearancePrimaryColor: userData.appearancePrimaryColor
-        ? oklchToHex(userData.appearancePrimaryColor)
+      name: user.name || "",
+      description: user.description || "",
+      appearancePrimaryColor: user.appearancePrimaryColor
+        ? oklchToHex(user.appearancePrimaryColor)
         : "",
-      appearanceTextPrimaryLight: userData.appearanceTextPrimaryLight || null,
-      appearanceTextPrimaryDark: userData.appearanceTextPrimaryDark || null,
+      appearanceTextPrimaryLight: user.appearanceTextPrimaryLight || null,
+      appearanceTextPrimaryDark: user.appearanceTextPrimaryDark || null,
     });
-  }, [userData, form]);
+  }, [user, form]);
 
   useEffect(() => {
     resetFormToUserData();
   }, [resetFormToUserData]);
-
-  // Apply theme colors only when not editing (showing saved colors)
-  useEffect(() => {
-    if (!edit && userData) {
-      // Apply only the saved colors from userData
-      applyThemeColors({
-        appearancePrimaryColor: userData.appearancePrimaryColor,
-        appearanceTextPrimaryLight: userData.appearanceTextPrimaryLight,
-        appearanceTextPrimaryDark: userData.appearanceTextPrimaryDark,
-      });
-    }
-  }, [edit, userData]);
 
   function handleEdit() {
     setEdit(true);
@@ -109,15 +92,25 @@ function Profile() {
   }
 
   async function handleSubmit(data: ProfileFormSchema) {
-    const updateData = {
+    updateUser({
+      name: data.name,
+      description: data.description,
+      appearancePrimaryColor: data.appearancePrimaryColor
+        ? hexToOKLCH(data.appearancePrimaryColor)
+        : undefined,
+      appearanceTextPrimaryLight: data.appearanceTextPrimaryLight ?? undefined,
+      appearanceTextPrimaryDark: data.appearanceTextPrimaryDark ?? undefined,
+    });
+
+    updateUserMutation.mutate({
       name: data.name,
       description: data.description || undefined,
-      appearancePrimaryColor: data.appearancePrimaryColor ? hexToOKLCH(data.appearancePrimaryColor) : null,
+      appearancePrimaryColor: data.appearancePrimaryColor
+        ? hexToOKLCH(data.appearancePrimaryColor)
+        : null,
       appearanceTextPrimaryLight: data.appearanceTextPrimaryLight || undefined,
       appearanceTextPrimaryDark: data.appearanceTextPrimaryDark || undefined,
-    };
-
-    updateUserMutation.mutate(updateData);
+    });
   }
 
   const isPending = updateUserMutation.isPending;

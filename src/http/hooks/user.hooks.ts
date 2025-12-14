@@ -39,7 +39,7 @@ export const useUpdateUserProfileMutation = (
   userId: string,
   setEdit: (edit: boolean) => void,
   updateAuthUser: (data: Partial<AuthUserDataModel>) => void,
-  currentUser: AuthUserDataModel | null // Pass current user directly
+  // currentUser: AuthUserDataModel | null // Pass current user directly
 ) =>
   useMutation<UserDataModel, Error, Omit<UserUpdateModel, 'id'>>({
     mutationFn: (data: Omit<UserUpdateModel, 'id'>) => {
@@ -49,29 +49,21 @@ export const useUpdateUserProfileMutation = (
       return updateUser({ ...data, id: userId });
     },
     onSuccess: async (updatedUser) => {
-      const authUpdateData: Partial<AuthUserDataModel> = {
-        id: userId,
-        name: updatedUser.name ?? currentUser?.name,
-        email: currentUser?.email,
-        userIdentifier: currentUser?.userIdentifier,
-        token: currentUser?.token,
-        avatarUser: updatedUser.avatarUser ?? currentUser?.avatarUser,
-        description: updatedUser?.description ?? currentUser?.description ?? "",
-        appearancePrimaryColor: updatedUser.appearancePrimaryColor ?? currentUser?.appearancePrimaryColor ?? '',
-        appearanceTextPrimaryDark: updatedUser.appearanceTextPrimaryDark ?? currentUser?.appearanceTextPrimaryDark ?? '',
-        appearanceTextPrimaryLight: updatedUser.appearanceTextPrimaryLight ?? currentUser?.appearanceTextPrimaryLight ?? '',
-      };
-
-
-      updateAuthUser(authUpdateData);
+      updateAuthUser({
+        name: updatedUser.name,
+        description: updatedUser.description,
+        avatarUser: updatedUser.avatarUser,
+        appearancePrimaryColor: updatedUser.appearancePrimaryColor,
+        appearanceTextPrimaryDark: updatedUser.appearanceTextPrimaryDark,
+        appearanceTextPrimaryLight: updatedUser.appearanceTextPrimaryLight,
+      })
 
       await queryClient.invalidateQueries({
         queryKey: ["user-details", userId],
-      });
+      })
 
-      setEdit(false);
-
-      toast.success("Perfil atualizado com sucesso!");
+      setEdit(false)
+      toast.success("Perfil atualizado com sucesso!")
     },
     onError: (error) => {
       if (error instanceof Error) {
