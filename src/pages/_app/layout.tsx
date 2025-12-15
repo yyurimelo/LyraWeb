@@ -23,7 +23,6 @@ export function AuthenticatedLayout() {
     return <Navigate to='/sign-in' replace />
   }
 
-
   return (
     <div className="flex flex-col h-dvh">
       <Header />

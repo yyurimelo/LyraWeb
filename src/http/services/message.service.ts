@@ -2,8 +2,6 @@ import type { MessageResponseDto, SendMessageRequest } from "@/@types/message/me
 import { http, isAxiosError } from "@lyra/axios-config";
 import { API_ENDPOINTS } from "../constants";
 
-const prefix = "/message";
-
 export async function sendMessage({
   receiverId,
   content
@@ -28,7 +26,7 @@ export async function getMessagesWithUser(
   let response: any;
 
   try {
-    response = await http.get(`${prefix}/get/all`, {
+    response = await http.get(API_ENDPOINTS.MESSAGE.GET_MESSAGES_WITH_USER, {
       params: { friendId }
     });
   } catch (error) {

@@ -65,6 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response);
       setIsAuthenticated(true);
       localStorage.setItem("auth-token", response.token);
+      http.defaults.headers.Authorization = `Bearer ${response.token}`;
       toast.success("Autenticado com sucesso!")
     } catch (error: any) {
       toast.error("Erro no login:", error);
@@ -76,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
     setIsAuthenticated(false)
     localStorage.removeItem('auth-token')
+    delete http.defaults.headers.Authorization
   }
 
   const loginWithGoogle = async (email: string) => {
@@ -86,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response);
       setIsAuthenticated(true);
       localStorage.setItem("auth-token", response.token);
+      http.defaults.headers.Authorization = `Bearer ${response.token}`;
       toast.success("Autenticado com Google!");
     } catch (error: any) {
       toast.error("Erro no login com Google");

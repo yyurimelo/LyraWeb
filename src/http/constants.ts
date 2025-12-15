@@ -1,3 +1,4 @@
+
 export const API_ENDPOINTS = {
   AUTH: {
     AUTHENTICATE: "/api/auth",
@@ -12,6 +13,7 @@ export const API_ENDPOINTS = {
   },
   MESSAGE: {
     SEND: "/api/message/send",
-    GET_MESSAGES_WITH_USER: "/api/message/get/all"
+    GET_MESSAGES_WITH_USER: "/api/message/get/all",
+    HUB: "/api/hubs/message"
   },
 } as const;

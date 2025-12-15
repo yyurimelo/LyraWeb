@@ -91,18 +91,13 @@ function Profile() {
     resetFormToUserData();
   }
 
-  async function handleSubmit(data: ProfileFormSchema) {
-    updateUser({
-      name: data.name,
-      description: data.description,
-      appearancePrimaryColor: data.appearancePrimaryColor
-        ? hexToOKLCH(data.appearancePrimaryColor)
-        : undefined,
-      appearanceTextPrimaryLight: data.appearanceTextPrimaryLight ?? undefined,
-      appearanceTextPrimaryDark: data.appearanceTextPrimaryDark ?? undefined,
-    });
+  const isPending = updateUserMutation.isPending;
 
-    updateUserMutation.mutate({
+  async function handleSubmit(data: ProfileFormSchema) {
+    if (updateUserMutation.isPending) return;
+
+
+    await updateUserMutation.mutateAsync({
       name: data.name,
       description: data.description || undefined,
       appearancePrimaryColor: data.appearancePrimaryColor
@@ -111,9 +106,18 @@ function Profile() {
       appearanceTextPrimaryLight: data.appearanceTextPrimaryLight || undefined,
       appearanceTextPrimaryDark: data.appearanceTextPrimaryDark || undefined,
     });
+
+    updateUser({
+      name: data.name,
+      description: data.description,
+      appearancePrimaryColor: data.appearancePrimaryColor
+        ? hexToOKLCH(data.appearancePrimaryColor)
+        : null,
+      appearanceTextPrimaryLight: data.appearanceTextPrimaryLight ?? undefined,
+      appearanceTextPrimaryDark: data.appearanceTextPrimaryDark ?? undefined,
+    });
   }
 
-  const isPending = updateUserMutation.isPending;
 
   return (
     <div className="space-y-6">

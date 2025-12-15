@@ -5,6 +5,7 @@ import type { UserGetAllFriendsDataModel } from '@/@types/user/user-get-all-frie
 import { queryClient } from '@lyra/react-query-config'
 import { ConnectionState } from '@/@types/signalr/hub-types'
 import { sendMessage as sendMessageService } from '../services/message.service'
+import { API_ENDPOINTS } from '../constants'
 
 // Helper function to update last message in friends cache
 const updateFriendLastMessage = (message: MessageResponseDto) => {
@@ -89,7 +90,7 @@ export function useSignalR({ userId, onMessage, onFriendUpdate, enabled }: UseSi
       const backendUrl = import.meta.env.VITE_API_URL
 
       const connection = new HubConnectionBuilder()
-        .withUrl(`${backendUrl}/hubs/message`, {
+        .withUrl(backendUrl + API_ENDPOINTS.MESSAGE.HUB, {
           accessTokenFactory: () => {
             const currentToken = localStorage.getItem('auth-token')
             return currentToken || ''
