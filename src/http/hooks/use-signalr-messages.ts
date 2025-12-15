@@ -134,9 +134,9 @@ export function useSignalR({ userId, onMessage, onFriendUpdate, enabled }: UseSi
         // Update messages cache for the chat
         queryClient.setQueryData<MessageResponseDto[]>(
           ["messages", chatPartnerId],
-          (oldMessages = []) => {
-            // Se ainda não veio a lista completa, não mexe
-            if (oldMessages.length === 0) return oldMessages
+          (oldMessages) => {
+            // 🚫 Query ainda não inicializada
+            if (!oldMessages) return oldMessages
 
             const exists = oldMessages.some(m => m.id === message.id)
             if (exists) return oldMessages
