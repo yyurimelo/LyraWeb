@@ -96,7 +96,6 @@ function Profile() {
   async function handleSubmit(data: ProfileFormSchema) {
     if (updateUserMutation.isPending) return;
 
-
     await updateUserMutation.mutateAsync({
       name: data.name,
       description: data.description || undefined,
@@ -117,7 +116,6 @@ function Profile() {
       appearanceTextPrimaryDark: data.appearanceTextPrimaryDark ?? undefined,
     });
   }
-
 
   return (
     <div className="space-y-6">

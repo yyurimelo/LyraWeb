@@ -63,7 +63,7 @@ const formatLastMessageTime = (date: Date | string) => {
 export function UserList({ users, selectedUser, onUserSelect, isLoading, error }: UserListProps) {
   if (isLoading) {
     return (
-      <UserListSkeleton count={6}/>
+      <UserListSkeleton count={6} />
     )
   }
 
@@ -71,7 +71,7 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
     return (
       <div className="flex flex-1 items-center justify-center">
         <div className="flex flex-col items-center gap-2">
-          <CloudAlert className='text-destructive'/>
+          <CloudAlert className='text-destructive' />
         </div>
       </div>
     )
@@ -87,9 +87,17 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
     )
   }
 
+  const sortedUsers = [...users].sort((a, b) => {
+    if (!a.lastMessageAt && !b.lastMessageAt) return 0;
+    if (!a.lastMessageAt) return 1;
+    if (!b.lastMessageAt) return -1;
+
+    return new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime();
+  });
+
   return (
     <div className="overflow-y-auto h-full space-y-1 px-4 dark:[color-scheme:dark]">
-      {users.map((user) => (
+      {sortedUsers.map((user) => (
         <div
           key={user.id}
           onClick={() => onUserSelect(user)}
