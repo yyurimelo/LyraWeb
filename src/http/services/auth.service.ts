@@ -2,7 +2,7 @@ import { http, isAxiosError } from "@lyra/axios-config";
 import type { AuthFormModel } from "@/@types/auth/auth-form-model";
 import type { AuthUserDataModel } from "@/@types/auth/auth-user-data-model";
 
-const prefix = "/auth";
+import { API_ENDPOINTS } from "@/http/constants"
 
 export async function authenticate({
   email,
@@ -10,7 +10,7 @@ export async function authenticate({
 }: AuthFormModel): Promise<AuthUserDataModel> {
   let response: any;
   try {
-    response = await http.post(`${prefix}`, {
+    response = await http.post(API_ENDPOINTS.AUTH.AUTHENTICATE, {
       email,
       password,
     });
@@ -24,7 +24,7 @@ export async function authenticate({
 export async function googleAuthenticate(email: string): Promise<AuthUserDataModel> {
   let response: any;
   try {
-    response = await http.post(`${prefix}/google`, {
+    response = await http.post(API_ENDPOINTS.AUTH.GOOGLE_AUTHENTICATE, {
       email,
     });
   } catch (error) {
@@ -36,7 +36,7 @@ export async function googleAuthenticate(email: string): Promise<AuthUserDataMod
 }
 
 export async function getLoggedUser(): Promise<AuthUserDataModel> {
-  const response = await http.get(`${prefix}/me`);
+  const response = await http.get(API_ENDPOINTS.AUTH.GET_LOGGED_USER);
 
   return response.data;
 }

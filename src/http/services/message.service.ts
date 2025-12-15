@@ -1,5 +1,6 @@
 import type { MessageResponseDto, SendMessageRequest } from "@/@types/message/message-types";
 import { http, isAxiosError } from "@lyra/axios-config";
+import { API_ENDPOINTS } from "../constants";
 
 const prefix = "/message";
 
@@ -9,7 +10,7 @@ export async function sendMessage({
 }: SendMessageRequest): Promise<MessageResponseDto> {
   let response: any;
   try {
-    response = await http.post(`${prefix}/send`, {
+    response = await http.post(API_ENDPOINTS.MESSAGE.SEND, {
       receiverId,
       content
     });

@@ -3,8 +3,8 @@ import type { UserFormModel } from "@/@types/user/user-form-model";
 import type { UserUpdateModel } from "@/@types/user/user-form-update";
 import type { UserGetAllFriendsDataModel } from "@/@types/user/user-get-all-friends";
 import { http, isAxiosError } from "@lyra/axios-config";
+import { API_ENDPOINTS } from "../constants";
 
-const prefix = "/user";
 
 export async function createUser({
   name,
@@ -13,7 +13,7 @@ export async function createUser({
 }: UserFormModel): Promise<UserDataModel> {
   let response: any;
   try {
-    response = await http.post(`${prefix}/create`, {
+    response = await http.post(API_ENDPOINTS.USER.CREATE, {
       name,
       email,
       password,
@@ -27,13 +27,13 @@ export async function createUser({
 }
 
 export async function getAllFriends(): Promise<UserGetAllFriendsDataModel> {
-  const response = await http.get(`${prefix}/get/all/friends`);
+  const response = await http.get(API_ENDPOINTS.USER.GET_ALL_FRIENDS);
 
   return response.data;
 }
 
 export async function getUser(id: string): Promise<UserDataModel> {
-  const response = await http.get(`${prefix}/get/${id}`);
+  const response = await http.get(API_ENDPOINTS.USER.GET(id));
   return response.data;
 }
 
@@ -48,7 +48,7 @@ export async function updateUser({
 }: UserUpdateModel) {
   let response: any;
   try {
-    response = await http.put(`${prefix}/update`,
+    response = await http.put(API_ENDPOINTS.USER.UPDATE,
       {
         name,
         description,
