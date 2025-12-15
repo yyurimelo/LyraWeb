@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/contexts/auth-provider";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 export function GoogleAuthButton() {
+  const { t } = useTranslation();
   const { loginWithGoogle } = useAuth();
   const navigate = useNavigate()
 
@@ -42,7 +44,7 @@ export function GoogleAuthButton() {
           fill="currentColor"
         />
       </svg>
-      Sign in with Google
+      {t('auth.signIn.googleSignIn')}
     </Button>
   );
 }

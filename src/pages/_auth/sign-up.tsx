@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useId } from "react";
+import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -10,30 +11,9 @@ import { Input } from "@/components/ui/input";
 import { InputPassword } from "@/components/ui/input-passowrd";
 import { useCreateUserMutation } from "@/http/hooks/user.hooks";
 
-const signUpForm = z
-  .object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().min(1, "Email is required").email("Invalid email"),
-    password: z.string().min(1, "Password is required"),
-    confirmPassword: z.string().min(1, "Confirm Password is required"),
-  })
-  .superRefine((data) => {
-    if (data.password !== data.confirmPassword) {
-      throw new z.ZodError([
-        {
-          path: ["confirmPassword"],
-          message: "Passwords must match",
-          code: z.ZodIssueCode.custom,
-        },
-      ]);
-    }
-  });
-
-type SignUpForm = z.infer<typeof signUpForm>;
-
 export const Route = createFileRoute('/_auth/sign-up')({
   component: SignUp,
-    head: () => ({
+  head: () => ({
     meta: [
       {
         title: 'Sign-up | Lyra Chat'
@@ -43,8 +23,30 @@ export const Route = createFileRoute('/_auth/sign-up')({
 })
 
 export function SignUp() {
+  const { t } = useTranslation();
   const navigate = useNavigate()
   const id = useId();
+
+  const signUpForm = z
+    .object({
+      name: z.string().min(1, t('auth.errors.nameRequired')),
+      email: z.string().min(1, t('auth.errors.emailRequired')).email(t('auth.errors.invalidEmail')),
+      password: z.string().min(1, t('auth.errors.passwordRequired')),
+      confirmPassword: z.string().min(1, t('auth.errors.confirmPasswordRequired')),
+    })
+    .superRefine((data) => {
+      if (data.password !== data.confirmPassword) {
+        throw new z.ZodError([
+          {
+            path: ["confirmPassword"],
+            message: t('auth.errors.passwordsMustMatch'),
+            code: z.ZodIssueCode.custom,
+          },
+        ]);
+      }
+    });
+
+  type SignUpForm = z.infer<typeof signUpForm>;
 
   const form = useForm<SignUpForm>({
     resolver: zodResolver(signUpForm),
@@ -54,7 +56,6 @@ export function SignUp() {
       password: "",
       confirmPassword: "",
     },
-
   });
 
   const { mutateAsync: createUserFn, isPending } = useCreateUserMutation()
@@ -65,8 +66,6 @@ export function SignUp() {
       to: "/sign-in"
     })
   }
-
-
 
   return (
     <Form {...form}>
@@ -80,9 +79,9 @@ export function SignUp() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>{t('auth.signUp.username')}</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="John Doe"/>
+                <Input {...field} placeholder={t('auth.signUp.usernamePlaceholder')} />
               </FormControl>
             </FormItem>
           )}
@@ -93,9 +92,9 @@ export function SignUp() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t('auth.signUp.email')}</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="john@example.com"/>
+                <Input {...field} placeholder={t('auth.signUp.emailPlaceholder')} />
               </FormControl>
             </FormItem>
           )}
@@ -106,7 +105,7 @@ export function SignUp() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>{t('auth.signUp.password')}</FormLabel>
               <FormControl>
                 <InputPassword
                   id={id}
@@ -123,7 +122,7 @@ export function SignUp() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm password</FormLabel>
+              <FormLabel>{t('auth.signUp.confirmPassword')}</FormLabel>
               <FormControl>
                 <InputPassword
                   id={id}
@@ -145,12 +144,12 @@ export function SignUp() {
           {isPending && (
             <LoaderCircle className="w-4 h-4 text-primary-foreground animate-spin mr-2" />
           )}
-          {isPending ? isPending : "Register"}
+          {isPending ? t('common.loading') : t('auth.signUp.register')}
         </Button>
         <div className="text-center text-sm text-foreground/50">
-          Already have an account?{" "}
+          {t('auth.signUp.hasAccount').split('?')[0]}{" "}
           <Link to="/sign-in" className="text-foreground hover:underline">
-            Sign in
+            {t('auth.signUp.hasAccount').split('?')[1]}
           </Link>
         </div>
       </form>

@@ -1,0 +1,153 @@
+{
+  "auth": {
+    "signIn": {
+      "title": "Sign in to Lyra",
+      "subtitle": "Connect with your friends effortlessly.",
+      "email": "Email",
+      "emailPlaceholder": "john@example.com",
+      "password": "Password",
+      "continue": "Continue",
+      "noAccount": "Don't have an account? Sign up",
+      "googleSignIn": "Sign in with Google"
+    },
+    "signUp": {
+      "title": "Sign up to Lyra",
+      "subtitle": "Connect with your friends effortlessly.",
+      "username": "Username",
+      "usernamePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "john@example.com",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "register": "Register",
+      "hasAccount": "Already have an account? Sign in"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid username or password",
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required",
+      "confirmPasswordRequired": "Confirm Password is required",
+      "invalidEmail": "Invalid email",
+      "passwordsMustMatch": "Passwords must match"
+    },
+    "toast": {
+      "authenticated": "Authenticated successfully!",
+      "loginError": "Login error:",
+      "googleAuthenticated": "Authenticated with Google!",
+      "googleLoginError": "Error logging in with Google"
+    }
+  },
+  "chat": {
+    "title": "Chats",
+    "search": "Search...",
+    "welcome": "Welcome to Lyra",
+    "selectConversation": "Select a conversation from the list to start chatting.",
+    "sendMessage": "Send",
+    "typeMessage": "Type a message...",
+    "noConversations": "No conversations, contacts or messages found",
+    "noMessages": "No messages",
+    "scrollDown": "Scroll down"
+  },
+  "userDetails": {
+    "title": "User data",
+    "status": "Status",
+    "noDescription": "No description provided."
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "account": {
+    "accountSettings": "Account Settings",
+    "logOut": "Log out"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and set your preferences.",
+    "profile": {
+      "titleTab": "Profile",
+      "title": "Profile Information",
+      "subtitle": "Manage your profile information and preferences",
+      "edit": "Edit",
+      "updating": "Updating",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "name": "Name*",
+      "namePlaceholder": "Not informed",
+      "description": "Description",
+      "descriptionPlaceholder": "Not informed",
+      "fontColor": "Font color",
+      "themeWhite": "Theme: White",
+      "themeDark": "Theme: Dark",
+      "primaryColor": "Primary color",
+      "hexValue": "Value: HEX",
+      "hexPlaceholder": "Enter the hexadecimal",
+      "white": "White",
+      "black": "Black"
+    },
+    "requests": {
+      "titleTab": "Requests"
+    }
+  },
+  "password": {
+    "placeholder": "Password",
+    "requirements": {
+      "title": "Your password must contain:",
+      "weak": "Weak password",
+      "medium": "Medium password",
+      "strong": "Strong password"
+    },
+    "rules": {
+      "characters": "At least 8 characters",
+      "number": "At least 1 number",
+      "lowercase": "At least 1 lowercase letter",
+      "uppercase": "At least 1 uppercase letter"
+    },
+    "hide": "Hide password",
+    "show": "Show password",
+    "strength": "Password strength"
+  },
+  "search": {
+    "placeholder": "Type a command or search...",
+    "button": "Search",
+    "noResults": "No results found.",
+    "quickStart": "Quick start",
+    "newFolder": "New folder",
+    "importDocument": "Import document",
+    "addBlock": "Add block",
+    "navigation": "Navigation",
+    "goToDashboard": "Go to dashboard",
+    "goToApps": "Go to apps",
+    "goToConnections": "Go to connections"
+  },
+  "copy": {
+    "tooltip": "Click to copy",
+    "copied": "Copied",
+    "copyToClipboard": "Copy to clipboard"
+  },
+  "command": {
+    "title": "Command Palette",
+    "placeholder": "Search for a command to run..."
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "time": {
+    "now": "Now",
+
+    "minute_one": "{{count}} minute",
+    "minute_other": "{{count}} minutes",
+
+    "hour_one": "{{count}} hour",
+    "hour_other": "{{count}} hours",
+
+    "day_one": "{{count}} day",
+    "day_other": "{{count}} days"
+  }
+}

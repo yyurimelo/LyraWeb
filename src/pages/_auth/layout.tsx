@@ -3,18 +3,22 @@ import { ModeToggle } from '@/components/ui/modo-toggle'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { GoogleAuthButton } from './-components/google-auth/page'
 import { useLocation } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { Separator } from '@/components/ui/separator'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
 
 export const Route = createFileRoute('/_auth')({
   component: AuthLayout,
 })
 
 export default function AuthLayout() {
+  const { t } = useTranslation();
   const location = useLocation();
 
   return (
     <>
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+        <LanguageSwitcher />
         <ModeToggle />
       </div>
 
@@ -29,12 +33,12 @@ export default function AuthLayout() {
             <div className="text-center">
               <div className="text-xl">
                 {location.pathname === '/sign-in'
-                  ? <span className='font-medium'>Sign in to Lyra</span>
-                  : <span className='font-medium'>Sign up to Lyra</span>
+                  ? <span className='font-medium'>{t('auth.signIn.title')}</span>
+                  : <span className='font-medium'>{t('auth.signUp.title')}</span>
                 }
               </div>
 
-              <p className='text-muted-foreground'>Your chat with your friends</p>
+              <p className='text-muted-foreground'>{t('auth.signIn.subtitle')}</p>
 
               <div className='space-y-6 mt-5'>
                 <div>

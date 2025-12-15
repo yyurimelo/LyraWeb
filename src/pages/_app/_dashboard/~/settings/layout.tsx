@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
 import { User, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next';
 
 export const Route = createFileRoute('/_app/_dashboard/~/settings')({
   component: SettingsLayout,
@@ -20,6 +21,7 @@ interface TabButtonProps {
 }
 
 function TabButton({ to, icon: Icon, children }: TabButtonProps) {
+
   return (
     <Link
       to={to}
@@ -39,12 +41,14 @@ function TabButton({ to, icon: Icon, children }: TabButtonProps) {
 }
 
 function SettingsLayout() {
+  const { t } = useTranslation();
+
   return (
     <div className="container mx-auto p-4 lg:p-6 max-w-6xl">
       <div className='flex flex-col space-y-1 mb-6'>
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
         <p className='text-muted-foreground'>
-          Manage your account settings and set your preferences.
+          {t('settings.description')}
         </p>
       </div>
 
@@ -53,10 +57,10 @@ function SettingsLayout() {
         <nav className="flex flex-row lg:flex-col lg:w-64 lg:shrink-0 overflow-x-auto lg:overflow-x-visible">
           <div className='border rounded-md p-2 space-y-1 w-full'>
             <TabButton to="/~/settings/profile" icon={User}>
-              Profile
+              {t('settings.profile.titleTab')}
             </TabButton>
             <TabButton to="/~/settings/requests" icon={MessageSquare}>
-              Requests
+              {t('settings.requests.titleTab')}
             </TabButton>
           </div>
         </nav>

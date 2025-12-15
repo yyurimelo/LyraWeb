@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useGetAllFriendsQuery } from '../../http/hooks/user.hooks'
 
 import { UserList } from './sections/user-list'
@@ -11,6 +12,7 @@ interface ChatLayoutProps {
 }
 
 export function ChatLayout({ className }: ChatLayoutProps) {
+  const { t } = useTranslation()
   const [selectedUser, setSelectedUser] = useState<UserGetAllFriendsDataModel | null>(null)
   const [isMobile, setIsMobile] = useState(false)
   const [currentView, setCurrentView] = useState<'list' | 'chat'>('list')
@@ -73,11 +75,11 @@ export function ChatLayout({ className }: ChatLayoutProps) {
       `}>
         <div className="p-4 flex-shrink-0 mb-3">
           <div className="mb-3">
-            <h2 className="text-xl font-semibold">Chats</h2>
+            <h2 className="text-xl font-semibold">{t('chat.title')}</h2>
           </div>
           <div className="relative">
             <Input
-              placeholder="Search..."
+              placeholder={t('chat.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pr-10" // espaço pro icon

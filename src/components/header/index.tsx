@@ -5,6 +5,8 @@ import { HeaderAccount } from "./header-account";
 import { HeaderFriends } from "./header-friends";
 import { HeaderNotification } from "./header-notification";
 import SearchUser from "../ui/search-user";
+import { LanguageSwitcher } from "../ui/language-switcher";
+
 
 export function Header() {
 
@@ -24,6 +26,7 @@ export function Header() {
           <SearchUser />
           <HeaderNotification />
           <ModeToggle />
+          <LanguageSwitcher />
           <HeaderAccount />
         </div>
       </div>

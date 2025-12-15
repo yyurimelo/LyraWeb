@@ -1,6 +1,7 @@
 import { EyeIcon, EyeOffIcon, CheckIcon, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { type ControllerRenderProps, type FieldError } from "react-hook-form";
 import { cn } from "@/lib/utils";
 
@@ -14,15 +15,16 @@ type Props = {
 };
 
 export function InputPassword({ id, field, error, isNormalInputPassword }: Props) {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible((prev) => !prev);
 
   const checkStrength = (pass: string) => {
     const requirements = [
-      { regex: /.{8,}/, text: "At least 8 characters" },
-      { regex: /[0-9]/, text: "At least 1 number" },
-      { regex: /[a-z]/, text: "At least 1 lowercase letter" },
-      { regex: /[A-Z]/, text: "At least 1 uppercase letter" },
+      { regex: /.{8,}/, text: t('password.rules.characters') },
+      { regex: /[0-9]/, text: t('password.rules.number') },
+      { regex: /[a-z]/, text: t('password.rules.lowercase') },
+      { regex: /[A-Z]/, text: t('password.rules.uppercase') },
     ];
     return requirements.map((req) => ({
       met: req.regex.test(pass),
@@ -45,10 +47,10 @@ export function InputPassword({ id, field, error, isNormalInputPassword }: Props
   };
 
   const getStrengthText = (score: number) => {
-    if (score === 0) return "Your password must contain:";
-    if (score <= 2) return "Weak password";
-    if (score === 3) return "Medium password";
-    return "Strong password";
+    if (score === 0) return t('password.requirements.title');
+    if (score <= 2) return t('password.requirements.weak');
+    if (score === 3) return t('password.requirements.medium');
+    return t('password.requirements.strong');
   };
 
   return (
@@ -59,7 +61,7 @@ export function InputPassword({ id, field, error, isNormalInputPassword }: Props
             id={id}
             className={`pe-9 ${error ? "border-destructive ring-destructive/20" : ""
               }`}
-            placeholder="Password"
+            placeholder={t('password.placeholder')}
             type={isVisible ? "text" : "password"}
             aria-invalid={!!error}
             aria-describedby={`${id}-description`}
@@ -70,7 +72,7 @@ export function InputPassword({ id, field, error, isNormalInputPassword }: Props
             type="button"
             onClick={toggleVisibility}
             className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center"
-            aria-label={isVisible ? "Hide password" : "Show password"}
+            aria-label={isVisible ? t('password.hide') : t('password.show')}
           >
             {isVisible ? (
               <EyeIcon size={16} className={cn(error && "text-red-400")} />
@@ -89,7 +91,7 @@ export function InputPassword({ id, field, error, isNormalInputPassword }: Props
             aria-valuenow={strengthScore}
             aria-valuemin={0}
             aria-valuemax={4}
-            aria-label="Password strength"
+            aria-label={t('password.strength')}
           >
             <div
               className={`h-full ${getStrengthColor(

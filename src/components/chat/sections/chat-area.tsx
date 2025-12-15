@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { UserGetAllFriendsDataModel } from '../../../@types/user/user-get-all-friends'
 import { LyraIcon } from '@/components/logos/lyra-icon'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,7 @@ interface ChatAreaProps {
 }
 
 export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps) {
+  const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
   const [messageInput, setMessageInput] = useState('')
   const [isSending, setIsSending] = useState(false)
@@ -65,7 +67,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
   const formatMessageTime = (date: string | Date) => {
     const dateObj = typeof date === 'string' ? new Date(date) : date
-    return dateObj.toLocaleTimeString('pt-BR', {
+    return dateObj.toLocaleTimeString(i18n.language, {
       hour: '2-digit',
       minute: '2-digit'
     })
@@ -191,9 +193,9 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
           <div className="flex items-center justify-center">
             <LyraIcon height="size-20 text-primary" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Welcome to Lyra</h2>
+          <h2 className="text-xl font-semibold mb-2">{t('chat.welcome')}</h2>
           <p className="text-muted-foreground">
-            Select a conversation from the list to start chatting.
+            {t('chat.selectConversation')}
           </p>
         </div>
       </div>
@@ -284,7 +286,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
           size="icon"
           variant="secondary"
           className="absolute bottom-25 right-4 size-12 rounded-full shadow-lg backdrop-blur-sm bg-background/90 border border-border hover:bg-background hover:scale-110 transition-all duration-200 z-50"
-          aria-label="Rolar para baixo"
+          aria-label={t('chat.scrollDown')}
         >
           <ChevronDown className="size-6 text-primary" />
         </Button>
@@ -298,7 +300,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Digite uma mensagem..."
+            placeholder={t('chat.typeMessage')}
             className="flex-1 px-4 py-2 border border-input rounded-full bg-background focus:ring-2 focus:ring-primary"
           />
 
@@ -310,7 +312,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
             {isSending && (
               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
             )}
-            Enviar
+            {t('chat.sendMessage')}
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import * as React from "react"
 import type { UserGetAllFriendsDataModel } from "../../../@types/user/user-get-all-friends"
+import { useTranslation } from "react-i18next"
 import {
   Sheet,
   SheetContent, SheetHeader,
@@ -20,12 +21,13 @@ interface ChatUserDetailsProps {
 }
 
 export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
+  const { t } = useTranslation()
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent side="right" className="w-full sm:w-96">
         <SheetHeader>
-          <SheetTitle>Dados do usuário</SheetTitle>
+          <SheetTitle>{t('userDetails.title')}</SheetTitle>
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
@@ -55,10 +57,10 @@ export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
 
           <div className="ml-4">
             <strong className="text-muted-foreground text-sm">
-              Recado
+              {t('userDetails.status')}
             </strong>
             <p className="mt-2 text-sm text-foreground">
-              {user.description || "Nenhuma descrição fornecida."}
+              {user.description || t('userDetails.noDescription')}
             </p>
           </div>
 

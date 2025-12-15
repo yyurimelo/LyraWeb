@@ -1,12 +1,14 @@
 import { Link, linkOptions, useLocation } from "@tanstack/react-router"
 import { useState, useRef, useEffect } from "react"
-
-export const options = linkOptions([
-  { to: '/', label: 'Dashboard', activeOptions: { exact: true } },
-  { to: '/~/settings', label: 'Settings' },
-])
+import { useTranslation } from "react-i18next"
 
 export function HeaderNavigation() {
+  const { t } = useTranslation()
+  const options = linkOptions([
+    { to: '/', label: t('navigation.dashboard'), activeOptions: { exact: true } },
+    { to: '/~/settings', label: t('navigation.settings') },
+  ])
+
   const location = useLocation()
   const [hoverStyle, setHoverStyle] = useState({ width: 0, left: 0, opacity: 0 })
   const [activeStyle, setActiveStyle] = useState({ width: 0, left: 0, opacity: 0 })

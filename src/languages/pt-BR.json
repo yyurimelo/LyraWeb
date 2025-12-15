@@ -1,0 +1,153 @@
+{
+  "auth": {
+    "signIn": {
+      "title": "Entrar no Lyra",
+      "subtitle": "Conecte-se com seus amigos de forma simples.",
+      "email": "E-mail",
+      "emailPlaceholder": "joao@exemplo.com",
+      "password": "Senha",
+      "continue": "Continuar",
+      "noAccount": "Não tem uma conta? Cadastre-se",
+      "googleSignIn": "Entrar com o Google"
+    },
+    "signUp": {
+      "title": "Cadastrar-se no Lyra",
+      "subtitle": "Conecte-se com seus amigos de forma simples.",
+      "username": "Nome de usuário",
+      "usernamePlaceholder": "João Silva",
+      "email": "E-mail",
+      "emailPlaceholder": "joao@exemplo.com",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "register": "Cadastrar",
+      "hasAccount": "Já tem uma conta? Entrar"
+    },
+    "errors": {
+      "invalidCredentials": "Usuário ou senha inválidos",
+      "nameRequired": "Nome é obrigatório",
+      "emailRequired": "E-mail é obrigatório",
+      "passwordRequired": "Senha é obrigatória",
+      "confirmPasswordRequired": "Confirmação de senha é obrigatória",
+      "invalidEmail": "E-mail inválido",
+      "passwordsMustMatch": "As senhas devem coincidir"
+    },
+    "toast": {
+      "authenticated": "Autenticado com sucesso!",
+      "loginError": "Erro no login:",
+      "googleAuthenticated": "Autenticado com Google!",
+      "googleLoginError": "Erro ao fazer login com Google"
+    }
+  },
+  "chat": {
+    "title": "Conversas",
+    "search": "Pesquisar...",
+    "welcome": "Bem-vindo ao Lyra",
+    "selectConversation": "Selecione uma conversa da lista para começar a conversar.",
+    "sendMessage": "Enviar",
+    "typeMessage": "Digite uma mensagem...",
+    "noConversations": "Nenhuma conversa, contato ou mensagem encontrada",
+    "noMessages": "Sem mensagens",
+    "scrollDown": "Rolar para baixo"
+  },
+  "userDetails": {
+    "title": "Dados do usuário",
+    "status": "Recado",
+    "noDescription": "Nenhuma descrição fornecida."
+  },
+  "navigation": {
+    "dashboard": "Painel",
+    "settings": "Configurações"
+  },
+  "account": {
+    "accountSettings": "Configurações da Conta",
+    "logOut": "Sair"
+  },
+  "settings": {
+    "title": "Configurações",
+    "description": "Gerencie as configurações da sua conta e defina suas preferências.",
+    "profile": {
+      "titleTab": "Perfil",
+      "title": "Informações do Perfil",
+      "subtitle": "Gerencie suas informações e preferências do perfil",
+      "edit": "Editar",
+      "updating": "Atualizando",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "name": "Nome*",
+      "namePlaceholder": "Não informado",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Não informada",
+      "fontColor": "Cor da fonte",
+      "themeWhite": "Tema: Branco",
+      "themeDark": "Tema: Escuro",
+      "primaryColor": "Cor primária",
+      "hexValue": "Valor: HEX",
+      "hexPlaceholder": "Informe o hexadecimal",
+      "white": "Branco",
+      "black": "Preto"
+    },
+    "requests": {
+      "titleTab": "Solicitações"
+    }
+  },
+  "password": {
+    "placeholder": "Senha",
+    "requirements": {
+      "title": "Sua senha deve conter:",
+      "weak": "Senha fraca",
+      "medium": "Senha média",
+      "strong": "Senha forte"
+    },
+    "rules": {
+      "characters": "Pelo menos 8 caracteres",
+      "number": "Pelo menos 1 número",
+      "lowercase": "Pelo menos 1 letra minúscula",
+      "uppercase": "Pelo menos 1 letra maiúscula"
+    },
+    "hide": "Ocultar senha",
+    "show": "Mostrar senha",
+    "strength": "Força da senha"
+  },
+  "search": {
+    "placeholder": "Digite um comando ou pesquise...",
+    "button": "Pesquisar",
+    "noResults": "Nenhum resultado encontrado.",
+    "quickStart": "Início rápido",
+    "newFolder": "Nova pasta",
+    "importDocument": "Importar documento",
+    "addBlock": "Adicionar bloco",
+    "navigation": "Navegação",
+    "goToDashboard": "Ir para o painel",
+    "goToApps": "Ir para os aplicativos",
+    "goToConnections": "Ir para as conexões"
+  },
+  "copy": {
+    "tooltip": "Clique para copiar",
+    "copied": "Copiado",
+    "copyToClipboard": "Copiar para a área de transferência"
+  },
+  "command": {
+    "title": "Paleta de Comandos",
+    "placeholder": "Pesquise um comando para executar..."
+  },
+  "common": {
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "confirm": "Confirmar",
+    "close": "Fechar"
+  },
+  "time": {
+    "now": "Agora",
+
+    "minute_one": "{{count}} minuto",
+    "minute_other": "{{count}} minutos",
+
+    "hour_one": "{{count}} hora",
+    "hour_other": "{{count}} horas",
+
+    "day_one": "{{count}} dia",
+    "day_other": "{{count}} dias"
+  }
+}

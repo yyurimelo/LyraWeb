@@ -27,6 +27,7 @@ import { abbreviateUserIdentifier } from "@/utils/abbreviate-user-identifier"
 import { Separator } from "@/components/ui/separator"
 import { Check, LoaderCircle, Pencil, X } from "lucide-react"
 import { ColorPicker } from "@/components/ui/color-picker"
+import { useTranslation } from "react-i18next"
 
 export const Route = createFileRoute('/_app/_dashboard/~/settings/profile/')({
   component: Profile,
@@ -43,6 +44,7 @@ const profileFormSchema = z.object({
 type ProfileFormSchema = z.infer<typeof profileFormSchema>;
 
 function Profile() {
+  const { t } = useTranslation();
   const id = useId();
   const [edit, setEdit] = useState(false);
   const { user, updateUser } = useAuth()
@@ -120,9 +122,9 @@ function Profile() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2">Profile Information</h3>
+        <h3 className="text-lg font-semibold mb-2">{t('settings.profile.title')}</h3>
         <p className="text-sm text-muted-foreground">
-          Manage your profile information and preferences
+          {t('settings.profile.subtitle')}
         </p>
       </div>
 
@@ -145,7 +147,7 @@ function Profile() {
             {!edit && (
               <Button variant="ghost" type="button" onClick={handleEdit}>
                 <Pencil className="w-4 h-4" />
-                Editar
+                {t('settings.profile.edit')}
               </Button>
             )}
 
@@ -161,12 +163,12 @@ function Profile() {
                   {isPending ? (
                     <span className="flex items-center gap-2">
                       <LoaderCircle className="w-4 h-4 animate-spin" />
-                      Atualizando
+                      {t('settings.profile.updating')}
                     </span>
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      Confirmar
+                      {t('settings.profile.confirm')}
                     </>
                   )}
                 </Button>
@@ -179,7 +181,7 @@ function Profile() {
                     type="button"
                   >
                     <X className="w-4 h-4" />
-                    Cancelar
+                    {t('settings.profile.cancel')}
                   </Button>
                 )}
               </>
@@ -211,13 +213,13 @@ function Profile() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name*</FormLabel>
+                  <FormLabel>{t('settings.profile.name')}</FormLabel>
                   <FormControl>
                     <Input
                       className="w-full"
                       {...field}
                       disabled={!edit}
-                      placeholder={!edit ? "Não informado" : ""}
+                      placeholder={!edit ? t('settings.profile.namePlaceholder') : ""}
                       autoComplete="name"
                     />
                   </FormControl>
@@ -230,12 +232,12 @@ function Profile() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('settings.profile.description')}</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
                       disabled={!edit}
-                      placeholder={!edit ? "Não informada" : ""}
+                      placeholder={!edit ? t('settings.profile.descriptionPlaceholder') : ""}
                       autoComplete="description"
                     />
                   </FormControl>
@@ -253,8 +255,8 @@ function Profile() {
               render={({ field }) => (
                 <FormItem>
                   <div>
-                    <FormLabel>Font color</FormLabel>
-                    <FormDescription>Theme: White</FormDescription>
+                    <FormLabel>{t('settings.profile.fontColor')}</FormLabel>
+                    <FormDescription>{t('settings.profile.themeWhite')}</FormDescription>
                   </div>
                   <FormControl>
                     <Combo
@@ -265,10 +267,10 @@ function Profile() {
                       }}
                       itens={[
                         {
-                          label: "Branco",
+                          label: t('settings.profile.white'),
                           value: "oklch(1.000 0.000 89.876)",
                         },
-                        { label: "Preto", value: "oklch(0.000 0.000 0.000)" },
+                        { label: t('settings.profile.black'), value: "oklch(0.000 0.000 0.000)" },
                       ]}
                       disabled={!edit}
                     />
@@ -283,8 +285,8 @@ function Profile() {
               render={({ field }) => (
                 <FormItem>
                   <div>
-                    <FormLabel>Font color</FormLabel>
-                    <FormDescription>Theme: Dark</FormDescription>
+                    <FormLabel>{t('settings.profile.fontColor')}</FormLabel>
+                    <FormDescription>{t('settings.profile.themeDark')}</FormDescription>
                   </div>
                   <FormControl>
                     <Combo
@@ -295,10 +297,10 @@ function Profile() {
                       }}
                       itens={[
                         {
-                          label: "Branco",
+                          label: t('settings.profile.white'),
                           value: "oklch(1.000 0.000 89.876)",
                         },
-                        { label: "Preto", value: "oklch(0.000 0.000 0.000)" },
+                        { label: t('settings.profile.black'), value: "oklch(0.000 0.000 0.000)" },
                       ]}
                       disabled={!edit}
                     />
@@ -313,14 +315,14 @@ function Profile() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <div>
-                    <FormLabel>Primary color</FormLabel>
-                    <FormDescription>Value: HEX</FormDescription>
+                    <FormLabel>{t('settings.profile.primaryColor')}</FormLabel>
+                    <FormDescription>{t('settings.profile.hexValue')}</FormDescription>
                   </div>
                   <FormControl>
                     <div className="flex gap-3 w-full">
                       <Input
-                        className=" w-full"
-                        placeholder="Informe o hexadecimal"
+                        className="w-full"
+                        placeholder={t('settings.profile.hexPlaceholder')}
                         type="text"
                         {...field}
                         onChange={(e) => {

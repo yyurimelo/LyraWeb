@@ -16,8 +16,10 @@ import {
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/auth-provider";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 export function HeaderAccount() {
+  const { t } = useTranslation()
   const { user, logout } = useAuth()
 
   const navigate = useNavigate()
@@ -72,7 +74,7 @@ export function HeaderAccount() {
         <DropdownMenuGroup>
           <Link to="/~/settings">
             <DropdownMenuItem>
-              Account Settings
+              {t('account.accountSettings')}
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
@@ -81,7 +83,7 @@ export function HeaderAccount() {
 
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut />
-          Log out
+          {t('account.logOut')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
