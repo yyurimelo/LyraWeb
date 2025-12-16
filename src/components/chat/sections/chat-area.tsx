@@ -1,12 +1,11 @@
-import { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import { useEffect, useRef, useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { UserGetAllFriendsDataModel } from '../../../@types/user/user-get-all-friends'
 import { LyraIcon } from '@/components/logos/lyra-icon'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronDown } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getInitialName } from '@/lib/get-initial-name'
-import { ChatUserDetails } from './chat-user-details'
+import { ChevronDown } from 'lucide-react'
+import { ChatHeader } from './chat-header'
+import { ChatInput } from './chat-input'
 import { useGetMessagesQuery, useSendMessageMutation } from '@/http/hooks/message.hooks'
 import { useAuth } from '@/contexts/auth-provider'
 import { useSignalR } from '@/http/hooks/use-signalr-messages'
@@ -19,11 +18,9 @@ interface ChatAreaProps {
 
 export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps) {
   const { t, i18n } = useTranslation()
-  const [open, setOpen] = useState(false)
-  const [messageInput, setMessageInput] = useState('')
-  const [isSending, setIsSending] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const { user } = useAuth()
 
@@ -45,23 +42,17 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
   const sendMessageMutation = useSendMessageMutation()
 
-  const handleSendMessage = async () => {
-    if (!messageInput.trim() || !selectedUser || !user?.id || isSending) return
-
-    const messageContent = messageInput.trim()
-    setMessageInput('')
-    setIsSending(true)
+  const handleMessageSend = async (message: string) => {
+    if (!selectedUser || !user?.id) return
 
     try {
-      await sendMessage(String(selectedUser.id), messageContent)
+      await sendMessage(String(selectedUser.id), message)
     } catch (error) {
       console.error('Error sending message:', error)
       await sendMessageMutation.mutateAsync({
         receiverId: String(selectedUser.id),
-        content: messageContent
+        content: message
       })
-    } finally {
-      setIsSending(false)
     }
   }
 
@@ -182,10 +173,6 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     }
   }, [allMessages?.length, selectedUser]) // Adiciona selectedUser para recalcular ao mudar de conversa
 
-  function openUserDetails() {
-    setOpen(true)
-  }
-
   if (!selectedUser) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -204,46 +191,11 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
   return (
     <div className="flex-1 flex flex-col h-full max-h-full no-scrollbar">
-      <div
-        className="p-4 border-b bg-background cursor-pointer"
-        onClick={() => openUserDetails()}
-      >
-        <div className="flex items-center">
-          {isMobile && onBackToList && (
-            <Button
-              onClick={(e) => {
-                onBackToList()
-                e.stopPropagation()
-              }}
-              size="icon"
-              className="bg-transparent hover:bg-transparent shadow-none"
-            >
-              <ChevronLeft className="text-foreground" />
-            </Button>
-          )}
-
-          <Avatar className="size-11 rounded-full mr-3">
-            <AvatarImage
-              src={selectedUser.avatarUser}
-              alt={selectedUser.name}
-              className="object-cover"
-            />
-            <AvatarFallback
-              style={{
-                backgroundColor:
-                  selectedUser.appearancePrimaryColor || 'hsl(var(--primary))'
-              }}
-              className="text-secondary-foreground font-semibold text-sm"
-            >
-              {getInitialName(selectedUser.name)}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="flex-1 flex items-center gap-2">
-            <h3 className="font-semibold">{selectedUser.name}</h3>
-          </div>
-        </div>
-      </div>
+      <ChatHeader
+        selectedUser={selectedUser}
+        onBackToList={onBackToList}
+        isMobile={isMobile}
+      />
 
       {/* Área de mensagens */}
       <div
@@ -292,32 +244,11 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
         </Button>
       )}
 
-      {/* Input */}
-      <div className="p-4 border-t bg-background">
-        <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder={t('chat.typeMessage')}
-            className="flex-1 px-4 py-2 border border-input rounded-full bg-background focus:ring-2 focus:ring-primary"
-          />
-
-          <button
-            onClick={handleSendMessage}
-            disabled={!messageInput.trim() || isSending}
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:bg-muted transition-colors flex items-center gap-2"
-          >
-            {isSending && (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            )}
-            {t('chat.sendMessage')}
-          </button>
-        </div>
-      </div>
-
-      <ChatUserDetails open={open} setOpen={setOpen} user={selectedUser} />
+      <ChatInput
+        ref={inputRef}
+        onSendMessage={handleMessageSend}
+        disabled={!selectedUser}
+      />
     </div>
   )
 }

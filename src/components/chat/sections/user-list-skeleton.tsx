@@ -33,7 +33,7 @@ interface UserListSkeletonProps {
 
 export function UserListSkeleton({ count = 6 }: UserListSkeletonProps) {
   return (
-    <div className="overflow-y-auto h-full space-y-1 px-4">
+    <div className="overflow-y-auto h-full space-y-1 px-4 py-1">
       {Array.from({ length: count }).map((_, index) => (
         <UserListItemSkeleton key={index} />
       ))}
