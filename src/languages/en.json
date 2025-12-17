@@ -151,6 +151,7 @@
     "day_other": "{{count}} days"
   },
   "notifications": {
+    "title": "Notifications",
     "tabs": {
       "all": "All",
       "read": "Read",
@@ -161,10 +162,14 @@
     "empty": {
       "all": "No notifications",
       "read": "No read notifications",
-      "unread": "No unread notifications"
+      "unread": "No unread notifications",
+      "newNotifications": "You have no new notifications."
     },
-    "markAsRead": "Mark as read",
-    "delete": "Delete",
+    "markAsRead": {
+      "singular": "Mark as read",
+      "plural": "Mark all as read"
+    } ,
+        "delete": "Delete",
     "types": {
       "inviteFriend": {
         "title": "Friend Request",

@@ -11,8 +11,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 // sections
-import { NotificationHeader } from "./sections/notification-header";
-import { NotificationList } from "./sections/notification-list";
+import { NotificationHeader } from "./notification-header";
+import { NotificationList } from "./notification-list";
 
 // hooks
 import {
@@ -23,33 +23,29 @@ import {
 import { useAuth } from "@/contexts/auth-provider";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
 
-export function NotificationDropdown() {
+export function Notification() {
   const { isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'unread' | 'read'>('unread');
 
-  // Fetch unread notifications - only when popover is open and tab is unread
   const {
     data: unreadNotifications,
     isLoading: isLoadingUnread,
     error: unreadError
   } = useUnreadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'unread');
 
-  // Fetch read notifications - only when popover is open and tab is read
   const {
     data: readNotifications,
     isLoading: isLoadingRead,
     error: readError
   } = useReadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'read');
 
-  // Fetch unread count for badge
   const {
     data: unreadCountData
   } = useUnreadNotificationsCountQuery();
 
   const unreadCount = unreadCountData || 0;
 
-  // Determine current data based on active tab
   const currentData = activeTab === 'unread' ? unreadNotifications : readNotifications;
   const currentLoading = activeTab === 'unread' ? isLoadingUnread : isLoadingRead;
   const currentError = activeTab === 'unread' ? unreadError : readError;
@@ -72,11 +68,13 @@ export function NotificationDropdown() {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[380px] p-0"
+        className="w-screen sm:w-[380px] p-0"
         align="end"
-        sideOffset={4}
+        sideOffset={12}
+        
       >
         <NotificationHeader
+          unreadNotificationsIds={unreadNotifications?.map((x) => x.id) ?? []}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           unreadCount={unreadCount}

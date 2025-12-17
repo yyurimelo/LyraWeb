@@ -3,9 +3,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const NotificationSkeleton = memo(() => {
   return (
-    <div className="px-4 py-2 space-y-2">
+    <div className="p-4 space-y-2">
       <div className="flex items-start gap-3">
-        <Skeleton className="size-5 rounded-none" />
+        <Skeleton className="size-5 rounded" />
         <div className="flex-1 space-y-1">
           <div className="flex items-center gap-2">
             <Skeleton className="h-3 w-16" />

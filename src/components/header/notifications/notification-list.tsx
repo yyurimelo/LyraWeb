@@ -7,6 +7,7 @@ import { NotificationSkeleton } from "./notification-skeleton";
 // types
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useTranslation } from "react-i18next";
 
 interface NotificationListProps {
   notifications: ExtendedNotificationDataModel[] | undefined;
@@ -19,10 +20,11 @@ export const NotificationList = memo(({
   isLoading,
   error
 }: NotificationListProps) => {
+  const { t } = useTranslation()
   if (error) {
     return (
       <div className="flex flex-col text-center items-center text-sm text-muted-foreground px-4 gap-2 py-6">
-        Erro ao carregar notificações
+        {t("notifications.error.loading")}
       </div>
     );
   }

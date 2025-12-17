@@ -6,7 +6,7 @@ export const useNotificationMessage = () => {
   const { t } = useTranslation();
 
   const getNotificationMessage = (notification: ExtendedNotificationDataModel): NotificationMessage => {
-    const creatorName = notification.createdByName || t('notifications.unknownUser');
+    const creatorName = notification.createdBy || t('notifications.unknownUser');
     const receiverName = notification.receiverName || t('notifications.you');
 
     switch (notification.type) {

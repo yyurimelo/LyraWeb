@@ -3,9 +3,10 @@ import { ModeToggle } from "@/components/ui/modo-toggle";
 import { HeaderNavigation } from "./header-navigation";
 import { HeaderAccount } from "./header-account";
 import { HeaderFriends } from "./header-friends";
-import { HeaderNotification } from "./header-notification";
+
 import SearchUser from "../ui/search-user";
 import { LanguageSwitcher } from "../ui/language-switcher";
+import { Notification } from "./notifications";
 
 
 export function Header() {
@@ -24,7 +25,7 @@ export function Header() {
 
         <div className="flex items-center space-x-2">
           <SearchUser />
-          <HeaderNotification />
+          <Notification />
           <ModeToggle />
           <LanguageSwitcher />
           <HeaderAccount />

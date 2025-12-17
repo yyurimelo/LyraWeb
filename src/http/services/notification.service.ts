@@ -10,20 +10,6 @@ export async function getNotificationPaginated({
   pageNumber,
   pageSize,
 }: NotificationFilter): Promise<PaginationDataModel<NotificationDataModel>> {
-  // Build request payload, only including fields that are not null
-  const payload: any = {};
-
-  // Only include status if it's defined (not undefined)
-  if (status !== undefined) {
-    payload.status = status;
-  }
-
-  // Only include type if it's defined and not empty
-  if (type !== undefined && type !== '') {
-    payload.type = type;
-  }
-
-
   const response = await http.post(
     API_ENDPOINTS.NOTIFICATION.GET_ALL_PAGINATED,
     {

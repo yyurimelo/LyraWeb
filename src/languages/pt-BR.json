@@ -151,6 +151,7 @@
     "day_other": "{{count}} dias"
   },
   "notifications": {
+    "title": "Notificações",
     "tabs": {
       "all": "Todas",
       "read": "Lidas",
@@ -161,14 +162,18 @@
     "empty": {
       "all": "Nenhuma notificação",
       "read": "Nenhuma notificação lida",
-      "unread": "Nenhuma notificação não lida"
+      "unread": "Nenhuma notificação não lida",
+      "newNotifications": "Você não tem novas notificações."
     },
-    "markAsRead": "Marcar como lida",
+    "markAsRead": {
+      "singular": "Marcar como lida",
+      "plural": "Marcar todas como lidas"
+    } ,
     "delete": "Excluir",
     "types": {
       "inviteFriend": {
         "title": "Solicitação de amizade",
-        "message": "{{senderName}} enviou uma solicitação de amizade para {{receiverName}}"
+        "message": "{{senderName}} enviou uma solicitação de amizade"
       },
       "acceptFriendRequest": {
         "title": "Amizade aceita",
@@ -201,7 +206,7 @@
       "daysAgo_other": "há {{count}} dias"
     },
     "error": {
-      "loading": "Erro ao carregar notificações: {{error}}",
+      "loading": "Erro ao carregar notificações",
       "retry": "Tentar novamente"
     }
   }
