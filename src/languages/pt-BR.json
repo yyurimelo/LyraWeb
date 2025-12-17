@@ -149,5 +149,60 @@
 
     "day_one": "{{count}} dia",
     "day_other": "{{count}} dias"
+  },
+  "notifications": {
+    "tabs": {
+      "all": "Todas",
+      "read": "Lidas",
+      "unread": "Não lidas"
+    },
+    "unknownUser": "Usuário desconhecido",
+    "you": "você",
+    "empty": {
+      "all": "Nenhuma notificação",
+      "read": "Nenhuma notificação lida",
+      "unread": "Nenhuma notificação não lida"
+    },
+    "markAsRead": "Marcar como lida",
+    "delete": "Excluir",
+    "types": {
+      "inviteFriend": {
+        "title": "Solicitação de amizade",
+        "message": "{{senderName}} enviou uma solicitação de amizade para {{receiverName}}"
+      },
+      "acceptFriendRequest": {
+        "title": "Amizade aceita",
+        "message": "{{senderName}} aceitou sua solicitação de amizade!"
+      },
+      "newMessage": {
+        "title": "Nova mensagem",
+        "message": "{{senderName}} te enviou uma mensagem"
+      },
+      "system": {
+        "title": "Notificação do sistema",
+        "message": "{{content}}"
+      },
+      "warning": {
+        "title": "Aviso",
+        "message": "{{content}}"
+      },
+      "default": {
+        "title": "Notificação",
+        "message": "Você tem uma nova notificação de {{senderName}}"
+      }
+    },
+    "time": {
+      "justNow": "Agora",
+      "minutesAgo_one": "há {{count}} minuto",
+      "minutesAgo_other": "há {{count}} minutos",
+      "hoursAgo_one": "há {{count}} hora",
+      "hoursAgo_other": "há {{count}} horas",
+      "daysAgo_one": "há {{count}} dia",
+      "daysAgo_other": "há {{count}} dias"
+    },
+    "error": {
+      "loading": "Erro ao carregar notificações: {{error}}",
+      "retry": "Tentar novamente"
+    }
   }
 }

@@ -149,5 +149,60 @@
 
     "day_one": "{{count}} day",
     "day_other": "{{count}} days"
+  },
+  "notifications": {
+    "tabs": {
+      "all": "All",
+      "read": "Read",
+      "unread": "Unread"
+    },
+    "unknownUser": "Unknown user",
+    "you": "you",
+    "empty": {
+      "all": "No notifications",
+      "read": "No read notifications",
+      "unread": "No unread notifications"
+    },
+    "markAsRead": "Mark as read",
+    "delete": "Delete",
+    "types": {
+      "inviteFriend": {
+        "title": "Friend Request",
+        "message": "{{senderName}} sent you a friend request"
+      },
+      "acceptFriendRequest": {
+        "title": "Friendship Accepted",
+        "message": "{{senderName}} accepted your friend request!"
+      },
+      "newMessage": {
+        "title": "New Message",
+        "message": "{{senderName}} sent you a message"
+      },
+      "system": {
+        "title": "System Notification",
+        "message": "{{content}}"
+      },
+      "warning": {
+        "title": "Warning",
+        "message": "{{content}}"
+      },
+      "default": {
+        "title": "Notification",
+        "message": "You have a new notification from {{senderName}}"
+      }
+    },
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo_one": "{{count}} minute ago",
+      "minutesAgo_other": "{{count}} minutes ago",
+      "hoursAgo_one": "{{count}} hour ago",
+      "hoursAgo_other": "{{count}} hours ago",
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago"
+    },
+    "error": {
+      "loading": "Error loading notifications: {{error}}",
+      "retry": "Try again"
+    }
   }
 }
