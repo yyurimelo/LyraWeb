@@ -19,5 +19,6 @@ export const API_ENDPOINTS = {
   NOTIFICATION: {
     GET_ALL_PAGINATED: "/api/notification/get/all/paginated",
     GET_UNREAD_COUNT: "/api/notification/get/unread/count",
+    MASK_AS_READ: "/api/notification/mark-as-read"
   },
 } as const;

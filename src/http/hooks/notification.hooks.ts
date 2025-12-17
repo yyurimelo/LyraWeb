@@ -1,5 +1,6 @@
-import { keepPreviousData, useQuery } from "@lyra/react-query-config";
-import { getNotificationPaginated, getUnreadNotificationCount } from "../services/notification.service";
+import { keepPreviousData, queryClient, useMutation, useQuery } from "@lyra/react-query-config";
+import { getNotificationPaginated, getUnreadNotificationCount, maskAsRead } from "../services/notification.service";
+import { toast } from "sonner";
 
 export const useNotificationPaginationQuery = (filters: Record<string, any>) =>
   useQuery({
@@ -17,31 +18,46 @@ export const useNotificationPaginationQuery = (filters: Record<string, any>) =>
     placeholderData: keepPreviousData,
   });
 
-// Hook for all notifications (max 5) - LAZY LOADING
+export const useMaskAsReadMutation = () =>
+  useMutation({
+    mutationFn: maskAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["notifications", "count", "unread"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["notifications", "header"],
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+
 export const useAllNotificationsQuery = (enabled: boolean = true) =>
   useQuery({
     queryKey: ["notifications", "header", "all"],
     queryFn: () =>
       getNotificationPaginated({
-        type: undefined, // type must be null
         pageNumber: 1,
-        pageSize: 5,
+        pageSize: 3,
       }),
     placeholderData: keepPreviousData,
     select: (data) => data.data,
     enabled: enabled,
   });
 
-// Hook for unread notifications (max 5) - LAZY LOADING
 export const useUnreadNotificationsQuery = (enabled: boolean = true) =>
   useQuery({
     queryKey: ["notifications", "header", "unread"],
     queryFn: () =>
       getNotificationPaginated({
-        status: false, // false means unread
-        type: undefined,
+        status: false,
+        type: "",
         pageNumber: 1,
-        pageSize: 5,
+        pageSize: 3,
       }),
     placeholderData: keepPreviousData,
     select: (data) => data.data,
@@ -55,9 +71,8 @@ export const useReadNotificationsQuery = (enabled: boolean = true) =>
     queryFn: () =>
       getNotificationPaginated({
         status: true, // true means read
-        type: undefined, // type must be null
         pageNumber: 1,
-        pageSize: 5,
+        pageSize: 3,
       }),
     placeholderData: keepPreviousData,
     select: (data) => data.data,
@@ -69,6 +84,7 @@ export const useUnreadNotificationsCountQuery = () =>
     queryKey: ["notifications", "count", "unread"],
     queryFn: () => getUnreadNotificationCount(),
     placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
   });
 
 export const useNotificationsAdaptiveQuery = (isOpen: boolean, activeTab: 'all' | 'unread' | 'read') =>
@@ -84,7 +100,7 @@ export const useNotificationsAdaptiveQuery = (isOpen: boolean, activeTab: 'all' 
       return getNotificationPaginated({
         status: statusMap[activeTab],
         pageNumber: 1,
-        pageSize: 5,
+        pageSize: 3,
       });
     },
     placeholderData: keepPreviousData,

@@ -45,7 +45,7 @@ export const NotificationList = memo(({
 
   return (
     <ScrollArea className="max-h-[300px] w-full">
-      <div className="space-y-1">
+      <div className="gap-1 flex flex-col p-2">
         {notifications.map((notification) => (
           <NotificationItem key={notification.id} notification={notification} />
         ))}

@@ -12,6 +12,7 @@ import { notificationTypeIconMap } from "@/app/_mappers/notification-type-icon-m
 // hooks
 import { useNotificationMessage } from "@/lib/notifications/notification-message.service";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 interface NotificationItemProps {
   notification: ExtendedNotificationDataModel;
@@ -31,17 +32,26 @@ export const NotificationItem = memo(({ notification }: NotificationItemProps) =
 
   const notificationMessage = getNotificationMessage(notification);
 
-  const {i18n} = useTranslation()
+  const { i18n } = useTranslation()
 
   return (
-    <div className="p-2 text-sm transition-colors">
+    <div className="text-sm transition-colors">
       <div className="hover:bg-accent cursor-pointer rounded-sm relative flex items-start gap-3 p-3 px-3">
         <div className="flex-1 space-y-1">
           <div className="flex space-x-2 w-full">
-            <Icon size={21} className="text-primary flex-shrink-0" />
-            <div className="flex flex-col gap-[2px] flex-1 min-w-0">
+            <Icon
+              size={21}
+              className={cn(
+                "flex-shrink-0",
+                String(notification.status) === "Read"
+                  ? "text-muted-foreground"
+                  : "text-primary"
+              )}
+            />            <div className="flex flex-col gap-[2px] flex-1 min-w-0">
               <div className="flex items-center">
-                <span className="text-[11px] text-primary">
+                <span className={cn("text-[11px]", String(notification.status) === "Read"
+                  ? "text-muted-foreground"
+                  : "text-primary")}>
                   {notificationMessage.title}
                 </span>
                 <Dot className="text-muted-foreground/50 size-[15px]" />

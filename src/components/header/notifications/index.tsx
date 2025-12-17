@@ -62,7 +62,7 @@ export function Notification() {
           <Bell className="size-5" />
           {unreadCount > 0 && (
             <Badge className="absolute -top-2 left-full min-w-5 -translate-x-1/2 px-1 h-5 flex items-center justify-center text-xs">
-              {unreadCount > 99 ? "99+" : unreadCount}
+              {unreadCount > 3 ? `${unreadCount}+` : unreadCount}
             </Badge>
           )}
         </Button>
@@ -74,7 +74,7 @@ export function Notification() {
         
       >
         <NotificationHeader
-          unreadNotificationsIds={unreadNotifications?.map((x) => x.id) ?? []}
+          unreadNotificationsIds={unreadNotifications?.map((x) => Number(x.id)) ?? []}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           unreadCount={unreadCount}

@@ -31,3 +31,7 @@ export async function getUnreadNotificationCount(): Promise<number> {
   const response = await http.get(API_ENDPOINTS.NOTIFICATION.GET_UNREAD_COUNT);
   return response.data;
 }
+
+export async function maskAsRead(notificationIds: number[]): Promise<void> {
+  await http.post(API_ENDPOINTS.NOTIFICATION.MASK_AS_READ, notificationIds);
+}
