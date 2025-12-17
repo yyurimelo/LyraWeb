@@ -23,6 +23,7 @@ export const useAllNotificationsQuery = (enabled: boolean = true) =>
     queryKey: ["notifications", "header", "all"],
     queryFn: () =>
       getNotificationPaginated({
+        type: undefined, // type must be null
         pageNumber: 1,
         pageSize: 5,
       }),
@@ -38,6 +39,7 @@ export const useUnreadNotificationsQuery = (enabled: boolean = true) =>
     queryFn: () =>
       getNotificationPaginated({
         status: false, // false means unread
+        type: undefined,
         pageNumber: 1,
         pageSize: 5,
       }),
@@ -53,6 +55,7 @@ export const useReadNotificationsQuery = (enabled: boolean = true) =>
     queryFn: () =>
       getNotificationPaginated({
         status: true, // true means read
+        type: undefined, // type must be null
         pageNumber: 1,
         pageSize: 5,
       }),

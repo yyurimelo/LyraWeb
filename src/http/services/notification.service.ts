@@ -23,9 +23,13 @@ export async function getNotificationPaginated({
     payload.type = type;
   }
 
+
   const response = await http.post(
     API_ENDPOINTS.NOTIFICATION.GET_ALL_PAGINATED,
-    payload,
+    {
+      status: status !== undefined ? (status ? "Read" : "Unread") : null,
+      type: type ? type : null,
+    },
     {
       params: {
         pageNumber,
