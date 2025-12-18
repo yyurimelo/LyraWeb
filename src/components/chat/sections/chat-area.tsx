@@ -57,7 +57,13 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
   }
 
   const formatMessageTime = (date: string | Date) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date
+    // Converte para UTC tratando strings corretamente
+    const dateStr = typeof date === 'string' ? date : date.toISOString()
+    // Verifica se já tem timezone, senão adiciona Z para tratar como UTC
+    const finalDateStr = dateStr.includes('Z') || dateStr.includes('+') || (dateStr.includes('-', 10) && dateStr.length > 10)
+      ? dateStr
+      : dateStr + 'Z'
+    const dateObj = new Date(finalDateStr)
     return dateObj.toLocaleTimeString(i18n.language, {
       hour: '2-digit',
       minute: '2-digit'

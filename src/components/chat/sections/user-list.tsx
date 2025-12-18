@@ -30,7 +30,13 @@ interface UserListProps {
 }
 
 const formatLastMessageTime = (date: Date | string, t: any, i18n: any) => {
-  const messageDate = dayjs(date)
+  // Converte para UTC tratando strings corretamente
+  const dateStr = typeof date === 'string' ? date : date.toISOString()
+  // Verifica se já tem timezone, senão adiciona Z para tratar como UTC
+  const finalDateStr = dateStr.includes('Z') || dateStr.includes('+') || (dateStr.includes('-', 10) && dateStr.length > 10)
+    ? dateStr
+    : dateStr + 'Z'
+  const messageDate = dayjs(finalDateStr)
   const now = dayjs()
 
   const diffInMinutes = now.diff(messageDate, 'minute')
@@ -108,7 +114,22 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
     if (!a.lastMessageAt) return 1;
     if (!b.lastMessageAt) return -1;
 
-    return new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime();
+    // Função auxiliar para converter data UTC para timestamp
+    const getUtcTimestamp = (dateStr: string) => {
+      // Verifica se já tem timezone
+      const finalDateStr = dateStr.includes('Z') || dateStr.includes('+') || (dateStr.includes('-', 10) && dateStr.length > 10)
+        ? dateStr
+        : dateStr + 'Z';
+      return new Date(finalDateStr).getTime();
+    };
+
+    try {
+      const dateA = getUtcTimestamp(a.lastMessageAt);
+      const dateB = getUtcTimestamp(b.lastMessageAt);
+      return dateB - dateA;
+    } catch {
+      return 0;
+    }
   });
 
   return (

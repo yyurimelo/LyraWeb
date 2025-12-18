@@ -83,6 +83,7 @@ export function Notification() {
           notifications={currentData as ExtendedNotificationDataModel[]}
           isLoading={currentLoading}
           error={currentError}
+          activeTab={activeTab}
         />
       </PopoverContent>
     </Popover>

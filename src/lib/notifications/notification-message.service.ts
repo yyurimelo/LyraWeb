@@ -79,11 +79,18 @@ export const useNotificationMessage = () => {
     }
   };
 
-  const formatNotificationTime = (date?: Date): string => {
+  const formatNotificationTime = (date?: Date | string): string => {
     if (!date) return t('notifications.time.justNow');
 
     const now = new Date();
-    const diffInMs = now.getTime() - new Date(date).getTime();
+    // Converte para UTC tratando strings corretamente
+    const dateStr = typeof date === 'string' ? date : date.toISOString();
+    // Verifica se já tem timezone, senão adiciona Z para tratar como UTC
+    const finalDateStr = dateStr.includes('Z') || dateStr.includes('+') || (dateStr.includes('-', 10) && dateStr.length > 10)
+      ? dateStr
+      : dateStr + 'Z';
+    const utcDate = new Date(finalDateStr);
+    const diffInMs = now.getTime() - utcDate.getTime();
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
@@ -97,7 +104,7 @@ export const useNotificationMessage = () => {
     } else if (diffInDays < 7) {
       return t('notifications.time.daysAgo', { count: diffInDays });
     } else {
-      return new Date(date).toLocaleDateString();
+      return utcDate.toLocaleDateString();
     }
   };
 

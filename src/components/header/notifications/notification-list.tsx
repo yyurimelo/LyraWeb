@@ -13,12 +13,14 @@ interface NotificationListProps {
   notifications: ExtendedNotificationDataModel[] | undefined;
   isLoading: boolean;
   error: Error | null;
+  activeTab: 'unread' | 'read';
 }
 
 export const NotificationList = memo(({
   notifications,
   isLoading,
-  error
+  error,
+  activeTab
 }: NotificationListProps) => {
   const { t } = useTranslation()
   if (error) {
@@ -47,7 +49,7 @@ export const NotificationList = memo(({
     <ScrollArea className="max-h-[300px] w-full">
       <div className="gap-1 flex flex-col p-2">
         {notifications.map((notification) => (
-          <NotificationItem key={notification.id} notification={notification} />
+          <NotificationItem key={notification.id} notification={notification} activeTab={activeTab} />
         ))}
       </div>
     </ScrollArea>

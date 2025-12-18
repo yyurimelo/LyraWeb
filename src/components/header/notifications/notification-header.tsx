@@ -25,13 +25,21 @@ export const NotificationHeader = memo(({
     await maskAsReadFn(unreadNotificationsIds ?? []);
   }
 
+  const hasUnreadNotifications =
+    unreadNotificationsIds && unreadNotificationsIds.length > 0;
+
+  const isButtonDisabled =
+    isPending ||
+    activeTab === "read" ||
+    !hasUnreadNotifications;
+
   return (
     <>
       <div>
         <div className="flex items-center justify-between px-4 pt-2 pb-1">
           <div className="text-sm font-semibold">{t("notifications.title")}</div>
           <Button
-            disabled={isPending}
+            disabled={isButtonDisabled}
             onClick={handleMarkAllAsRead}
             className="text-xs ml-2 flex items-center gap-1 p-0 shadow-none text-secondary-foreground/80 bg-transparent hover:bg-transparent hover:text-secondary-foreground"
           >
