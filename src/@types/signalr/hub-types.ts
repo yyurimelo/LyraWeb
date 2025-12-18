@@ -7,10 +7,13 @@ export interface MessageHub {
   off(event: 'UpdateFriendLastMessage', callback: (message: MessageResponseDto) => void): void
 }
 
-export enum ConnectionState {
-  Disconnected = 'disconnected',
-  Connecting = 'connecting',
-  Connected = 'connected',
-  Reconnecting = 'reconnecting',
-  Error = 'error'
-}
+export const ConnectionState = {
+  Disconnected: 'disconnected',
+  Connecting: 'connecting',
+  Connected: 'connected',
+  Reconnecting: 'reconnecting',
+  Error: 'error',
+} as const
+
+export type ConnectionState =
+  typeof ConnectionState[keyof typeof ConnectionState]

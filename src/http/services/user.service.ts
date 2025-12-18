@@ -70,3 +70,37 @@ export async function updateUser({
   }
   return response.data;
 }
+
+export async function searchUserByUserIdentifier(userIdentifier: string): Promise<UserDataModel[]> {
+  let response: any;
+  try {
+    response = await http.get(`${API_ENDPOINTS.USER.SEARCH}?userIdentifier=${userIdentifier}`);
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data || 'Erro ao buscar usuários');
+    }
+    throw error;
+  }
+
+  if (!response?.data) {
+    return [];
+  }
+
+  // Handle both single user and array responses
+  const data = response.data;
+  let result: UserDataModel[] = [];
+  if (Array.isArray(data)) {
+    result = data;
+  } else if (data && typeof data === 'object') {
+    // Check if data is wrapped in an object
+    if (data.users && Array.isArray(data.users)) {
+      result = data.users;
+    } else if (data.data && Array.isArray(data.data)) {
+      result = data.data;
+    } else {
+      result = [data];
+    }
+  }
+
+  return result.filter(Boolean);
+}

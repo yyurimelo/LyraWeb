@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
     GET_ALL_FRIENDS: "/api/user/get/all/friends",
     UPDATE: "/api/user/update",
     GET: (id: string) => `/api/user/get/${id}`,
+    SEARCH: "/api/user/get/search",
   },
   MESSAGE: {
     SEND: "/api/message/send",
@@ -20,5 +21,11 @@ export const API_ENDPOINTS = {
     GET_ALL_PAGINATED: "/api/notification/get/all/paginated",
     GET_UNREAD_COUNT: "/api/notification/get/unread/count",
     MASK_AS_READ: "/api/notification/mark-as-read"
+  },
+  FRIEND_REQUEST: {
+    SEND: "/api/friend-request/send",
+    ACCEPT: "/api/friend-request/accept",
+    REMOVE: "/api/friend-request/remove",
+    CHECK_REQUEST: "/api/friend-request/check/request",
   },
 } as const;
