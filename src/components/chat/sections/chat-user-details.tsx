@@ -13,6 +13,12 @@ import {
 } from "@/components/ui/avatar"
 import { getInitialName } from "@/lib/get-initial-name"
 import type { Dispatch } from "react"
+import { useRemoveFriendMutation } from "@/http/hooks/user.hooks"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { UserRoundX } from "lucide-react"
+import { useNavigate } from "@tanstack/react-router"
+
 
 interface ChatUserDetailsProps {
   user: UserGetAllFriendsDataModel
@@ -23,6 +29,27 @@ interface ChatUserDetailsProps {
 export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
   const { t } = useTranslation()
 
+  const navigate = useNavigate()
+
+  const { mutateAsync: removeFriendFn, isPending } =
+    useRemoveFriendMutation();
+
+  async function handleRemoveFriend() {
+    if (!user.userIdentifier) return;
+
+    try {
+      await removeFriendFn(user.userIdentifier);
+      await navigate({
+        to: "/"
+      })
+      setOpen(false)
+    } catch (error) {
+      console.error("Error canceling friend request:", error);
+      toast.error("Falha ao cancelar solicitação de amizade");
+    }
+  }
+
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent side="right" className="w-full sm:w-96">
@@ -30,7 +57,7 @@ export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
           <SheetTitle>{t('userDetails.title')}</SheetTitle>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-6 px-4">
           {/* User Avatar Section */}
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="w-24 h-24">
@@ -49,13 +76,13 @@ export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
 
             <div className="text-center">
               <h3 className="text-xl font-semibold">{user.name}</h3>
-                <p className="text-sm text-muted-foreground mt-2 px-4">
-                  {user.email}
-                </p>
+              <p className="text-sm text-muted-foreground mt-2 px-4">
+                {user.email}
+              </p>
             </div>
           </div>
 
-          <div className="ml-4">
+          <div>
             <strong className="text-muted-foreground text-sm">
               {t('userDetails.status')}
             </strong>
@@ -64,6 +91,18 @@ export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
             </p>
           </div>
 
+          <div className="flex-1 ml-auto">
+            <Button
+              tabIndex={-1}
+              variant="outline"
+              onClick={handleRemoveFriend}
+              disabled={isPending}
+              className="text-red-500 w-full"
+            >
+              <UserRoundX className="w-4 h-4 " />
+              Remover amigo
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

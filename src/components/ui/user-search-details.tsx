@@ -36,6 +36,7 @@ import {
 // types
 import type { UserDataModel } from "@/@types/user/user-data-model";
 import { getInitialName } from "@/lib/get-initial-name";
+import { useRemoveFriendMutation } from "@/http/hooks/user.hooks";
 
 interface UserSearchDetailsProps {
   open: boolean;
@@ -45,17 +46,16 @@ interface UserSearchDetailsProps {
 
 export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProps) {
   const { user: loggedUser } = useAuth();
-  const loggedUserId = loggedUser?.id;
+  const loggedUserId = loggedUser?.userIdentifier;
 
-  const loggedUserIsMe = loggedUserId === user?.id;
+  const loggedUserIsMe = loggedUserId === user?.userIdentifier;
   const otherUserId = user?.userIdentifier || "";
 
-  // Check friend request status between users
   const { friendRequest } = useCheckFriendshipStatus(
-    otherUserId
+    otherUserId,
+    open
   );
 
-  // Friend request mutations
   const { mutateAsync: sendInviteFriendFn, isPending: isSendingInvite } =
     useSendFriendRequestMutation();
 
@@ -65,14 +65,27 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
   const { mutateAsync: cancelRequestFn, isPending: isRemoving } =
     useCancelFriendRequestMutation();
 
-  const isPending = isSendingInvite || isAccepting || isRemoving;
+  const { mutateAsync: removeFriendFn, isPending: isRemovingFriend } =
+    useRemoveFriendMutation();
 
-  // Cancelar solicitação de amizade
+
+  const isPending = isSendingInvite || isAccepting || isRemoving || isRemovingFriend;
+
   async function handleCancelRequest() {
     if (!friendRequest?.id) return;
 
     try {
       await cancelRequestFn(friendRequest.id);
+    } catch (error) {
+      console.error("Error canceling friend request:", error);
+      toast.error("Falha ao cancelar solicitação de amizade");
+    }
+  }
+  async function handleRemoveFriend() {
+    if (otherUserId) return;
+
+    try {
+      await removeFriendFn(otherUserId);
     } catch (error) {
       console.error("Error canceling friend request:", error);
       toast.error("Falha ao cancelar solicitação de amizade");
@@ -151,7 +164,6 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
               {friendRequest.status === "Pending" && (
                 <>
                   {friendRequest.senderId === loggedUserId ? (
-                    // Eu enviei e posso cancelar
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -212,7 +224,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                           tabIndex={-1}
                           size="icon"
                           variant="outline"
-                          onClick={handleCancelRequest}
+                          onClick={handleRemoveFriend}
                         >
                           <UserRoundX className="w-4 h-4 text-red-500" />
                         </Button>

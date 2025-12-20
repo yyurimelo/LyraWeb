@@ -7,7 +7,7 @@ import { memo } from "react";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
 
 // mappers
-import { notificationTypeIconMap } from "@/app/_mappers/notification-type-icon-map";
+import { notificationTypeIconMap } from "@/mappers/notification-type-icon-map";
 
 // hooks
 import { useNotificationMessage } from "@/lib/notifications/notification-message.service";

@@ -9,7 +9,7 @@ export async function sendFriendRequest({
   let response: any;
   try {
     response = await http.post(API_ENDPOINTS.FRIEND_REQUEST.SEND, {
-      userIdentifier
+      receiverId: userIdentifier
     });
   } catch (error) {
     if (isAxiosError(error)) {

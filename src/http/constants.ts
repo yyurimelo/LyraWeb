@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
     UPDATE: "/api/user/update",
     GET: (id: string) => `/api/user/get/${id}`,
     SEARCH: "/api/user/get/search",
+    REMOVE: "/api/user/remove/friend"
   },
   MESSAGE: {
     SEND: "/api/message/send",

@@ -66,20 +66,19 @@ export const useCancelFriendRequestMutation = () =>
     },
   });
 
-export const useCheckFriendRequestQuery = (otherUserId: string | null) =>
+export const useCheckFriendRequestQuery = (otherUserId: string | null, open?: boolean) =>
   useQuery<FriendRequestDataModel | null>({
-    queryKey: ["friend-request", "status", otherUserId],
+    queryKey: ["friend-request", "status", otherUserId, open],
     queryFn: (): Promise<FriendRequestDataModel | null> => {
       if (!otherUserId) return Promise.resolve(null);
       return checkFriendRequestStatus(otherUserId);
     },
-    enabled: !!otherUserId,
-    staleTime: 30 * 1000, // 30 seconds
-    refetchOnWindowFocus: false,
+    enabled: !!otherUserId || open,
+    refetchOnWindowFocus: true,
   });
 
-export const useCheckFriendshipStatus = (otherUserId: string | null) => {
-  const { data: friendRequest, isLoading } = useCheckFriendRequestQuery(otherUserId);
+export const useCheckFriendshipStatus = (otherUserId: string | null, open?: boolean) => {
+  const { data: friendRequest, isLoading } = useCheckFriendRequestQuery(otherUserId, open);
 
   return {
     isPending: friendRequest?.status === "Pending",

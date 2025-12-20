@@ -104,3 +104,17 @@ export async function searchUserByUserIdentifier(userIdentifier: string): Promis
 
   return result.filter(Boolean);
 }
+
+export async function removeFriend(userIdentifier: string) {
+  let response: any;
+  try {
+    response = await http.delete(`${API_ENDPOINTS.USER.REMOVE}?userIdentifier=${userIdentifier}`);
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data);
+    }
+    throw error;
+  }
+
+  return response;
+}

@@ -1,5 +1,5 @@
 import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
-import { createUser, getAllFriends, getUser, updateUser } from "../services/user.service";
+import { createUser, getAllFriends, getUser, removeFriend, updateUser } from "../services/user.service";
 import { toast } from "sonner";
 import type { UserUpdateModel } from "@/@types/user/user-form-update";
 import type { UserDataModel } from "@/@types/user/user-data-model";
@@ -14,6 +14,24 @@ export const useCreateUserMutation = () =>
         queryKey: ["user"],
       });
       toast.success("Usuário criado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+export const useRemoveFriendMutation = () =>
+  useMutation({
+    mutationFn: removeFriend,
+    onSuccess: async () => {
+      queryClient.invalidateQueries({
+        queryKey: ["chat"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["user-details"],
+      });
+      toast.success("Usuário removido com sucesso!");
     },
     onError: (error) => {
       toast.error(error.message);
