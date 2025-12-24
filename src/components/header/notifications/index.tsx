@@ -13,12 +13,14 @@ import { Badge } from "@/components/ui/badge";
 // sections
 import { NotificationHeader } from "./notification-header";
 import { NotificationList } from "./notification-list";
+import { UserSearchDetails } from "@/components/ui/user-search-details";
 
 // hooks
 import {
   useUnreadNotificationsQuery,
   useReadNotificationsQuery,
-  useUnreadNotificationsCountQuery
+  useUnreadNotificationsCountQuery,
+  useNotificationClick
 } from "@/http/hooks/notification.hooks";
 import { useAuth } from "@/contexts/auth-provider";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
@@ -49,6 +51,14 @@ export function Notification() {
   const currentData = activeTab === 'unread' ? unreadNotifications : readNotifications;
   const currentLoading = activeTab === 'unread' ? isLoadingUnread : isLoadingRead;
   const currentError = activeTab === 'unread' ? unreadError : readError;
+
+  const {
+    selectedUser,
+    userDetailsDialogOpen,
+    isLoadingUser,
+    setUserDetailsDialogOpen,
+    handleNotificationClick
+  } = useNotificationClick();
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -84,8 +94,18 @@ export function Notification() {
           isLoading={currentLoading}
           error={currentError}
           activeTab={activeTab}
+          onNotificationClick={handleNotificationClick}
+          isLoadingNotification={isLoadingUser}
         />
       </PopoverContent>
+
+      {selectedUser && (
+        <UserSearchDetails
+          open={userDetailsDialogOpen}
+          setOpen={setUserDetailsDialogOpen}
+          user={selectedUser}
+        />
+      )}
     </Popover>
   );
 }

@@ -30,10 +30,12 @@ import { useMaskAsReadMutation } from "@/http/hooks/notification.hooks";
 interface NotificationItemProps {
   notification: ExtendedNotificationDataModel;
   activeTab: 'unread' | 'read';
+  onClick?: (notification: ExtendedNotificationDataModel) => Promise<void>;
+  isLoading?: boolean;
 }
 
 export const NotificationItem = memo(
-  ({ notification, activeTab }: NotificationItemProps) => {
+  ({ notification, activeTab, onClick, isLoading }: NotificationItemProps) => {
     const { getNotificationMessage } = useNotificationMessage();
     const { type, createdAt } = notification;
     const { i18n } = useTranslation();
@@ -49,7 +51,7 @@ export const NotificationItem = memo(
             : type === "System"
               ? 3
               : 4;
-
+    
     const Icon = notificationTypeIconMap[typeKey] || notificationTypeIconMap[4];
     const notificationMessage = getNotificationMessage(notification);
 
@@ -59,9 +61,22 @@ export const NotificationItem = memo(
       await maskAsReadFn([Number(notification.id)]);
     }
 
+    async function handleClick() {
+      if (onClick && notification.type === "InviteFriend") {
+        await onClick(notification);
+      }
+    }
+
     return (
       <div className="text-sm transition-colors">
-        <div className="hover:bg-accent/40 cursor-pointer rounded-sm relative p-3 group">
+        <div
+          className={cn(
+            "hover:bg-accent/40 rounded-sm relative p-3 group",
+            onClick && notification.type === "InviteFriend" && "cursor-pointer",
+            isLoading && "opacity-50 pointer-events-none"
+          )}
+          onClick={handleClick}
+        >
           {activeTab === "unread" && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -1,5 +1,5 @@
 import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
-import { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, checkFriendRequestStatus } from "../services/friend-request.service";
+import { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, checkFriendRequestStatus, getFriendRequest } from "../services/friend-request.service";
 import { toast } from "sonner";
 import type { FriendRequestFormModel } from "@/@types/friend-request/friend-request-form";
 import type { FriendRequestDataModel } from "@/@types/friend-request/friend-request-data";
@@ -87,3 +87,11 @@ export const useCheckFriendshipStatus = (otherUserId: string | null, open?: bool
     friendRequest,
   };
 };
+
+export const useGetFriendRequestQuery = (friendRequestId: string | null, enabled: boolean = true) =>
+  useQuery({
+    queryKey: ["friend-request", friendRequestId],
+    queryFn: () => getFriendRequest(friendRequestId!),
+    enabled: !!friendRequestId && enabled,
+    staleTime: 2 * 60 * 1000,
+  });

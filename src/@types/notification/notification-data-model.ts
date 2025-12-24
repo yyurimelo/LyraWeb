@@ -7,4 +7,6 @@ export type NotificationDataModel = {
   createdBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  referenceType?: string;
+  referenceId?: string;
 }

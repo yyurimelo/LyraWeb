@@ -25,6 +25,8 @@ export interface ExtendedNotificationDataModel {
   createdByName?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  referenceType?: string;
+  referenceId?: string;
 }
 
 export interface NotificationTab {

@@ -1,6 +1,13 @@
 import { keepPreviousData, queryClient, useMutation, useQuery } from "@lyra/react-query-config";
 import { getNotificationPaginated, getUnreadNotificationCount, maskAsRead } from "../services/notification.service";
 import { toast } from "sonner";
+import { useState } from "react";
+import { isAxiosError } from "@lyra/axios-config";
+import { getFriendRequest } from "../services/friend-request.service";
+import { getUserPublicId } from "../services/user.service";
+import { NotificationTypeEnum } from "@/@types/notification";
+import type { ExtendedNotificationDataModel } from "@/@types/notification";
+import type { UserDataModel } from "@/@types/user/user-data-model";
 
 export const useNotificationPaginationQuery = (filters: Record<string, any>) =>
   useQuery({
@@ -118,3 +125,61 @@ export const useUnreadNotificationsLazyQuery = (enabled: boolean) =>
 
 export const useReadNotificationsLazyQuery = (enabled: boolean) =>
   useReadNotificationsQuery(enabled);
+
+interface UseNotificationClickResult {
+  selectedUser: UserDataModel | null;
+  userDetailsDialogOpen: boolean;
+  isLoadingUser: boolean;
+  setUserDetailsDialogOpen: (open: boolean) => void;
+  handleNotificationClick: (notification: ExtendedNotificationDataModel) => Promise<void>;
+}
+
+export const useNotificationClick = (): UseNotificationClickResult => {
+  const [selectedUser, setSelectedUser] = useState<UserDataModel | null>(null);
+  const [userDetailsDialogOpen, setUserDetailsDialogOpen] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
+
+  const handleNotificationClick = async (notification: ExtendedNotificationDataModel) => {
+    if (notification.type !== NotificationTypeEnum.INVITE_FRIEND) {
+      return;
+    }
+    
+    if (!notification.referenceId) {
+      toast.error("Informações da notificação incompletas");
+      return;
+    }
+
+    setIsLoadingUser(true);
+
+    try {
+      const friendRequest = await getFriendRequest(notification.referenceId);
+      const senderId = friendRequest.senderId;
+      const userData = await getUserPublicId(senderId);
+
+      setSelectedUser(userData);
+      setUserDetailsDialogOpen(true);
+
+    } catch (error) {
+      console.error('Error handling notification click:', error);
+      if (isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          toast.error("Solicitação de amizade não encontrada");
+        } else {
+          toast.error(error.response?.data || "Erro ao carregar dados");
+        }
+      } else {
+        toast.error("Erro ao processar notificação");
+      }
+    } finally {
+      setIsLoadingUser(false);
+    }
+  };
+
+  return {
+    selectedUser,
+    userDetailsDialogOpen,
+    isLoadingUser,
+    setUserDetailsDialogOpen,
+    handleNotificationClick,
+  };
+};

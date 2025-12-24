@@ -1,5 +1,5 @@
 import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
-import { createUser, getAllFriends, getUser, getUserByName, removeFriend, updateUser } from "../services/user.service";
+import { createUser, getAllFriends, getUser, getUserByName, getUserPublicId, removeFriend, updateUser } from "../services/user.service";
 import { toast } from "sonner";
 import type { UserUpdateModel } from "@/@types/user/user-form-update";
 import type { UserDataModel } from "@/@types/user/user-data-model";
@@ -57,6 +57,14 @@ export const useGetUserWithNameQuery = (name: string) => useQuery({
   queryFn: () => getUserByName(name),
   enabled: !!name,
 });
+
+export const useGetUserPublicIdQuery = (userIdentifier: string | null, enabled: boolean = true) =>
+  useQuery({
+    queryKey: ["user", "public", userIdentifier],
+    queryFn: () => getUserPublicId(userIdentifier!),
+    enabled: !!userIdentifier && enabled,
+    staleTime: 5 * 60 * 1000,
+  });
 
 
 export const useUpdateUserProfileMutation = (
