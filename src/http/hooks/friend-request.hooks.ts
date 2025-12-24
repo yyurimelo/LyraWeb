@@ -11,6 +11,13 @@ const updateFriendsListCache = () => {
   });
 };
 
+// Helper function to update notifications cache
+const updateNotificationsCache = () => {
+  queryClient.invalidateQueries({
+    queryKey: ["notifications"],
+  });
+};
+
 export const useSendFriendRequestMutation = () =>
   useMutation({
     mutationFn: ({ userIdentifier }: FriendRequestFormModel) =>
@@ -20,6 +27,9 @@ export const useSendFriendRequestMutation = () =>
       queryClient.invalidateQueries({
         queryKey: ["friend-request"],
       });
+
+      // Update notifications cache
+      updateNotificationsCache();
 
       toast.success("Solicitação de amizade enviada com sucesso!");
     },
@@ -35,6 +45,9 @@ export const useAcceptFriendRequestMutation = () =>
     onSuccess: async () => {
       // Update friends list to include the new friend
       updateFriendsListCache();
+
+      // Update notifications cache
+      updateNotificationsCache();
 
       // Invalidate friend request status cache
       queryClient.invalidateQueries({
@@ -56,6 +69,9 @@ export const useCancelFriendRequestMutation = () =>
       queryClient.invalidateQueries({
         queryKey: ["friend-request"],
       });
+
+      // Update notifications cache
+      updateNotificationsCache();
 
       toast.success("Solicitação de amizade cancelada!");
     },
