@@ -44,8 +44,8 @@ export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
       })
       setOpen(false)
     } catch (error) {
-      console.error("Error canceling friend request:", error);
-      toast.error("Falha ao cancelar solicitação de amizade");
+      console.error("Error removing friend:", error);
+      toast.error(t('userSearch.chatUserDetails.removeError'));
     }
   }
 
@@ -100,7 +100,7 @@ export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
               className="text-red-500 w-full"
             >
               <UserRoundX className="w-4 h-4 " />
-              Remover amigo
+              {t('userSearch.chatUserDetails.removeFriend')}
             </Button>
           </div>
         </div>

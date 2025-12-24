@@ -1,6 +1,7 @@
 import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
 import { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, checkFriendRequestStatus, getFriendRequest } from "../services/friend-request.service";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import type { FriendRequestFormModel } from "@/@types/friend-request/friend-request-form";
 import type { FriendRequestDataModel } from "@/@types/friend-request/friend-request-data";
 
@@ -18,8 +19,10 @@ const updateNotificationsCache = () => {
   });
 };
 
-export const useSendFriendRequestMutation = () =>
-  useMutation({
+export const useSendFriendRequestMutation = () => {
+  const { t } = useTranslation();
+
+  return useMutation({
     mutationFn: ({ userIdentifier }: FriendRequestFormModel) =>
       sendFriendRequest({ userIdentifier }),
     onSuccess: async () => {
@@ -31,16 +34,19 @@ export const useSendFriendRequestMutation = () =>
       // Update notifications cache
       updateNotificationsCache();
 
-      toast.success("Solicitação de amizade enviada com sucesso!");
+      toast.success(t('toasts.friendRequest.sendSuccess'));
     },
     onError: (error) => {
-      toast.error(error.message || "Falha ao enviar solicitação de amizade");
+      toast.error(error.message || t('toasts.friendRequest.sendError'));
       console.error("Error sending friend request:", error);
     },
   });
+};
 
-export const useAcceptFriendRequestMutation = () =>
-  useMutation({
+export const useAcceptFriendRequestMutation = () => {
+  const { t } = useTranslation();
+
+  return useMutation({
     mutationFn: (requestId: number) => acceptFriendRequest(requestId),
     onSuccess: async () => {
       // Update friends list to include the new friend
@@ -54,16 +60,19 @@ export const useAcceptFriendRequestMutation = () =>
         queryKey: ["friend-request"],
       });
 
-      toast.success("Solicitação de amizade aceita!");
+      toast.success(t('toasts.friendRequest.acceptSuccess'));
     },
     onError: (error) => {
-      toast.error(error.message || "Falha ao aceitar solicitação de amizade");
+      toast.error(error.message || t('toasts.friendRequest.acceptError'));
       console.error("Error accepting friend request:", error);
     },
   });
+};
 
-export const useCancelFriendRequestMutation = () =>
-  useMutation({
+export const useCancelFriendRequestMutation = () => {
+  const { t } = useTranslation();
+
+  return useMutation({
     mutationFn: (requestId: number) => cancelFriendRequest(requestId),
     onSuccess: async () => {
       queryClient.invalidateQueries({
@@ -73,13 +82,14 @@ export const useCancelFriendRequestMutation = () =>
       // Update notifications cache
       updateNotificationsCache();
 
-      toast.success("Solicitação de amizade cancelada!");
+      toast.success(t('toasts.friendRequest.cancelSuccess'));
     },
     onError: (error) => {
-      toast.error(error.message || "Falha ao cancelar solicitação de amizade");
+      toast.error(error.message || t('toasts.friendRequest.cancelError'));
       console.error("Error canceling friend request:", error);
     },
   });
+};
 
 export const useCheckFriendRequestQuery = (otherUserId: string | null, open?: boolean) =>
   useQuery<FriendRequestDataModel | null>({

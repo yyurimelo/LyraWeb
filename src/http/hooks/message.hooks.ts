@@ -3,6 +3,7 @@ import { sendMessage, getMessagesWithUser } from "../services/message.service"
 import type { MessageResponseDto } from "@/@types/message/message-types"
 import type { UserGetAllFriendsDataModel } from "@/@types/user/user-get-all-friends"
 import { toast } from "sonner"
+import { useTranslation } from "react-i18next"
 
 // Helper function to update last message in friends cache
 const updateFriendLastMessage = (message: MessageResponseDto) => {
@@ -42,8 +43,10 @@ export const useGetMessagesQuery = (friendId: string | null) =>
     refetchOnMount: true,
   })
 
-export const useSendMessageMutation = () =>
-  useMutation({
+export const useSendMessageMutation = () => {
+  const { t } = useTranslation();
+
+  return useMutation({
     mutationFn: sendMessage,
     onSuccess: (newMessage) => {
       // Update React Query cache with the new message
@@ -65,7 +68,8 @@ export const useSendMessageMutation = () =>
       updateFriendLastMessage(newMessage)
     },
     onError: (error) => {
-      toast.error("Falha ao enviar mensagem")
+      toast.error(t('toasts.message.sendError'))
       console.error("Error sending message:", error)
     }
   })
+};

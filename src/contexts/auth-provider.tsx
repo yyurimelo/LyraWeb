@@ -5,6 +5,7 @@ import { http } from '@lyra/axios-config'
 import { LoaderCircle } from 'lucide-react'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 
 interface AuthState {
@@ -19,6 +20,7 @@ interface AuthState {
 const AuthContext = createContext<AuthState | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const [user, setUser] = useState<AuthUserDataModel | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -66,9 +68,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAuthenticated(true);
       localStorage.setItem("auth-token", response.token);
       http.defaults.headers.Authorization = `Bearer ${response.token}`;
-      toast.success("Autenticado com sucesso!")
+      toast.success(t('toasts.auth.authenticated'))
     } catch (error: any) {
-      toast.error("Erro no login:", error);
+      toast.error(t('toasts.auth.loginError'), error);
       throw error;
     }
   }
@@ -89,9 +91,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAuthenticated(true);
       localStorage.setItem("auth-token", response.token);
       http.defaults.headers.Authorization = `Bearer ${response.token}`;
-      toast.success("Autenticado com Google!");
+      toast.success(t('toasts.auth.googleAuthenticated'));
     } catch (error: any) {
-      toast.error("Erro no login com Google");
+      toast.error(t('toasts.auth.googleLoginError'));
       throw error;
     }
   };

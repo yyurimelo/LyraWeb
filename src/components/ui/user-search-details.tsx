@@ -1,8 +1,10 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { enUS, ptBR } from "date-fns/locale";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+
 
 // components
 import {
@@ -45,6 +47,7 @@ interface UserSearchDetailsProps {
 }
 
 export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProps) {
+  const { t, i18n } = useTranslation();
   const { user: loggedUser } = useAuth();
   const loggedUserId = loggedUser?.userIdentifier;
 
@@ -78,17 +81,19 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
       await cancelRequestFn(friendRequest.id);
     } catch (error) {
       console.error("Error canceling friend request:", error);
-      toast.error("Falha ao cancelar solicitação de amizade");
+      toast.error(t('toasts.friendRequest.cancelError'));
     }
   }
+
   async function handleRemoveFriend() {
-    if (otherUserId) return;
+    if (!otherUserId) return; // FIXED: was `if (otherUserId) return;`
 
     try {
       await removeFriendFn(otherUserId);
+      setOpen(false);
     } catch (error) {
-      console.error("Error canceling friend request:", error);
-      toast.error("Falha ao cancelar solicitação de amizade");
+      console.error("Error removing friend:", error);
+      toast.error(t('toasts.friendRequest.removeError'));
     }
   }
 
@@ -100,7 +105,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
       await acceptRequestFn(friendRequest.id);
     } catch (error) {
       console.error("Error accepting friend request:", error);
-      toast.error("Falha ao aceitar solicitação de amizade");
+      toast.error(t('toasts.friendRequest.acceptError'));
     }
   }
 
@@ -112,19 +117,42 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
       await sendInviteFriendFn({ userIdentifier: otherUserId });
     } catch (error) {
       console.error("Error sending friend request:", error);
-      toast.error("Falha ao enviar solicitação de amizade");
+      toast.error(t('toasts.friendRequest.sendError'));
     }
   }
 
   if (!user) return null;
 
+  // Format friendship time
+  const friendshipTime = friendRequest?.createdAt
+    ? (() => {
+      const dateStr =
+        typeof friendRequest.createdAt === "string"
+          ? friendRequest.createdAt
+          : friendRequest.createdAt.toISOString();
+
+      const finalDateStr =
+        dateStr.includes("Z") ||
+          dateStr.includes("+") ||
+          (dateStr.includes("-", 10) && dateStr.length > 10)
+          ? dateStr
+          : dateStr + "Z";
+
+      return formatDistanceToNow(new Date(finalDateStr), {
+        locale: i18n.language === "en" ? enUS : ptBR,
+        addSuffix: true,
+      });
+    })()
+    : "";
+
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Detalhes do Usuário</DialogTitle>
+          <DialogTitle>{t('userSearch.details.title')}</DialogTitle>
           <DialogDescription>
-            Recupere as informações detalhadas do usuário selecionado.
+            {t('userSearch.details.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -147,12 +175,10 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
             </Avatar>
             <div className="flex flex-col ml-4 space-y-1">
               <h1 className="text-xl font-semibold">
-                {user.name ?? "Nome não disponível"}
+                {user.name ?? t('userSearch.details.nameNotAvailable')}
               </h1>
               <p className="text-secondary-foreground/80 text-xs">
-                {user.description
-                  ? user.description
-                  : "Descrição não disponível"}
+                {user.description ?? t('userSearch.details.descriptionNotAvailable')}
               </p>
             </div>
           </div>
@@ -176,7 +202,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                           <UserRoundX className="w-4 h-4 text-red-500" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Cancelar solicitação</TooltipContent>
+                      <TooltipContent>{t('userSearch.details.tooltips.cancelRequest')}</TooltipContent>
                     </Tooltip>
                   ) : (
                     // Eu recebi e posso aceitar ou rejeitar
@@ -193,7 +219,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                             <UserRoundCheck className="w-4 h-4 text-emerald-500" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Aceitar solicitação</TooltipContent>
+                        <TooltipContent>{t('userSearch.details.tooltips.acceptRequest')}</TooltipContent>
                       </Tooltip>
 
                       <Tooltip>
@@ -208,7 +234,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                             <UserRoundX className="w-4 h-4 text-red-500" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Rejeitar solicitação</TooltipContent>
+                        <TooltipContent>{t('userSearch.details.tooltips.rejectRequest')}</TooltipContent>
                       </Tooltip>
                     </>
                   )}
@@ -229,7 +255,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                           <UserRoundX className="w-4 h-4 text-red-500" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Remover amigo</TooltipContent>
+                      <TooltipContent>{t('userSearch.details.tooltips.removeFriend')}</TooltipContent>
                     </Tooltip>
                   </div>
 
@@ -237,12 +263,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
 
                   <div className="flex w-full justify-end">
                     <span className="text-muted-foreground/80 text-[11px]">
-                      Vocês se tornaram amigos{" "}
-                      {formatDistanceToNow(new Date(friendRequest.createdAt), {
-                        locale: ptBR,
-                        addSuffix: true,
-                      })}{" "}
-                      atrás.
+                      {t('userSearch.details.friendshipStatus', { time: friendshipTime })}
                     </span>
                   </div>
                 </section>
@@ -262,7 +283,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                     <UserRoundPlus className="w-4 h-4 text-emerald-500" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Enviar solicitação de amizade</TooltipContent>
+                <TooltipContent>{t('userSearch.details.tooltips.sendRequest')}</TooltipContent>
               </Tooltip>
             )
           )}

@@ -209,5 +209,66 @@
       "loading": "Error loading notifications: {{error}}",
       "retry": "Try again"
     }
+  },
+  "toasts": {
+    "user": {
+      "createSuccess": "User created successfully!",
+      "removeSuccess": "User removed successfully!",
+      "updateProfileSuccess": "Profile updated successfully!",
+      "updateProfileError": "An error occurred while updating the profile."
+    },
+    "auth": {
+      "authenticated": "Authenticated successfully!",
+      "loginError": "Login error:",
+      "googleAuthenticated": "Authenticated with Google!",
+      "googleLoginError": "Error logging in with Google"
+    },
+    "friendRequest": {
+      "sendSuccess": "Friend request sent successfully!",
+      "sendError": "Failed to send friend request",
+      "acceptSuccess": "Friend request accepted!",
+      "acceptError": "Failed to accept friend request",
+      "cancelSuccess": "Friend request cancelled!",
+      "cancelError": "Failed to cancel friend request",
+      "removeError": "Failed to remove friend"
+    },
+    "notification": {
+      "incompleteInfo": "Incomplete notification information",
+      "notFound": "Friend request not found",
+      "loadDataError": "Error loading data",
+      "processError": "Error processing notification"
+    },
+    "message": {
+      "sendError": "Failed to send message"
+    }
+  },
+  "userSearch": {
+    "button": "Search",
+    "placeholder": "Search for a friend...",
+    "emptyStates": {
+      "enterName": "Enter the user name",
+      "searchError": "Error searching for users",
+      "usersFound": "Users found",
+      "noUsersFound": "No users found"
+    },
+    "details": {
+      "title": "User Details",
+      "description": "Retrieve detailed information about the selected user.",
+      "nameNotAvailable": "Name not available",
+      "descriptionNotAvailable": "Description not available",
+      "noDescription": "No description",
+      "tooltips": {
+        "cancelRequest": "Cancel request",
+        "acceptRequest": "Accept request",
+        "rejectRequest": "Reject request",
+        "removeFriend": "Remove friend",
+        "sendRequest": "Send friend request"
+      },
+      "friendshipStatus": "You became friends {{time}}."
+    },
+    "chatUserDetails": {
+      "removeFriend": "Remove friend",
+      "removeError": "Failed to remove friend"
+    }
   }
 }

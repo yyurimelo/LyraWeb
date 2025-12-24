@@ -1,5 +1,6 @@
 import type { UserDataModel } from "@/@types/user/user-data-model";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 // components
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,6 +20,8 @@ export function UserSearchResultItem({
   onSelect,
   isSelected = false,
 }: UserSearchResultItemProps) {
+  const { t } = useTranslation();
+
   return (
     <CommandItem
       value={user.name}
@@ -52,7 +55,7 @@ export function UserSearchResultItem({
 
         <div className="flex items-center justify-between gap-2 -mt-1">
           <p className="text-xs text-muted-foreground truncate leading-relaxed">
-            {user.description || "Sem descrição"}
+            {user.description || t('userSearch.details.noDescription')}
           </p>
         </div>
       </div>

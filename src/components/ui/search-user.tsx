@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SearchIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   CommandDialog,
@@ -21,6 +22,7 @@ import type { UserDataModel } from "@/@types/user/user-data-model";
 import { useGetUserWithNameQuery } from "@/http/hooks/user.hooks";
 
 export default function SearchUser() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,7 +66,9 @@ export default function SearchUser() {
           aria-hidden="true"
         />
         <span className="hidden sm:flex grow items-center ms-3">
-          <span className="text-muted-foreground/70 font-normal">Procurar</span>
+          <span className="text-muted-foreground/70 font-normal">
+            {t('userSearch.button')}
+          </span>
         </span>
         <kbd className="hidden sm:inline bg-background text-muted-foreground/70 ms-auto h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
           ⌘K
@@ -74,7 +78,7 @@ export default function SearchUser() {
       <CommandDialog open={open} onOpenChange={setOpen}>
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Procure por um amigo..."
+            placeholder={t('userSearch.placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
@@ -82,7 +86,7 @@ export default function SearchUser() {
           <CommandList>
             {!searchQuery ? (
               <CommandEmpty>
-                Digite o nome do usuário
+                {t('userSearch.emptyStates.enterName')}
               </CommandEmpty>
             ) : isPending ? (
               <CommandGroup>
@@ -90,10 +94,10 @@ export default function SearchUser() {
               </CommandGroup>
             ) : error ? (
               <CommandEmpty>
-                Erro ao buscar usuários
+                {t('userSearch.emptyStates.searchError')}
               </CommandEmpty>
             ) : users.length > 0 ? (
-              <CommandGroup heading="Usuários encontrados">
+              <CommandGroup heading={t('userSearch.emptyStates.usersFound')}>
                 {users.map((user) => (
                   <div className="mt-1">
                     <UserSearchResultItem
@@ -106,7 +110,7 @@ export default function SearchUser() {
               </CommandGroup>
             ) : (
               <CommandEmpty>
-                Nenhum usuário encontrado
+                {t('userSearch.emptyStates.noUsersFound')}
               </CommandEmpty>
             )}
           </CommandList>

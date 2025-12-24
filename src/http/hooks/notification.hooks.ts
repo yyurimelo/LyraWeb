@@ -8,6 +8,7 @@ import { getUserPublicId } from "../services/user.service";
 import { NotificationTypeEnum } from "@/@types/notification";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
 import type { UserDataModel } from "@/@types/user/user-data-model";
+import { useTranslation } from "react-i18next";
 
 export const useNotificationPaginationQuery = (filters: Record<string, any>) =>
   useQuery({
@@ -135,6 +136,7 @@ interface UseNotificationClickResult {
 }
 
 export const useNotificationClick = (): UseNotificationClickResult => {
+  const { t } = useTranslation();
   const [selectedUser, setSelectedUser] = useState<UserDataModel | null>(null);
   const [userDetailsDialogOpen, setUserDetailsDialogOpen] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(false);
@@ -143,9 +145,9 @@ export const useNotificationClick = (): UseNotificationClickResult => {
     if (notification.type !== NotificationTypeEnum.INVITE_FRIEND) {
       return;
     }
-    
+
     if (!notification.referenceId) {
-      toast.error("Informações da notificação incompletas");
+      toast.error(t('toasts.notification.incompleteInfo'));
       return;
     }
 
@@ -163,12 +165,12 @@ export const useNotificationClick = (): UseNotificationClickResult => {
       console.error('Error handling notification click:', error);
       if (isAxiosError(error)) {
         if (error.response?.status === 404) {
-          toast.error("Solicitação de amizade não encontrada");
+          toast.error(t('toasts.notification.notFound'));
         } else {
-          toast.error(error.response?.data || "Erro ao carregar dados");
+          toast.error(error.response?.data || t('toasts.notification.loadDataError'));
         }
       } else {
-        toast.error("Erro ao processar notificação");
+        toast.error(t('toasts.notification.processError'));
       }
     } finally {
       setIsLoadingUser(false);
