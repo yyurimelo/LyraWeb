@@ -1,5 +1,5 @@
 import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
-import { createUser, getAllFriends, getUser, removeFriend, updateUser } from "../services/user.service";
+import { createUser, getAllFriends, getUser, getUserByName, removeFriend, updateUser } from "../services/user.service";
 import { toast } from "sonner";
 import type { UserUpdateModel } from "@/@types/user/user-form-update";
 import type { UserDataModel } from "@/@types/user/user-data-model";
@@ -50,6 +50,12 @@ export const useGetUserQuery = (userId: string) => useQuery({
   queryFn: () => getUser(userId),
   enabled: !!userId, // Only run query if userId exists
   // Note: In dashboard, userId is usually guaranteed to exist, but we add safety check
+});
+
+export const useGetUserWithNameQuery = (name: string) => useQuery({
+  queryKey: ["user", name],
+  queryFn: () => getUserByName(name),
+  enabled: !!name,
 });
 
 

@@ -203,7 +203,6 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
         isMobile={isMobile}
       />
 
-      {/* Área de mensagens */}
       <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 bg-background no-scrollbar relative"

@@ -3,47 +3,42 @@
 import { useEffect, useState } from "react";
 import { SearchIcon } from "lucide-react";
 
-// components
 import {
   CommandDialog,
   CommandGroup,
   CommandInput,
   CommandList,
   CommandEmpty,
+  Command,
 } from "@/components/ui/command";
 import { Button } from "./button";
 import { UserSearchResultItem } from "./user-search-result-item";
 import { UserSearchDetails } from "./user-search-details";
 import { UserSearchSkeleton } from "./user-search-skeleton";
 
-// hooks
-import { useUserSearchMutation } from "@/http/hooks/user-search.hooks";
 import { useDebounce } from "@/hooks/use-debounce";
-
-// types
 import type { UserDataModel } from "@/@types/user/user-data-model";
+import { useGetUserWithNameQuery } from "@/http/hooks/user.hooks";
 
 export default function SearchUser() {
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<UserDataModel[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserDataModel | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const [currentSearchQuery, setCurrentSearchQuery] = useState("");
 
-  // Debounced search query (300ms delay)
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  // Search mutation
-  const { mutateAsync: searchUsers, error, isPending } = useUserSearchMutation();
+  const {
+    data: users = [],
+    isPending,
+    error,
+  } = useGetUserWithNameQuery(debouncedSearchQuery);
 
-  // Handle keyboard shortcut
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen((prev) => !prev);
       }
     };
 
@@ -51,44 +46,9 @@ export default function SearchUser() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  // Clear results when search is too short or empty
-  useEffect(() => {
-    if (searchQuery.trim().length === 0 || searchQuery.trim().length < 6) {
-      setSearchResults([]);
-      setIsSearching(false);
-      setCurrentSearchQuery(""); // Reset to allow re-searching same query
-    }
-  }, [searchQuery]);
-
-  // Trigger search when debounced query changes and meets requirements
-  useEffect(() => {
-    const performSearch = async () => {
-      if (debouncedSearchQuery.trim().length >= 6 && debouncedSearchQuery !== currentSearchQuery) {
-        setCurrentSearchQuery(debouncedSearchQuery);
-        setIsSearching(true);
-        try {
-          const results = await searchUsers(debouncedSearchQuery);
-          setSearchResults(results);
-        } catch (error) {
-          console.error("Search error:", error);
-          setSearchResults([]);
-        } finally {
-          setIsSearching(false);
-        }
-      }
-    };
-
-    performSearch();
-  }, [debouncedSearchQuery, currentSearchQuery, searchUsers]);
-
   const handleUserSelect = (user: UserDataModel) => {
     setSelectedUser(user);
-    setOpen(false);
     setOpenDialog(true);
-  };
-
-  const handleSearchValueChange = (value: string) => {
-    setSearchQuery(value);
   };
 
   return (
@@ -112,42 +72,45 @@ export default function SearchUser() {
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput
-          placeholder="Buscar usuários (mínimo 6 caracteres)..."
-          value={searchQuery}
-          onValueChange={handleSearchValueChange}
-        />
-        <CommandList>
-          {searchQuery.trim().length === 0 ? (
-            <CommandEmpty>
-              Digite o ID do usuário
-            </CommandEmpty>
-          ) : (searchQuery.trim().length < 6 && !isSearching) ? (
-            <CommandEmpty>
-              <UserSearchSkeleton />
-            </CommandEmpty>
-          ) : isPending ? (
-            <CommandGroup>
-              <UserSearchSkeleton />
-            </CommandGroup>
-          ) : error ? (
-            <CommandEmpty>Erro ao buscar usuários. Tente novamente.</CommandEmpty>
-          ) : searchResults.length > 0 ? (
-            <CommandGroup heading="Usuários encontrados">
-              {searchResults.map((user) => (
-                <UserSearchResultItem
-                  key={user.userIdentifier}
-                  user={user}
-                  onSelect={handleUserSelect}
-                />
-              ))}
-            </CommandGroup>
-          ) : searchQuery.trim().length >= 6 ? (
-            <CommandEmpty>Nenhum usuário encontrado.</CommandEmpty>
-          ) : (
-            <CommandEmpty>Digite pelo menos 6 caracteres para buscar usuários...</CommandEmpty>
-          )}
-        </CommandList>
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Procure por um amigo..."
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+          />
+
+          <CommandList>
+            {!searchQuery ? (
+              <CommandEmpty>
+                Digite o nome do usuário
+              </CommandEmpty>
+            ) : isPending ? (
+              <CommandGroup>
+                <UserSearchSkeleton />
+              </CommandGroup>
+            ) : error ? (
+              <CommandEmpty>
+                Erro ao buscar usuários
+              </CommandEmpty>
+            ) : users.length > 0 ? (
+              <CommandGroup heading="Usuários encontrados">
+                {users.map((user) => (
+                  <div className="mt-1">
+                    <UserSearchResultItem
+                      key={user.userIdentifier}
+                      user={user}
+                      onSelect={handleUserSelect}
+                    />
+                  </div>
+                ))}
+              </CommandGroup>
+            ) : (
+              <CommandEmpty>
+                Nenhum usuário encontrado
+              </CommandEmpty>
+            )}
+          </CommandList>
+        </Command>
       </CommandDialog>
 
       {selectedUser && (

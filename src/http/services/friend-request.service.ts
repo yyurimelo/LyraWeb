@@ -58,3 +58,9 @@ export async function checkFriendRequestStatus(otherUserId: string): Promise<Fri
   }
   return null;
 }
+
+export async function getFriendRequest(id: string): Promise<FriendRequestDataModel> {
+  const response = await http.get(API_ENDPOINTS.FRIEND_REQUEST.GET(id));
+  return response.data;
+}
+

@@ -21,7 +21,7 @@ export function UserSearchResultItem({
 }: UserSearchResultItemProps) {
   return (
     <CommandItem
-      value={user.userIdentifier}
+      value={user.name}
       onSelect={() => onSelect(user)}
       className={cn(
         "group relative flex items-center p-3 rounded-lg cursor-pointer transition-colors",

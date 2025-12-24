@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
     GET_ALL_FRIENDS: "/api/user/get/all/friends",
     UPDATE: "/api/user/update",
     GET: (id: string) => `/api/user/get/${id}`,
+    GET_PUBLIC: (userIdentifier: string) => `/api/user/get/public/${userIdentifier}`,
     SEARCH: "/api/user/get/search",
     REMOVE: "/api/user/remove/friend"
   },
@@ -28,5 +29,6 @@ export const API_ENDPOINTS = {
     ACCEPT: "/api/friend-request/accept",
     REMOVE: "/api/friend-request/remove",
     CHECK_REQUEST: "/api/friend-request/check/request",
+    GET: (id: string) => `/api/friend-request/get/${id}`,
   },
 } as const;

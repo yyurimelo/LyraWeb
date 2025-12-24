@@ -53,7 +53,6 @@ export const useCancelFriendRequestMutation = () =>
   useMutation({
     mutationFn: (requestId: number) => cancelFriendRequest(requestId),
     onSuccess: async () => {
-      // Invalidate friend request status cache
       queryClient.invalidateQueries({
         queryKey: ["friend-request"],
       });
