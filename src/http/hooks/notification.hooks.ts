@@ -147,7 +147,6 @@ export const useNotificationClick = (): UseNotificationClickResult => {
     }
 
     if (!notification.referenceId) {
-      toast.error(t('toasts.notification.incompleteInfo'));
       return;
     }
 
