@@ -6,6 +6,7 @@ import { LoaderCircle } from 'lucide-react'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { queryClient } from '@lyra/react-query-config'
 
 
 interface AuthState {
@@ -43,6 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsAuthenticated(true)
       })
       .catch(() => {
+        // Clear cache FIRST on auth error to prevent stale data
+        queryClient.clear()
         localStorage.removeItem('auth-token')
         setUser(null)
         setIsAuthenticated(false)
@@ -62,6 +65,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (credentials: AuthFormModel) => {
     try {
+      // Clear any existing cache BEFORE setting new user data to prevent data leakage
+      queryClient.clear()
+
       const response = await authenticate(credentials);
 
       setUser(response);
@@ -76,6 +82,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = () => {
+    // Clear all React Query cache FIRST to prevent data leakage between users
+    // This includes: messages, friends list, notifications, friend requests
+    queryClient.clear()
+
     setUser(null)
     setIsAuthenticated(false)
     localStorage.removeItem('auth-token')
@@ -84,6 +94,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async (email: string) => {
     try {
+      // Clear any existing cache BEFORE setting new user data to prevent data leakage
+      queryClient.clear()
+
       const res = await googleAuthenticate(email);
       const response = res;
 

@@ -44,7 +44,7 @@ interface UseSignalRProps {
   }) => void
 }
 
-export function useSignalR({ userId, onMessage, onFriendUpdate, enabled }: UseSignalRProps) {
+export function useSignalRMessages({ userId, onMessage, onFriendUpdate, enabled }: UseSignalRProps) {
   const connectionRef = useRef<HubConnection | null>(null)
   const reconnectAttemptsRef = useRef(0)
   const maxReconnectAttempts = 5

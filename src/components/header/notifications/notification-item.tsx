@@ -40,6 +40,7 @@ export const NotificationItem = memo(
     const { type, createdAt } = notification;
     const { i18n } = useTranslation();
 
+
     // Convert NotificationTypeEnum to numeric key for mappers
     const typeKey =
       type === "InviteFriend"
@@ -51,7 +52,7 @@ export const NotificationItem = memo(
             : type === "System"
               ? 3
               : 4;
-    
+
     const Icon = notificationTypeIconMap[typeKey] || notificationTypeIconMap[4];
     const notificationMessage = getNotificationMessage(notification);
 
@@ -62,6 +63,8 @@ export const NotificationItem = memo(
     }
 
     async function handleClick() {
+      if (!notification.id) return;
+
       if (onClick && notification.type === "InviteFriend") {
         await onClick(notification);
       }
@@ -72,7 +75,7 @@ export const NotificationItem = memo(
         <div
           className={cn(
             "hover:bg-accent/40 rounded-sm relative p-3 group",
-            onClick && notification.type === "InviteFriend" && "cursor-pointer",
+            onClick && notification.type === "InviteFriend" && notification.id && "cursor-pointer",
             isLoading && "opacity-50 pointer-events-none"
           )}
           onClick={handleClick}

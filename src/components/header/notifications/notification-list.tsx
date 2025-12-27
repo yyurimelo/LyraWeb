@@ -27,6 +27,7 @@ export const NotificationList = memo(({
   isLoadingNotification
 }: NotificationListProps) => {
   const { t } = useTranslation()
+
   if (error) {
     return (
       <div className="flex flex-col text-center items-center text-sm text-muted-foreground px-4 gap-2 py-6">

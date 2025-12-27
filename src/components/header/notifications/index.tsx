@@ -20,44 +20,44 @@ import {
   useUnreadNotificationsQuery,
   useReadNotificationsQuery,
   useUnreadNotificationsCountQuery,
-  useNotificationClick
+  useNotificationClick,
 } from "@/http/hooks/notification.hooks";
 import { useAuth } from "@/contexts/auth-provider";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
+import { useSignalRNotifications } from "@/http/hooks/use-signalr-notifications";
 
 export function Notification() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'unread' | 'read'>('unread');
 
-  const {
-    data: unreadNotifications,
-    isLoading: isLoadingUnread,
-    error: unreadError
-  } = useUnreadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'unread');
+  // 🔔 Conecta SignalR para notificações
+  useSignalRNotifications({
+    userId: user?.userIdentifier ?? '',
+    enabled: isAuthenticated,
+  });
 
-  const {
-    data: readNotifications,
-    isLoading: isLoadingRead,
-    error: readError
-  } = useReadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'read');
+  // Queries
+  const { data: unreadNotifications, isLoading: isLoadingUnread, error: unreadError } =
+    useUnreadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'unread');
 
-  const {
-    data: unreadCountData
-  } = useUnreadNotificationsCountQuery();
+  const { data: readNotifications, isLoading: isLoadingRead, error: readError } =
+    useReadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'read');
 
-  const unreadCount = unreadCountData || 0;
+  const { data: unreadCountData } = useUnreadNotificationsCountQuery();
+  const unreadCount = unreadCountData ?? 0;
 
   const currentData = activeTab === 'unread' ? unreadNotifications : readNotifications;
   const currentLoading = activeTab === 'unread' ? isLoadingUnread : isLoadingRead;
   const currentError = activeTab === 'unread' ? unreadError : readError;
 
+  // Hook para clique em notificação
   const {
     selectedUser,
     userDetailsDialogOpen,
     isLoadingUser,
     setUserDetailsDialogOpen,
-    handleNotificationClick
+    handleNotificationClick,
   } = useNotificationClick();
 
   return (
@@ -77,11 +77,11 @@ export function Notification() {
           )}
         </Button>
       </PopoverTrigger>
+
       <PopoverContent
         className="w-screen sm:w-[380px] p-0"
         align="end"
         sideOffset={12}
-        
       >
         <NotificationHeader
           unreadNotificationsIds={unreadNotifications?.map((x) => Number(x.id)) ?? []}

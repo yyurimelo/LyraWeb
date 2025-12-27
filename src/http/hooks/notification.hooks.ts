@@ -93,6 +93,8 @@ export const useUnreadNotificationsCountQuery = () =>
     queryFn: () => getUnreadNotificationCount(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5, // 5 minutos - considera os dados frescos por 5 min
+    gcTime: 1000 * 60 * 10, // 10 minutos - mantém no cache por 10 min
   });
 
 export const useNotificationsAdaptiveQuery = (isOpen: boolean, activeTab: 'all' | 'unread' | 'read') =>
