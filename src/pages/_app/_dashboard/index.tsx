@@ -1,5 +1,5 @@
 
-import { ChatComponent } from '@/components/chat'
+import { Chat } from '@/components/chat'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_app/_dashboard/')({
@@ -7,5 +7,5 @@ export const Route = createFileRoute('/_app/_dashboard/')({
 })
 
 function RouteComponent() {
-  return <ChatComponent />
+  return <Chat />
 }

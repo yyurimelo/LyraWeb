@@ -150,20 +150,20 @@ export function useSignalRNotifications({ userId, enabled }: UseSignalRNotificat
       });
 
       connection.on('NotificationRemoved', (notificationId: number) => {
-  console.log('🔔 NotificationRemoved', notificationId);
+        console.log('🔔 NotificationRemoved', notificationId);
 
-  queryClient.setQueryData(['notifications', 'header', 'unread'], (old: NotificationCacheData | undefined) => {
-    if (!old || !old.data) return old;
+        queryClient.setQueryData(['notifications', 'header', 'unread'], (old: NotificationCacheData | undefined) => {
+          if (!old || !old.data) return old;
 
-    const updatedData = old.data.filter(n => n.id !== String(notificationId));
+          const updatedData = old.data.filter(n => n.id !== String(notificationId));
 
-    return {
-      ...old,
-      data: updatedData,
-      totalRecords: Math.max(0, old.totalRecords - 1) // atualiza totalRecords apenas
-    };
-  });
-});
+          return {
+            ...old,
+            data: updatedData,
+            totalRecords: Math.max(0, old.totalRecords - 1) // atualiza totalRecords apenas
+          };
+        });
+      });
 
       connection.on('UpdateNotificationCount', (count: number) => {
         console.log('🔔 UpdateNotificationCount - setting count to', count)
