@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { queryClient } from '@lyra/react-query-config'
-import type { ExtendedNotificationDataModel } from '@/@types/notification'
 import { API_ENDPOINTS } from '@/http/constants'
 import { useSignalRBase } from '.'
 
@@ -24,35 +23,21 @@ export function useSignalRNotifications({
   useEffect(() => {
     if (!connection) return
 
-    connection.on(
-      'NotificationReceived',
-      (notification: ExtendedNotificationDataModel) => {
-        queryClient.setQueryData(
-          ['notifications', 'header', 'unread'],
-          (old: any) => {
-            if (!old) {
-              return {
-                data: [notification],
-                pageNumber: 1,
-                pageSize: 3,
-                totalRecords: 1,
-                totalPages: 1
-              }
-            }
+    connection.on('NotificationRemoved', (notificationId: number) => {
+      queryClient.setQueryData(['notifications', 'header', 'unread'], (old: any) => {
+        if (!old) return old
+        const filtered = old.data.filter((n: any) => n.id !== notificationId)
+        // atualiza também o contador direto
+        queryClient.setQueryData(['notifications', 'count', 'unread'], filtered.length)
+        return {
+          ...old,
+          data: filtered,
+          totalRecords: Math.max(0, filtered.length)
+        }
+      })
+    })
 
-            if (old.data.some((n: any) => n.id === notification.id)) {
-              return old
-            }
 
-            return {
-              ...old,
-              data: [notification, ...old.data].slice(0, 3),
-              totalRecords: old.totalRecords + 1
-            }
-          }
-        )
-      }
-    )
 
     connection.on('UpdateNotificationCount', (count: number) => {
       queryClient.setQueryData(

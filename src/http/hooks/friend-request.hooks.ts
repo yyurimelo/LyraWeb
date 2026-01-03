@@ -12,10 +12,10 @@ const updateFriendsListCache = () => {
   });
 };
 
-// Helper function to update notifications cache
+// Helper function to update notifications cache (but NOT count, which is handled by SignalR)
 const updateNotificationsCache = () => {
   queryClient.invalidateQueries({
-    queryKey: ["notifications"],
+    queryKey: ["notifications", "header"],
   });
 };
 

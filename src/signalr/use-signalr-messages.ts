@@ -53,19 +53,25 @@ export function useSignalRMessages({
 
       onMessage?.(message)
     }
+    // Invalida APENAS a lista de amigos quando alguém se torna seu amigo
     const handleUpdateListFriend = () => {
-
       queryClient.invalidateQueries({ queryKey: ['chat'] })
+    }
 
+    // Invalida as solicitações de amizade E as notificações (mas NÃO count, que é via SignalR)
+    const handleUpdateFriendRequest = () => {
       queryClient.invalidateQueries({ queryKey: ['friend-request'] })
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'header'] })
     }
 
     connection.on('ReceiveMessage', handleReceiveMessage)
     connection.on('UpdateListFriend', handleUpdateListFriend)
+    connection.on('UpdateFriendRequest', handleUpdateFriendRequest)
 
     return () => {
       connection.off('ReceiveMessage', handleReceiveMessage)
       connection.off('UpdateListFriend', handleUpdateListFriend)
+      connection.off('UpdateFriendRequest', handleUpdateFriendRequest)
     }
   }, [connection, userId, onMessage])
 
