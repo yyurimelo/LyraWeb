@@ -24,20 +24,19 @@ import {
 } from "@/http/hooks/notification.hooks";
 import { useAuth } from "@/contexts/auth-provider";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
-import { useSignalRNotifications } from "@/http/hooks/use-signalr-notifications";
+import { useSignalRNotifications } from "@/signalr/use-signalr-notifications";
+
 
 export function Notification() {
   const { isAuthenticated, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'unread' | 'read'>('unread');
 
-  // 🔔 Conecta SignalR para notificações
   useSignalRNotifications({
     userId: user?.userIdentifier ?? '',
     enabled: isAuthenticated,
   });
 
-  // Queries
   const { data: unreadNotifications, isLoading: isLoadingUnread, error: unreadError } =
     useUnreadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'unread');
 

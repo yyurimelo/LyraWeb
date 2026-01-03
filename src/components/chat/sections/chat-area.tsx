@@ -8,7 +8,7 @@ import { ChatHeader } from './chat-header'
 import { ChatInput } from './chat-input'
 import { useGetMessagesQuery, useSendMessageMutation } from '@/http/hooks/message.hooks'
 import { useAuth } from '@/contexts/auth-provider'
-import { useSignalRMessages } from '@/http/hooks/use-signalr-messages'
+import { useSignalRMessages } from '@/signalr/use-signalr-messages'
 
 interface ChatAreaProps {
   selectedUser: UserGetAllFriendsDataModel | null
@@ -34,7 +34,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
 
   const { sendMessage } = useSignalRMessages({
     userId: user?.id || '',
-    enabled: isFetched, // 👈 só depois da API
+    enabled: isFetched,
   })
 
 
