@@ -24,23 +24,18 @@ export function useSignalRMessages({
   useEffect(() => {
     if (!connection) return
 
-    /* =========================
-       MENSAGENS
-    ========================== */
     const handleReceiveMessage = (message: MessageResponseDto) => {
       const chatPartnerId =
         message.senderId === userId
           ? message.receiverId
           : message.senderId
 
-      // Atualiza as mensagens do chat específico
       queryClient.setQueryData<MessageResponseDto[]>(
         ['messages', chatPartnerId],
         (old = []) =>
           old.some(m => m.id === message.id) ? old : [...old, message]
       )
 
-      // Atualiza a lista de amigos com a última mensagem
       queryClient.setQueryData<UserGetAllFriendsDataModel[]>(
         ['chat'],
         (old = []) =>
@@ -59,7 +54,6 @@ export function useSignalRMessages({
       onMessage?.(message)
     }
     const handleUpdateListFriend = () => {
-      console.log('🔔 Lista de amigos atualizada via SignalR')
 
       queryClient.invalidateQueries({ queryKey: ['chat'] })
 
@@ -72,7 +66,6 @@ export function useSignalRMessages({
     return () => {
       connection.off('ReceiveMessage', handleReceiveMessage)
       connection.off('UpdateListFriend', handleUpdateListFriend)
-      console.log('🔌 SignalR listeners removidos')
     }
   }, [connection, userId, onMessage])
 

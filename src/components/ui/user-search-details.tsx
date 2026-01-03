@@ -54,7 +54,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
   const loggedUserIsMe = loggedUserId === user?.userIdentifier;
   const otherUserId = user?.userIdentifier || "";
 
-  const { friendRequest } = useCheckFriendshipStatus(
+  const { friendRequest, refetch: refetchFriendshipStatus } = useCheckFriendshipStatus(
     otherUserId,
     open
   );
@@ -79,6 +79,8 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
 
     try {
       await cancelRequestFn(friendRequest.id);
+      // Força atualização imediata do status
+      await refetchFriendshipStatus();
     } catch (error) {
       console.error("Error canceling friend request:", error);
       toast.error(t('toasts.friendRequest.cancelError'));
@@ -86,10 +88,12 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
   }
 
   async function handleRemoveFriend() {
-    if (!otherUserId) return; // FIXED: was `if (otherUserId) return;`
+    if (!otherUserId) return;
 
     try {
       await removeFriendFn(otherUserId);
+      // Força atualização imediata do status antes de fechar
+      await refetchFriendshipStatus();
       setOpen(false);
     } catch (error) {
       console.error("Error removing friend:", error);
@@ -103,6 +107,8 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
 
     try {
       await acceptRequestFn(friendRequest.id);
+      // Força atualização imediata do status
+      await refetchFriendshipStatus();
     } catch (error) {
       console.error("Error accepting friend request:", error);
       toast.error(t('toasts.friendRequest.acceptError'));
@@ -115,6 +121,8 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
 
     try {
       await sendInviteFriendFn({ userIdentifier: otherUserId });
+      // Força atualização imediata do status
+      await refetchFriendshipStatus();
     } catch (error) {
       console.error("Error sending friend request:", error);
       toast.error(t('toasts.friendRequest.sendError'));

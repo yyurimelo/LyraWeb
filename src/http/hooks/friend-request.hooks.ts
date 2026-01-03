@@ -98,19 +98,20 @@ export const useCheckFriendRequestQuery = (otherUserId: string | null, open?: bo
       if (!otherUserId) return Promise.resolve(null);
       return checkFriendRequestStatus(otherUserId);
     },
-    enabled: !!otherUserId || open,
-    refetchOnWindowFocus: true,
+    enabled: !!otherUserId && open,
+    staleTime: 0,
   });
 
 export const useCheckFriendshipStatus = (otherUserId: string | null, open?: boolean) => {
-  const { data: friendRequest, isLoading } = useCheckFriendRequestQuery(otherUserId, open);
+  const query = useCheckFriendRequestQuery(otherUserId, open);
 
   return {
-    isPending: friendRequest?.status === "Pending",
-    isAccepted: friendRequest?.status === "Accepted",
-    noRequest: !friendRequest,
-    isLoading,
-    friendRequest,
+    isPending: query.data?.status === "Pending",
+    isAccepted: query.data?.status === "Accepted",
+    noRequest: !query.data,
+    isLoading: query.isLoading,
+    friendRequest: query.data,
+    refetch: query.refetch, // Expõe a função refetch
   };
 };
 

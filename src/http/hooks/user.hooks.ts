@@ -37,6 +37,12 @@ export const useRemoveFriendMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ["user-details"],
       });
+
+      // Invalida friend request status cache para atualizar UserSearchDetails
+      queryClient.invalidateQueries({
+        queryKey: ["friend-request"],
+      });
+
       toast.success(t('toasts.user.removeSuccess'));
     },
     onError: (error) => {
