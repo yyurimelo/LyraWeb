@@ -37,6 +37,11 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
     enabled: isFetched,
   })
 
+  useSignalRMessages({
+    userId: user?.id || '',
+    enabled: !!user?.id
+  })
+
 
   const allMessages = messages
 

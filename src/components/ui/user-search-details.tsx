@@ -39,6 +39,7 @@ import {
 import type { UserDataModel } from "@/@types/user/user-data-model";
 import { getInitialName } from "@/lib/get-initial-name";
 import { useRemoveFriendMutation } from "@/http/hooks/user.hooks";
+import { useSignalRMessages } from "@/signalr/use-signalr-messages";
 
 interface UserSearchDetailsProps {
   open: boolean;
@@ -58,6 +59,11 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
     otherUserId,
     open
   );
+
+  useSignalRMessages({
+    userId: user?.id || '',
+    enabled: !!user?.id
+  })
 
   const { mutateAsync: sendInviteFriendFn, isPending: isSendingInvite } =
     useSendFriendRequestMutation();

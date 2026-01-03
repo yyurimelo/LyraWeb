@@ -6,12 +6,6 @@ import { API_ENDPOINTS } from '@/http/constants'
 import { sendMessage as sendMessageService } from '@/http/services/message.service'
 import { useSignalRBase } from '.'
 
-interface FriendRealtimeDto {
-  id: string
-  name: string
-  avatarUrl?: string
-}
-
 export function useSignalRMessages({
   userId,
   enabled,
@@ -39,61 +33,46 @@ export function useSignalRMessages({
           ? message.receiverId
           : message.senderId
 
+      // Atualiza as mensagens do chat específico
       queryClient.setQueryData<MessageResponseDto[]>(
         ['messages', chatPartnerId],
         (old = []) =>
           old.some(m => m.id === message.id) ? old : [...old, message]
       )
 
+      // Atualiza a lista de amigos com a última mensagem
       queryClient.setQueryData<UserGetAllFriendsDataModel[]>(
         ['chat'],
         (old = []) =>
           old.map(friend =>
             friend.id === message.senderId ||
-            friend.id === message.receiverId
+              friend.id === message.receiverId
               ? {
-                  ...friend,
-                  lastMessage: message.content,
-                  lastMessageAt: message.sentAt
-                }
+                ...friend,
+                lastMessage: message.content,
+                lastMessageAt: message.sentAt
+              }
               : friend
           )
       )
 
       onMessage?.(message)
     }
+    const handleUpdateListFriend = () => {
+      console.log('🔔 Lista de amigos atualizada via SignalR')
 
-    /* =========================
-       AMIZADE ACEITA (🔥 AQUI)
-    ========================== */
-    const handleFriendAccepted = (friend: FriendRealtimeDto) => {
-      queryClient.setQueryData<UserGetAllFriendsDataModel[]>(
-        ['chat'],
-        (old = []) => {
-          // evita duplicar
-          if (old.some(f => f.id === friend.id)) return old
+      queryClient.invalidateQueries({ queryKey: ['chat'] })
 
-          return [
-            {
-              id: friend.id,
-              name: friend.name,
-              avatarUrl: friend.avatarUrl,
-              lastMessage: null,
-              lastMessageAt: null,
-              description: null
-            },
-            ...old
-          ]
-        }
-      )
+      queryClient.invalidateQueries({ queryKey: ['user-details'] })
     }
 
     connection.on('ReceiveMessage', handleReceiveMessage)
-    connection.on('FriendAccepted', handleFriendAccepted)
+    connection.on('UpdateListFriend', handleUpdateListFriend)
 
     return () => {
       connection.off('ReceiveMessage', handleReceiveMessage)
-      connection.off('FriendAccepted', handleFriendAccepted)
+      connection.off('UpdateListFriend', handleUpdateListFriend)
+      console.log('🔌 SignalR listeners removidos')
     }
   }, [connection, userId, onMessage])
 
