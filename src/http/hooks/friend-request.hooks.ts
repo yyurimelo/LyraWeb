@@ -60,6 +60,11 @@ export const useAcceptFriendRequestMutation = () => {
         queryKey: ["friend-request"],
       });
 
+      // Invalidate count (SignalR doesn't send update when accepting, so we need to refresh)
+      queryClient.invalidateQueries({
+        queryKey: ["notifications", "count", "unread"],
+      });
+
       toast.success(t('toasts.friendRequest.acceptSuccess'));
     },
     onError: (error) => {
