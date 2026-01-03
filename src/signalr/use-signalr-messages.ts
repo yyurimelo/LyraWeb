@@ -63,7 +63,7 @@ export function useSignalRMessages({
 
       queryClient.invalidateQueries({ queryKey: ['chat'] })
 
-      queryClient.invalidateQueries({ queryKey: ['user-details'] })
+      queryClient.invalidateQueries({ queryKey: ['friend-request'] })
     }
 
     connection.on('ReceiveMessage', handleReceiveMessage)
