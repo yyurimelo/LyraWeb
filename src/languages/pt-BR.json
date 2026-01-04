@@ -261,13 +261,13 @@
         "cancelRequest": "Cancelar solicitação",
         "acceptRequest": "Aceitar solicitação",
         "rejectRequest": "Rejeitar solicitação",
-        "removeFriend": "Remover amigo",
+        "removeFriend": "Remover amigo e apagar conversa",
         "sendRequest": "Enviar solicitação de amizade"
       },
       "friendshipStatus": "Vocês se tornaram amigos {{time}}."
     },
     "chatUserDetails": {
-      "removeFriend": "Remover amigo",
+      "removeFriend": "Remover amigo e apagar conversa",
       "removeError": "Falha ao remover amigo"
     }
   }

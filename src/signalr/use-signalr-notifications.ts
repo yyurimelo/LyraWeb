@@ -27,7 +27,6 @@ export function useSignalRNotifications({
       queryClient.setQueryData(['notifications', 'header', 'unread'], (old: any) => {
         if (!old) return old
         const filtered = old.data.filter((n: any) => n.id !== notificationId)
-        // atualiza também o contador direto
         queryClient.setQueryData(['notifications', 'count', 'unread'], filtered.length)
         return {
           ...old,
