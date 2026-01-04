@@ -75,12 +75,12 @@ export const NotificationItem = memo(
         <div
           className={cn(
             "hover:bg-accent/40 rounded-sm relative p-3 group",
-            onClick && notification.type === "InviteFriend" && notification.id && "cursor-pointer",
+            onClick && notification.type === "InviteFriend" && notification.id && String(notification.status) !== "Completed" && "cursor-pointer",
             isLoading && "opacity-50 pointer-events-none"
           )}
           onClick={handleClick}
         >
-          {activeTab === "unread" && (
+          {activeTab === "unread" && String(notification.status) !== "Completed" && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -115,7 +115,7 @@ export const NotificationItem = memo(
               size={21}
               className={cn(
                 "flex-shrink-0 mt-[2px]",
-                String(notification.status) === "Read"
+                String(notification.status) === "Read" || String(notification.status) === "Completed"
                   ? "text-muted-foreground"
                   : "text-primary"
               )}
@@ -126,7 +126,7 @@ export const NotificationItem = memo(
                 <span
                   className={cn(
                     "text-[11px]",
-                    String(notification.status) === "Read"
+                    String(notification.status) === "Read" || String(notification.status) === "Completed"
                       ? "text-muted-foreground"
                       : "text-primary"
                   )}

@@ -29,18 +29,12 @@ export const useRemoveFriendMutation = () => {
 
   return useMutation({
     mutationFn: removeFriend,
-    onSuccess: async () => {
-      queryClient.invalidateQueries({
-        queryKey: ["chat"],
-      });
+    onSuccess: () => {
+      // SignalR handles invalidation of ['chat'] and ['friend-request'] automatically via UpdateListFriend and UpdateFriendRequest events
 
+      // Invalidate user-details (no SignalR event for this)
       queryClient.invalidateQueries({
         queryKey: ["user-details"],
-      });
-
-      // Invalida friend request status cache para atualizar UserSearchDetails
-      queryClient.invalidateQueries({
-        queryKey: ["friend-request"],
       });
 
       toast.success(t('toasts.user.removeSuccess'));

@@ -47,17 +47,27 @@ export function useSignalRNotifications({
 
     connection.on(
       'NotificationUpdated',
-      (payload: { ReferenceId: number; Status: string }) => {
+      (payload: { referenceId: number; status: string }) => {
         queryClient.setQueryData(
           ['notifications', 'header', 'unread'],
           (old: any) => {
             if (!old) return old
 
+            // If status is Read or Completed, remove from unread list
+            if (payload.status === 'Read' || payload.status === 'Completed') {
+              return {
+                ...old,
+                data: old.data.filter((n: any) => n.referenceId !== payload.referenceId),
+                totalRecords: Math.max(0, old.totalRecords - 1)
+              }
+            }
+
+            // Otherwise just update the status
             return {
               ...old,
               data: old.data.map((n: any) =>
-                n.referenceId === payload.ReferenceId
-                  ? { ...n, status: payload.Status }
+                n.referenceId === payload.referenceId
+                  ? { ...n, status: payload.status }
                   : n
               )
             }

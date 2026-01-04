@@ -5,34 +5,14 @@ import { useTranslation } from "react-i18next";
 import type { FriendRequestFormModel } from "@/@types/friend-request/friend-request-form";
 import type { FriendRequestDataModel } from "@/@types/friend-request/friend-request-data";
 
-// Helper function to update friends list cache
-const updateFriendsListCache = () => {
-  queryClient.invalidateQueries({
-    queryKey: ["chat"],
-  });
-};
-
-// Helper function to update notifications cache (but NOT count, which is handled by SignalR)
-const updateNotificationsCache = () => {
-  queryClient.invalidateQueries({
-    queryKey: ["notifications", "header"],
-  });
-};
-
 export const useSendFriendRequestMutation = () => {
   const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ userIdentifier }: FriendRequestFormModel) =>
       sendFriendRequest({ userIdentifier }),
-    onSuccess: async () => {
-      // Invalidate friend request status cache
-      queryClient.invalidateQueries({
-        queryKey: ["friend-request"],
-      });
-
-      // Update notifications cache
-      updateNotificationsCache();
+    onSuccess: () => {
+      // SignalR handles invalidation of ['friend-request'] and ['notifications', 'header'] automatically via UpdateFriendRequest event
 
       toast.success(t('toasts.friendRequest.sendSuccess'));
     },
@@ -48,14 +28,10 @@ export const useAcceptFriendRequestMutation = () => {
 
   return useMutation({
     mutationFn: (requestId: number) => acceptFriendRequest(requestId),
-    onSuccess: async () => {
-      // Update friends list to include the new friend
-      updateFriendsListCache();
+    onSuccess: () => {
+      // SignalR handles invalidation of ['chat'] and ['notifications', 'header'] automatically via UpdateListFriend and UpdateFriendRequest events
 
-      // Update notifications cache
-      updateNotificationsCache();
-
-      // Invalidate friend request status cache
+      // Invalidate friend-request status (SignalR event likely only goes to sender, not acceptor)
       queryClient.invalidateQueries({
         queryKey: ["friend-request"],
       });
@@ -79,13 +55,8 @@ export const useCancelFriendRequestMutation = () => {
 
   return useMutation({
     mutationFn: (requestId: number) => cancelFriendRequest(requestId),
-    onSuccess: async () => {
-      queryClient.invalidateQueries({
-        queryKey: ["friend-request"],
-      });
-
-      // Update notifications cache
-      updateNotificationsCache();
+    onSuccess: () => {
+      // SignalR handles invalidation of ['friend-request'] and ['notifications', 'header'] automatically via UpdateFriendRequest event
 
       toast.success(t('toasts.friendRequest.cancelSuccess'));
     },
@@ -116,7 +87,7 @@ export const useCheckFriendshipStatus = (otherUserId: string | null, open?: bool
     noRequest: !query.data,
     isLoading: query.isLoading,
     friendRequest: query.data,
-    refetch: query.refetch, // Expõe a função refetch
+    refetch: query.refetch, // Exposes the refetch function
   };
 };
 

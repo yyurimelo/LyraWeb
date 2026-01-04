@@ -148,6 +148,11 @@ export const useNotificationClick = (): UseNotificationClickResult => {
       return;
     }
 
+    // Completed notifications are inactive - do nothing
+    if (String(notification.status) === "Completed") {
+      return;
+    }
+
     if (!notification.referenceId) {
       return;
     }
@@ -157,6 +162,13 @@ export const useNotificationClick = (): UseNotificationClickResult => {
     try {
       const friendRequest = await getFriendRequest(notification.referenceId);
       const senderId = friendRequest.senderId;
+
+      if (!senderId) {
+        console.error('Friend request has no senderId');
+        toast.error(t('toasts.notification.notFound'));
+        return;
+      }
+
       const userData = await getUserPublicId(senderId);
 
       setSelectedUser(userData);
