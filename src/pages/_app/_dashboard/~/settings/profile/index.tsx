@@ -61,7 +61,6 @@ function Profile() {
   });
 
   const updateUserMutation = useUpdateUserProfileMutation(
-    user?.id || '',
     setEdit,
     updateUser,
   );

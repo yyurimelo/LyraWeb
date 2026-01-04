@@ -30,7 +30,11 @@ export const useRemoveFriendMutation = () => {
   return useMutation({
     mutationFn: removeFriend,
     onSuccess: () => {
-      // SignalR handles invalidation of ['chat'] and ['friend-request'] automatically via UpdateListFriend and UpdateFriendRequest events
+      // SignalR handles invalidation for the OTHER user via UpdateListFriend
+      // But we need to invalidate OUR own list manually
+      queryClient.invalidateQueries({
+        queryKey: ["chat"],
+      });
 
       // Invalidate user-details (no SignalR event for this)
       queryClient.invalidateQueries({
@@ -75,19 +79,14 @@ export const useGetUserPublicIdQuery = (userIdentifier: string | null, enabled: 
 
 
 export const useUpdateUserProfileMutation = (
-  userId: string,
   setEdit: (edit: boolean) => void,
   updateAuthUser: (data: Partial<AuthUserDataModel>) => void,
-  // currentUser: AuthUserDataModel | null // Pass current user directly
 ) => {
   const { t } = useTranslation();
 
   return useMutation<UserDataModel, Error, Omit<UserUpdateModel, 'id'>>({
     mutationFn: (data: Omit<UserUpdateModel, 'id'>) => {
-      if (!userId) {
-        throw new Error('User ID is required for updating profile');
-      }
-      return updateUser({ ...data, id: userId });
+      return updateUser(data);
     },
     onSuccess: async (updatedUser) => {
       updateAuthUser({
@@ -97,10 +96,6 @@ export const useUpdateUserProfileMutation = (
         appearancePrimaryColor: updatedUser.appearancePrimaryColor,
         appearanceTextPrimaryDark: updatedUser.appearanceTextPrimaryDark,
         appearanceTextPrimaryLight: updatedUser.appearanceTextPrimaryLight,
-      })
-
-      await queryClient.invalidateQueries({
-        queryKey: ["user-details", userId],
       })
 
       setEdit(false)

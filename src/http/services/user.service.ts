@@ -39,7 +39,6 @@ export async function getUser(id: string): Promise<UserDataModel> {
 
 
 export async function updateUser({
-  id,
   name,
   description,
   appearancePrimaryColor,
@@ -55,11 +54,6 @@ export async function updateUser({
         appearancePrimaryColor,
         appearanceTextPrimaryLight,
         appearanceTextPrimaryDark,
-      },
-      {
-        params: {
-          id,
-        },
       },
     );
   } catch (error) {

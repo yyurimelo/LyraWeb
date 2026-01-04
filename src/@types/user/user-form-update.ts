@@ -1,5 +1,5 @@
 export type UserUpdateModel = {
-  id: string;
+  id?: string;
   name?: string;
   description?: string;
   appearancePrimaryColor?: string | null;
