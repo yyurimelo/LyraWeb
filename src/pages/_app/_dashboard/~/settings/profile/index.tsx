@@ -140,17 +140,6 @@ function Profile() {
     }
 
     await updateUserMutation.mutateAsync(updateData);
-
-    updateUser({
-      name: data.name,
-      description: data.description,
-      appearancePrimaryColor: data.appearancePrimaryColor
-        ? hexToOKLCH(data.appearancePrimaryColor)
-        : null,
-      appearanceTextPrimaryLight: data.appearanceTextPrimaryLight ?? undefined,
-      appearanceTextPrimaryDark: data.appearanceTextPrimaryDark ?? undefined,
-    });
-
     setAvatarBlob(null);
     setShouldRemoveAvatar(false);
   }

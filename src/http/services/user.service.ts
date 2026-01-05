@@ -45,7 +45,7 @@ export async function updateUser({
   appearanceTextPrimaryDark,
   avatar,
   removeAvatar,
-}: UserUpdateModel & { avatar?: File | null; removeAvatar?: boolean }) {
+}: UserUpdateModel & { avatar?: File | null; removeAvatar?: boolean }): Promise<UserDataModel> {
   try {
     const formData = new FormData()
 

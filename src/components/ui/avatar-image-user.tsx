@@ -28,20 +28,17 @@ export function AvatarImageUser({
     : null;
   return (
     <>
-      {src && alt ? (
-        <AvatarImage
-          alt={alt}
-          src={src}
-          className={cn(className ? className : "")}
-        />
-      ) : (
-        <AvatarFallback
-          className="rounded-full text-primary-foreground bg-primary"
-          style={{ backgroundColor: colorUserPublic ?? undefined }}
-        >
-          {initialName}
-        </AvatarFallback>
-      )}
+      <AvatarImage
+        alt={alt}
+        src={src}
+        className={cn(className ? className : "")}
+      />
+      <AvatarFallback
+        className="rounded-full text-primary-foreground bg-primary"
+        style={{ backgroundColor: colorUserPublic ?? undefined }}
+      >
+        {initialName}
+      </AvatarFallback>
     </>
   );
 }
