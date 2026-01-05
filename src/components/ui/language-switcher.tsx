@@ -15,7 +15,7 @@ const languages = [
 ];
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   const handleLanguageChange = (languageCode: string) => {
     i18n.changeLanguage(languageCode);
@@ -43,7 +43,7 @@ export function LanguageSwitcher() {
             )}
           >
             <span className="mr-2">{language.flag}</span>
-            {language.name}
+            {t(`languages.${language.code === 'pt-BR' ? 'ptBR' : 'en'}`)}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

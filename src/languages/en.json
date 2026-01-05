@@ -270,5 +270,16 @@
       "removeFriend": "Remove friend and delete conversation",
       "removeError": "Failed to remove friend"
     }
+  },
+  "theme": {
+    "toggle": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "languages": {
+    "en": "English",
+    "ptBR": "Portuguese"
   }
 }

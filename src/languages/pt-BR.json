@@ -270,5 +270,16 @@
       "removeFriend": "Remover amigo e apagar conversa",
       "removeError": "Falha ao remover amigo"
     }
+  },
+  "theme": {
+    "toggle": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    }
+  },
+  "languages": {
+    "en": "Inglês",
+    "ptBR": "Português"
   }
 }

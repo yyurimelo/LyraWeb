@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 // sections
 import { NotificationHeader } from "./notification-header";
 import { NotificationList } from "./notification-list";
-import { UserSearchDetails } from "@/components/ui/user-search-details";
+import { UserSearchDetails } from "@/components/user-search";
 
 // hooks
 import {

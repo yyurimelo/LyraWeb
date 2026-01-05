@@ -13,9 +13,11 @@ import {
   Command,
 } from "@/components/ui/command";
 import { Button } from "./button";
-import { UserSearchResultItem } from "./user-search-result-item";
-import { UserSearchDetails } from "./user-search-details";
-import { UserSearchSkeleton } from "./user-search-skeleton";
+import {
+  UserSearchResultItem,
+  UserSearchDetails,
+  UserSearchSkeleton
+} from "@/components/user-search";
 
 import { useDebounce } from "@/hooks/use-debounce";
 import type { UserDataModel } from "@/@types/user/user-data-model";
