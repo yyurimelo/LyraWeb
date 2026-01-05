@@ -117,7 +117,7 @@ function Profile() {
       appearancePrimaryColor?: string | null;
       appearanceTextPrimaryLight?: string;
       appearanceTextPrimaryDark?: string;
-      avatar?: File | null;
+      avatar?: File;
       removeAvatar?: boolean;
     } = {
       name: data.name,
