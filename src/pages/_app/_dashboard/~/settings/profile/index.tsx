@@ -1,11 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useAuth } from "@/contexts/auth-provider"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getInitialName } from "@/lib/get-initial-name"
 import z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useUpdateUserProfileMutation } from "@/http/hooks/user.hooks"
+import { useUpdateUserProfileMutation, useUploadAvatarMutation } from "@/http/hooks/user.hooks"
 import { useEffect, useId, useState, useCallback } from "react"
 import { oklchToHex, hexToOKLCH } from "@/utils/color"
 import {
@@ -28,6 +26,7 @@ import { Separator } from "@/components/ui/separator"
 import { Check, LoaderCircle, Pencil, X } from "lucide-react"
 import { ColorPicker } from "@/components/ui/color-picker"
 import { useTranslation } from "react-i18next"
+import { ProfileAvatarEditor } from "@/components/profile-avatar-editor"
 
 export const Route = createFileRoute('/_app/_dashboard/~/settings/profile/')({
   component: Profile,
@@ -60,10 +59,23 @@ function Profile() {
     },
   });
 
+  const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
+
+  const [shouldRemoveAvatar, setShouldRemoveAvatar] = useState(false);
+
+  const handleAvatarChange = useCallback((blob: Blob | null) => {
+    if (blob) {
+      setShouldRemoveAvatar(false);
+    }
+    setAvatarBlob(blob);
+  }, []);
+
   const updateUserMutation = useUpdateUserProfileMutation(
     setEdit,
     updateUser,
   );
+
+  const uploadAvatarMutation = useUploadAvatarMutation(updateUser);
 
   const resetFormToUserData = useCallback(() => {
     if (!user) return;
@@ -89,15 +101,25 @@ function Profile() {
 
   function handleCancelEdit() {
     setEdit(false);
+    setAvatarBlob(null);
+    setShouldRemoveAvatar(false);
     resetFormToUserData();
   }
 
-  const isPending = updateUserMutation.isPending;
+  const isPending = updateUserMutation.isPending || uploadAvatarMutation.isPending;
 
   async function handleSubmit(data: ProfileFormSchema) {
     if (updateUserMutation.isPending) return;
 
-    await updateUserMutation.mutateAsync({
+    const updateData: {
+      name: string;
+      description?: string;
+      appearancePrimaryColor?: string | null;
+      appearanceTextPrimaryLight?: string;
+      appearanceTextPrimaryDark?: string;
+      avatar?: File | null;
+      removeAvatar?: boolean;
+    } = {
       name: data.name,
       description: data.description || undefined,
       appearancePrimaryColor: data.appearancePrimaryColor
@@ -105,7 +127,19 @@ function Profile() {
         : null,
       appearanceTextPrimaryLight: data.appearanceTextPrimaryLight || undefined,
       appearanceTextPrimaryDark: data.appearanceTextPrimaryDark || undefined,
-    });
+      removeAvatar: shouldRemoveAvatar,
+    };
+
+    if (avatarBlob) {
+      updateData.avatar = new File([avatarBlob], "avatar.jpg", {
+        type: avatarBlob.type,
+        lastModified: Date.now(),
+      });
+    } else if (shouldRemoveAvatar) {
+      updateData.removeAvatar = true;
+    }
+
+    await updateUserMutation.mutateAsync(updateData);
 
     updateUser({
       name: data.name,
@@ -116,6 +150,9 @@ function Profile() {
       appearanceTextPrimaryLight: data.appearanceTextPrimaryLight ?? undefined,
       appearanceTextPrimaryDark: data.appearanceTextPrimaryDark ?? undefined,
     });
+
+    setAvatarBlob(null);
+    setShouldRemoveAvatar(false);
   }
 
   return (
@@ -127,14 +164,14 @@ function Profile() {
         </p>
       </div>
 
-      <div className="flex items-center gap-4">
-        <Avatar className="w-20 h-20">
-          <AvatarImage src={user?.avatarUser} alt={user?.name} />
-          <AvatarFallback className="text-lg bg-primary text-primary-foreground">
-            {getInitialName(user!.name)}
-          </AvatarFallback>
-        </Avatar>
-      </div>
+      <ProfileAvatarEditor
+        currentAvatar={user?.avatarUser}
+        userName={user?.name || ""}
+        isEditable={edit}
+        isAvatarRemoved={shouldRemoveAvatar}
+        onAvatarChange={handleAvatarChange}
+        onAvatarRemove={() => setShouldRemoveAvatar(true)}
+      />
 
       <Form {...form}>
         <form

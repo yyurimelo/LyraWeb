@@ -110,3 +110,28 @@ export const useUpdateUserProfileMutation = (
     },
   });
 };
+
+export const useUploadAvatarMutation = (
+  updateAuthUser: (data: Partial<AuthUserDataModel>) => void,
+) => {
+  const { t } = useTranslation();
+
+  return useMutation<UserDataModel, Error, { avatar: File }>({
+    mutationFn: ({ avatar }) => {
+      return updateUser({ avatar });
+    },
+    onSuccess: async (updatedUser) => {
+      updateAuthUser({
+        avatarUser: updatedUser.avatarUser,
+      });
+      toast.success(t('toasts.user.updateProfileSuccess'));
+    },
+    onError: (error) => {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error(t('toasts.user.updateProfileError'));
+      }
+    },
+  });
+};

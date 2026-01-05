@@ -37,32 +37,50 @@ export async function getUser(id: string): Promise<UserDataModel> {
   return response.data;
 }
 
-
 export async function updateUser({
   name,
   description,
   appearancePrimaryColor,
   appearanceTextPrimaryLight,
   appearanceTextPrimaryDark,
-}: UserUpdateModel) {
-  let response: any;
+  avatar,
+  removeAvatar,
+}: UserUpdateModel & { avatar?: File | null; removeAvatar?: boolean }) {
   try {
-    response = await http.put(API_ENDPOINTS.USER.UPDATE,
-      {
-        name,
-        description,
-        appearancePrimaryColor,
-        appearanceTextPrimaryLight,
-        appearanceTextPrimaryDark,
-      },
-    );
+    const formData = new FormData()
+
+    console.log(removeAvatar)
+
+    if (name) formData.append('name', name)
+    if (description) formData.append('description', description)
+    if (appearancePrimaryColor)
+      formData.append('appearancePrimaryColor', appearancePrimaryColor)
+    if (appearanceTextPrimaryLight)
+      formData.append('appearanceTextPrimaryLight', appearanceTextPrimaryLight)
+    if (appearanceTextPrimaryDark)
+      formData.append('appearanceTextPrimaryDark', appearanceTextPrimaryDark)
+
+    if (removeAvatar === true) {
+      formData.append('removeAvatar', 'true')
+    } else if (avatar instanceof File) {
+      formData.append('avatar', avatar)
+    }
+
+    const response = await http.put(
+      API_ENDPOINTS.USER.UPDATE,
+      formData
+    )
+
+    return response.data
   } catch (error) {
     if (isAxiosError(error)) {
-      throw new Error(error.response?.data || 'An error occurred while updating the user');
+      throw new Error(
+        error.response?.data?.message ??
+        'An error occurred while updating the user'
+      )
     }
-    throw error;
+    throw error
   }
-  return response.data;
 }
 
 export async function getUserPublicId(userIdentifier: string): Promise<UserDataModel> {

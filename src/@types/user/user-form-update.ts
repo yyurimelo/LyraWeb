@@ -5,4 +5,6 @@ export type UserUpdateModel = {
   appearancePrimaryColor?: string | null;
   appearanceTextPrimaryLight?: string;
   appearanceTextPrimaryDark?: string;
+  avatar?: File;
+  removeAvatar?: boolean;
 };
