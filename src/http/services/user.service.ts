@@ -49,8 +49,6 @@ export async function updateUser({
   try {
     const formData = new FormData()
 
-    console.log(removeAvatar)
-
     if (name) formData.append('name', name)
     if (description) formData.append('description', description)
     if (appearancePrimaryColor)
