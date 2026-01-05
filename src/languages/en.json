@@ -281,5 +281,12 @@
   "languages": {
     "en": "English",
     "ptBR": "Portuguese"
+  },
+  "cropper": {
+    "dialog": {
+      "title": "Crop image",
+      "description": "Crop image dialog",
+      "apply": "Apply"
+    }
   }
 }

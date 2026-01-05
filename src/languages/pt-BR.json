@@ -281,5 +281,12 @@
   "languages": {
     "en": "Inglês",
     "ptBR": "Português"
+  },
+  "cropper": {
+    "dialog": {
+      "title": "Recortar imagem",
+      "description": "Caixa de diálogo de recorte de imagem",
+      "apply": "Aplicar"
+    }
   }
 }

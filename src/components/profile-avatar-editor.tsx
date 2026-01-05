@@ -7,6 +7,7 @@ import {
   ZoomOutIcon
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -102,6 +103,8 @@ export function ProfileAvatarEditor({
   onAvatarChange,
   onAvatarRemove,
 }: ProfileAvatarEditorProps) {
+  const { t } = useTranslation();
+
   const [
     { files, isDragging },
     {
@@ -354,7 +357,7 @@ export function ProfileAvatarEditor({
       <Dialog onOpenChange={setIsDialogOpen} open={isDialogOpen}>
         <DialogContent className="gap-0 p-0 sm:max-w-140 *:[button]:hidden">
           <DialogDescription className="sr-only">
-            Crop image dialog
+            {t('cropper.dialog.description')}
           </DialogDescription>
           <DialogHeader className="contents space-y-0 text-left">
             <DialogTitle className="flex items-center justify-between border-b p-4 text-base">
@@ -375,7 +378,7 @@ export function ProfileAvatarEditor({
                 >
                   <ArrowLeftIcon aria-hidden="true" />
                 </Button>
-                <span>Crop image</span>
+                <span>{t('cropper.dialog.title')}</span>
               </div>
               <Button
                 autoFocus
@@ -383,7 +386,7 @@ export function ProfileAvatarEditor({
                 disabled={!previewUrl}
                 onClick={handleApply}
               >
-                Apply
+                {t('cropper.dialog.apply')}
               </Button>
             </DialogTitle>
           </DialogHeader>
