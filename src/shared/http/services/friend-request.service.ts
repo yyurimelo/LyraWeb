@@ -2,6 +2,8 @@ import type { FriendRequestFormModel } from "@/@types/friend-request/friend-requ
 import type { FriendRequestDataModel } from "@/@types/friend-request/friend-request-data";
 import { API_ENDPOINTS } from "../constants";
 import { http, isAxiosError } from "@lyra/axios-config";
+import type { FriendRequestFilter } from "@/@types/friend-request/friend-request-filter";
+import type { PaginationDataModel } from "@/@types/pagination";
 
 export async function sendFriendRequest({
   userIdentifier
@@ -64,3 +66,24 @@ export async function getFriendRequest(id: string): Promise<FriendRequestDataMod
   return response.data;
 }
 
+export async function getFriendRequestPaginated({
+  name,
+  pageNumber,
+  pageSize,
+}: FriendRequestFilter): Promise<PaginationDataModel<FriendRequestDataModel>> {
+  const response = await http.post(
+    API_ENDPOINTS.FRIEND_REQUEST.GET_ALL_PAGINATED,
+    {
+      name: name ? name : null,
+    },
+    {
+      params: {
+        pageNumber,
+        pageSize,
+      },
+    },
+
+  );
+
+  return response.data;
+}

@@ -12,7 +12,7 @@ import {
   CommandEmpty,
   Command,
 } from "@/shared/components/ui/command";
-import { Button } from "./button";
+import { Button } from "@/shared/components/ui/button";
 import {
   UserSearchResultItem,
   UserSearchDetails,
@@ -23,7 +23,7 @@ import { useDebounce } from "@/shared/hooks/use-debounce";
 import type { UserDataModel } from "@/@types/user/user-data-model";
 import { useGetUserWithNameQuery } from "@/shared/http/hooks/user.hooks";
 
-export default function SearchUser() {
+export function SearchUser() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);

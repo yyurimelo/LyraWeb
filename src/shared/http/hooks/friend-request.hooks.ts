@@ -1,5 +1,5 @@
-import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
-import { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, checkFriendRequestStatus, getFriendRequest } from "../services/friend-request.service";
+import { queryClient, useMutation, useQuery, useInfiniteQuery } from "@lyra/react-query-config";
+import { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, checkFriendRequestStatus, getFriendRequest, getFriendRequestPaginated } from "../services/friend-request.service";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import type { FriendRequestFormModel } from "@/@types/friend-request/friend-request-form";
@@ -98,3 +98,36 @@ export const useGetFriendRequestQuery = (friendRequestId: string | null, enabled
     enabled: !!friendRequestId && enabled,
     staleTime: 2 * 60 * 1000,
   });
+
+interface FriendRequestsInfiniteQueryOptions {
+  name?: string;
+  pageSize?: number;
+  enabled?: boolean;
+}
+
+export const useFriendRequestsInfiniteQuery = ({
+  name = "",
+  pageSize = 10,
+  enabled = true,
+}: FriendRequestsInfiniteQueryOptions) => {
+  return useInfiniteQuery({
+    queryKey: ["friend-requests", "infinite", { name, pageSize }],
+    queryFn: async ({ pageParam = 1 }) => {
+      return await getFriendRequestPaginated({
+        name,
+        pageNumber: pageParam,
+        pageSize,
+      });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pageNumber < lastPage.totalPages) {
+        return lastPage.pageNumber + 1;
+      }
+      return undefined;
+    },
+    enabled,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};

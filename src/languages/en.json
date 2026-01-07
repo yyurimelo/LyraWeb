@@ -90,6 +90,34 @@
       "titleTab": "Requests"
     }
   },
+  "friendRequest": {
+    "title": "Friend Requests",
+    "description": "Manage your received friend requests",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted"
+    },
+    "actions": {
+      "accept": "Accept",
+      "cancel": "Decline"
+    },
+    "search": {
+      "placeholder": "Search by name...",
+      "button": "Search",
+      "clear": "Clear",
+      "active": "Results for: {{query}}"
+    },
+    "refetch": "Refresh",
+    "empty": {
+      "title": "No requests",
+      "description": "You don't have any pending friend requests"
+    },
+    "error": {
+      "loading": "Error loading requests",
+      "retry": "Try again"
+    },
+    "endOfResults": "End of results"
+  },
   "password": {
     "placeholder": "Password",
     "requirements": {

@@ -90,6 +90,34 @@
       "titleTab": "Solicitações"
     }
   },
+  "friendRequest": {
+    "title": "Solicitações de Amizade",
+    "description": "Gerencie suas solicitações de amizade recebidas",
+    "status": {
+      "pending": "Pendente",
+      "accepted": "Aceito"
+    },
+    "actions": {
+      "accept": "Aceitar",
+      "cancel": "Recusar"
+    },
+    "search": {
+      "placeholder": "Buscar por nome...",
+      "button": "Buscar",
+      "clear": "Limpar",
+      "active": "Resultados para: {{query}}"
+    },
+    "refetch": "Atualizar",
+    "empty": {
+      "title": "Nenhuma solicitação",
+      "description": "Você não tem solicitações de amizade pendentes"
+    },
+    "error": {
+      "loading": "Erro ao carregar solicitações",
+      "retry": "Tentar novamente"
+    },
+    "endOfResults": "Fim dos resultados"
+  },
   "password": {
     "placeholder": "Senha",
     "requirements": {

@@ -32,5 +32,6 @@ export const API_ENDPOINTS = {
     CHECK_REQUEST: "/api/friend-request/check/request",
     GET: (id: string) => `/api/friend-request/get/${id}`,
     GET_ALL_REQUESTS: "/api/friend-request/get/all",
+    GET_ALL_PAGINATED: "/api/friend-request/get/all/paginated"
   },
 } as const;

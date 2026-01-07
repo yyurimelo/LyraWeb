@@ -4,9 +4,10 @@ import { HeaderNavigation } from "./header-navigation";
 import { HeaderAccount } from "./header-account";
 import { HeaderFriends } from "./header-friends";
 
-import SearchUser from "@/shared/components/ui/search-user";
+
 import { LanguageSwitcher } from "@/shared/components/ui/language-switcher";
 import { Notification } from "./notifications";
+import { SearchUser } from "../user-search/search-user";
 
 
 export function Header() {
