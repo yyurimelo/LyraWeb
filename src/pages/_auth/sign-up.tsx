@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useId } from "react";
 import { useTranslation } from 'react-i18next';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { LoaderCircle } from "lucide-react";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { InputPassword } from "@/components/ui/input-passowrd";
-import { useCreateUserMutation } from "@/http/hooks/user.hooks";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/shared/components/ui/form";
+import { Input } from "@/shared/components/ui/input";
+import { InputPassword } from "@/shared/components/ui/input-passowrd";
+import { useCreateUserMutation } from "@/shared/http/hooks/user.hooks";
 
 export const Route = createFileRoute('/_auth/sign-up')({
   component: SignUp,

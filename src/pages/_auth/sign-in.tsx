@@ -4,10 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { InputPassword } from "@/components/ui/input-passowrd";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/shared/components/ui/form";
+import { Input } from "@/shared/components/ui/input";
+import { Button } from "@/shared/components/ui/button";
+import { InputPassword } from "@/shared/components/ui/input-passowrd";
 import { toast } from "sonner";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 

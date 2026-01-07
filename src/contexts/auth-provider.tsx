@@ -1,6 +1,6 @@
 import type { AuthFormModel } from '@/@types/auth/auth-form-model'
 import type { AuthUserDataModel } from '@/@types/auth/auth-user-data-model'
-import { authenticate, getLoggedUser, googleAuthenticate } from '@/http/services/auth.service'
+import { authenticate, getLoggedUser, googleAuthenticate } from '@/shared/http/services/auth.service'
 import { http } from '@lyra/axios-config'
 import { LoaderCircle } from 'lucide-react'
 import React, { createContext, useContext, useState, useEffect } from 'react'

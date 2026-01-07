@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/contexts/auth-provider";
 import { useNavigate } from "@tanstack/react-router";

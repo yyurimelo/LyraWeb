@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useRef } from "react";
 import { useAuth } from "./auth-provider";
-import { applyThemeColors } from "@/utils/apply-theme-colors";
-import { oklchToHex } from "@/utils/color";
+import { applyThemeColors } from "@/shared/utils/apply-theme-colors";
+import { oklchToHex } from "@/shared/utils/color";
 
 
 interface UserColorContextType {

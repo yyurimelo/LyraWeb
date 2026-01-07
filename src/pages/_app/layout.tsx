@@ -1,6 +1,7 @@
-import { Header } from '@/components/header'
+
 import { useAuth } from '@/contexts/auth-provider'
 import { createFileRoute, Navigate, Outlet, redirect } from '@tanstack/react-router'
+import { Header } from './-components/header'
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: ({ context, location }) => {

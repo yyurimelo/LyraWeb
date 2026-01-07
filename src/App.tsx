@@ -1,7 +1,7 @@
 import { QueryClientProvider, queryClient } from "@lyra/react-query-config"
 import { routeTree } from './routeTree.gen';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-import { ThemeProvider } from './components/ui/theme-provider';
+import { ThemeProvider } from '@/shared/components/ui/theme-provider';
 import { createHttp } from "@lyra/axios-config";
 import { env } from './env';
 import { Toaster } from "sonner";

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { queryClient } from '@lyra/react-query-config'
-import { API_ENDPOINTS } from '@/http/constants'
+import { API_ENDPOINTS } from '@/shared/http/constants'
 import { useSignalRBase } from '.'
 
 interface UseSignalRNotificationsProps {

@@ -3,9 +3,9 @@ import { useAuth } from "@/contexts/auth-provider"
 import z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useUpdateUserProfileMutation, useUploadAvatarMutation } from "@/http/hooks/user.hooks"
+import { useUpdateUserProfileMutation, useUploadAvatarMutation } from "@/shared/http/hooks/user.hooks"
 import { useEffect, useId, useState, useCallback } from "react"
-import { oklchToHex, hexToOKLCH } from "@/utils/color"
+import { oklchToHex, hexToOKLCH } from "@/shared/utils/color"
 import {
   Form,
   FormControl,
@@ -13,20 +13,20 @@ import {
   FormField,
   FormItem,
   FormLabel,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Combo } from "@/components/ui/combo"
+} from "@/shared/components/ui/form"
+import { Input } from "@/shared/components/ui/input"
+import { Textarea } from "@/shared/components/ui/textarea"
+import { Button } from "@/shared/components/ui/button"
+import { Combo } from "@/shared/components/ui/combo"
 
-import { ClickCopy } from "@/components/ui/click-copy"
+import { ClickCopy } from "@/shared/components/ui/click-copy"
 import { formatHexInput } from "@/lib/hex-format"
-import { abbreviateUserIdentifier } from "@/utils/abbreviate-user-identifier"
-import { Separator } from "@/components/ui/separator"
+import { abbreviateUserIdentifier } from "@/shared/utils/abbreviate-user-identifier"
+import { Separator } from "@/shared/components/ui/separator"
 import { Check, LoaderCircle, Pencil, X } from "lucide-react"
-import { ColorPicker } from "@/components/ui/color-picker"
+import { ColorPicker } from "@/shared/components/ui/color-picker"
 import { useTranslation } from "react-i18next"
-import { ProfileAvatarEditor } from "@/components/profile-avatar-editor"
+import { ProfileAvatarEditor } from "@/pages/_app/-components/profile-avatar-editor"
 
 export const Route = createFileRoute('/_app/_dashboard/~/settings/profile/')({
   component: Profile,

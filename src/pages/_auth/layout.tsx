@@ -1,11 +1,11 @@
-import { LyraChatIcon } from '@/components/logos/lyra-chat-icon'
-import { ModeToggle } from '@/components/ui/modo-toggle'
+import { LyraChatIcon } from '@/shared/components/logos/lyra-chat-icon'
+import { ModeToggle } from '@/shared/components/ui/modo-toggle'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { GoogleAuthButton } from './-components/google-auth/page'
 import { useLocation } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Separator } from '@/components/ui/separator'
-import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { Separator } from '@/shared/components/ui/separator'
+import { LanguageSwitcher } from '@/shared/components/ui/language-switcher'
 
 export const Route = createFileRoute('/_auth')({
   component: AuthLayout,

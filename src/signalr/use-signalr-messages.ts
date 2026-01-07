@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import type { MessageResponseDto } from '@/@types/message/message-types'
 import type { UserGetAllFriendsDataModel } from '@/@types/user/user-get-all-friends'
 import { queryClient } from '@lyra/react-query-config'
-import { API_ENDPOINTS } from '@/http/constants'
-import { sendMessage as sendMessageService } from '@/http/services/message.service'
+import { API_ENDPOINTS } from '@/shared/http/constants'
+import { sendMessage as sendMessageService } from '@/shared/http/services/message.service'
 import { useSignalRBase } from '.'
 
 export function useSignalRMessages({
