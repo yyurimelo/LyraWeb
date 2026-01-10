@@ -1,6 +1,6 @@
 // components
 import { Avatar } from "@/shared/components/ui/avatar";
-import { AvatarImageUser } from "@/pages/_app/-components/avatar-image-user";
+import { AvatarImageUser } from "@/pages/_app/_dashboard/-components/avatar-image-user";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,

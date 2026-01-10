@@ -140,9 +140,9 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
           onClick={() => onUserSelect(user)}
           className={cn(
             "group relative flex items-start p-3 rounded-lg",
-            "border border-transparent hover:bg-primary/20 hover:border hover:border-primary/30",
+            "border border-transparent hover:bg-primary/15 hover:border hover:border-primary/30",
             "cursor-pointer",
-            selectedUser?.id === user.id && "bg-primary/20 border border-primary/30"
+            selectedUser?.id === user.id && "bg-primary/10 border border-primary/30"
           )}
         >
 

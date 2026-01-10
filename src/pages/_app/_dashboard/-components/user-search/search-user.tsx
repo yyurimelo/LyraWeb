@@ -17,7 +17,7 @@ import {
   UserSearchResultItem,
   UserSearchDetails,
   UserSearchSkeleton
-} from "@/pages/_app/-components/user-search";
+} from "@/pages/_app/_dashboard/-components/user-search";
 
 import { useDebounce } from "@/shared/hooks/use-debounce";
 import type { UserDataModel } from "@/@types/user/user-data-model";

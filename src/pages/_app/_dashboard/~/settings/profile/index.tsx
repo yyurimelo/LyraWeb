@@ -26,7 +26,7 @@ import { Separator } from "@/shared/components/ui/separator"
 import { Check, LoaderCircle, Pencil, X } from "lucide-react"
 import { ColorPicker } from "@/shared/components/ui/color-picker"
 import { useTranslation } from "react-i18next"
-import { ProfileAvatarEditor } from "@/pages/_app/-components/profile-avatar-editor"
+import { ProfileAvatarEditor } from "@/pages/_app/_dashboard/-components/profile-avatar-editor"
 
 export const Route = createFileRoute('/_app/_dashboard/~/settings/profile/')({
   component: Profile,

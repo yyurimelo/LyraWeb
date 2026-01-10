@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useGetAllFriendsQuery } from '../../../../shared/http/hooks/user.hooks'
+import { useGetAllFriendsQuery } from '../../../../../shared/http/hooks/user.hooks'
 
 import { UserList } from './sections/user-list'
 import { ChatArea } from './sections/chat-area'
