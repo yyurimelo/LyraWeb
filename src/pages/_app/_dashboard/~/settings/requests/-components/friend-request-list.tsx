@@ -18,12 +18,14 @@ interface FriendRequestListProps {
   isLoading: boolean;
   isError: boolean;
   searchQuery: string;
+  onActionSuccess?: () => void;
 }
 
 export const FriendRequestList = memo(({
   allRequests,
   isLoading,
   isError,
+  onActionSuccess,
 }: FriendRequestListProps) => {
 
   if (isError) {
@@ -51,6 +53,7 @@ export const FriendRequestList = memo(({
           <FriendRequestItem
             key={request.id}
             request={request}
+            onActionSuccess={onActionSuccess}
           />
         ))}
       </div>

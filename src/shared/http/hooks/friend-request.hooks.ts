@@ -29,7 +29,10 @@ export const useAcceptFriendRequestMutation = () => {
   return useMutation({
     mutationFn: (requestId: number) => acceptFriendRequest(requestId),
     onSuccess: () => {
-      // SignalR handles invalidation of ['chat'] and ['notifications', 'header'] automatically via UpdateListFriend and UpdateFriendRequest events
+      // Invalida lista de amigos para mostrar o novo amigo
+      queryClient.invalidateQueries({
+        queryKey: ["chat"],
+      });
 
       // Invalidate query to remove accepted request from list
       queryClient.invalidateQueries({
@@ -37,14 +40,17 @@ export const useAcceptFriendRequestMutation = () => {
         refetchType: "all",
       });
 
-      // Invalidate friend-request status (SignalR event likely only goes to sender, not acceptor)
+      // Invalidate friend-request status
       queryClient.invalidateQueries({
         queryKey: ["friend-request"],
       });
 
-      // Invalidate count (SignalR doesn't send update when accepting, so we need to refresh)
+      // Invalidate count e notificações
       queryClient.invalidateQueries({
         queryKey: ["notifications", "count", "unread"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications", "header"],
       });
 
       toast.success(t('toasts.friendRequest.acceptSuccess'));
@@ -133,6 +139,8 @@ export const useFriendRequestsQuery = ({
         pageSize,
       }),
     placeholderData: keepPreviousData,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
     enabled,
   });
 };

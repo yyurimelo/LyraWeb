@@ -133,6 +133,7 @@ function Requests() {
           isLoading={isLoading}
           isError={isError}
           searchQuery={searchQuery}
+          onActionSuccess={refetch}
         />
       </div>
 

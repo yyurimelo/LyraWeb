@@ -28,10 +28,12 @@ dayjs.locale('pt-br');
 
 interface FriendRequestItemProps {
   request: FriendRequestDataModel;
+  onActionSuccess?: () => void;
 }
 
 export const FriendRequestItem = memo(({
   request,
+  onActionSuccess,
 }: FriendRequestItemProps) => {
   const { t, i18n } = useTranslation();
 
@@ -49,11 +51,19 @@ export const FriendRequestItem = memo(({
   }
 
   const handleAccept = () => {
-    acceptRequest(request.id);
+    acceptRequest(request.id, {
+      onSuccess: () => {
+        onActionSuccess?.();
+      }
+    });
   };
 
   const handleCancel = () => {
-    cancelRequest(request.id);
+    cancelRequest(request.id, {
+      onSuccess: () => {
+        onActionSuccess?.();
+      }
+    });
   };
 
   const formatRelativeTime = (date: Date | string) => {
