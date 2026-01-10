@@ -1,6 +1,8 @@
 import { useState, forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/components/ui/button'
+import { SendIcon } from 'lucide-react'
+import { Spinner } from '@/shared/components/ui/spinner'
 
 interface ChatInputProps {
   onSendMessage: (message: string) => Promise<void>
@@ -58,14 +60,19 @@ export const ChatInput = forwardRef<HTMLInputElement, ChatInputProps>(
           />
 
           <Button
+            type="submit"
+            variant="default"
+            size="icon"
+            className="shrink-0 rounded-full"
             onClick={handleSendMessage}
             disabled={!messageInput.trim() || disabled || isSending}
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:bg-muted transition-colors flex items-center gap-2"
           >
-            {isSending && (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            {isSending ? (
+              <Spinner />
+            ) : (
+              <SendIcon />
             )}
-            {sendButtonText || t('chat.sendMessage')}
+
           </Button>
         </div>
       </div>

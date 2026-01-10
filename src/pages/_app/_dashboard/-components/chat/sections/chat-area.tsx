@@ -217,9 +217,9 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
               >
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${isFromMe
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-foreground border'
-                    }`}
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-foreground border'
+                    } break-words`}
                 >
                   <p className="text-sm">{message.content}</p>
                   <p
