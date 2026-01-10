@@ -10,9 +10,10 @@ interface ChatHeaderProps {
   selectedUser: UserGetAllFriendsDataModel
   onBackToList?: () => void
   isMobile?: boolean
+  onUserRemoved?: () => void
 }
 
-export function ChatHeader({ selectedUser, onBackToList, isMobile }: ChatHeaderProps) {
+export function ChatHeader({ selectedUser, onBackToList, isMobile, onUserRemoved }: ChatHeaderProps) {
   const [open, setOpen] = useState(false)
 
   function openUserDetails() {
@@ -62,7 +63,7 @@ export function ChatHeader({ selectedUser, onBackToList, isMobile }: ChatHeaderP
         </div>
       </div>
 
-      <ChatUserDetails open={open} setOpen={setOpen} user={selectedUser} />
+      <ChatUserDetails open={open} setOpen={setOpen} user={selectedUser} onUserRemoved={onUserRemoved} />
     </>
   )
 }

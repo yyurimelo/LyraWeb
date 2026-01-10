@@ -116,6 +116,7 @@ export function Chat({ className }: ChatProps) {
           selectedUser={selectedUser}
           onBackToList={isMobile ? handleBackToList : undefined}
           isMobile={isMobile}
+          onUserRemoved={() => setSelectedUser(null)}
         />
       </div>
     </div>

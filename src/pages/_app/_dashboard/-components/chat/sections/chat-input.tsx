@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/components/ui/button'
 import { SendIcon } from 'lucide-react'
 import { Spinner } from '@/shared/components/ui/spinner'
+import { Input } from '@/shared/components/ui/input'
 
 interface ChatInputProps {
   onSendMessage: (message: string) => Promise<void>
@@ -45,7 +46,7 @@ export const ChatInput = forwardRef<HTMLInputElement, ChatInputProps>(
     return (
       <div className="p-4 border-t bg-background">
         <div className="flex items-center space-x-2">
-          <input
+          <Input
             ref={ref}
             type="text"
             value={messageInput}

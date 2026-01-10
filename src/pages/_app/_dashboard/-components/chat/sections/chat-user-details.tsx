@@ -24,9 +24,10 @@ interface ChatUserDetailsProps {
   user: UserGetAllFriendsDataModel
   open: boolean;
   setOpen: Dispatch<React.SetStateAction<boolean>>;
+  onUserRemoved?: () => void;
 }
 
-export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
+export function ChatUserDetails({ user, open, setOpen, onUserRemoved }: ChatUserDetailsProps) {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -43,6 +44,7 @@ export function ChatUserDetails({ user, open, setOpen }: ChatUserDetailsProps) {
         to: "/"
       })
       setOpen(false)
+      onUserRemoved?.() // Limpa o usuário selecionado
     } catch (error) {
       console.error("Error removing friend:", error);
       toast.error(t('userSearch.chatUserDetails.removeError'));

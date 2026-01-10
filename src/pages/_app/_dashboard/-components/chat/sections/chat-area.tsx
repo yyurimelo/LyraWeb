@@ -14,9 +14,10 @@ interface ChatAreaProps {
   selectedUser: UserGetAllFriendsDataModel | null
   onBackToList?: () => void
   isMobile?: boolean
+  onUserRemoved?: () => void
 }
 
-export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps) {
+export function ChatArea({ selectedUser, onBackToList, isMobile, onUserRemoved }: ChatAreaProps) {
   const { t, i18n } = useTranslation()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -200,6 +201,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile }: ChatAreaProps
         selectedUser={selectedUser}
         onBackToList={onBackToList}
         isMobile={isMobile}
+        onUserRemoved={onUserRemoved}
       />
 
       <div
