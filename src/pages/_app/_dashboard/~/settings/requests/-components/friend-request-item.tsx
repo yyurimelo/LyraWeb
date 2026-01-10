@@ -18,7 +18,6 @@ import type { FriendRequestDataModel } from "@/@types/friend-request/friend-requ
 
 // helpers
 import { getInitialName } from "@/lib/get-initial-name";
-import { cn } from "@/lib/utils";
 
 // hooks
 import { useAcceptFriendRequestMutation, useCancelFriendRequestMutation } from "@/shared/http/hooks/friend-request.hooks";
@@ -40,7 +39,6 @@ export const FriendRequestItem = memo(({
   const { mutate: cancelRequest, isPending: isCancelingMutation } = useCancelFriendRequestMutation();
 
   const isPending = request.status === "Pending";
-  const isAccepted = request.status === "Accepted";
 
   // Update dayjs locale based on current language
   const currentLanguage = i18n.language;

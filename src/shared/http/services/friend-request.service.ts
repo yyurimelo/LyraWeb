@@ -78,7 +78,7 @@ export async function getFriendRequestPaginated({
     },
     {
       params: {
-        pageNumber,
+        Page: pageNumber,
         pageSize,
       },
     },

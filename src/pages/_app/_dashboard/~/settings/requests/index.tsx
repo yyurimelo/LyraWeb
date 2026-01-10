@@ -1,17 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 // components
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
+import { DataTablePagination } from "@/shared/components/ui/data-table-pagination";
 import { Search, RefreshCw } from "lucide-react";
 
 // custom components
-import { FriendRequestList } from "../../../../-components/friend-request/friend-request-list";
+import { FriendRequestList } from "./-components/friend-request-list";
 
 // hooks
-import { useFriendRequestsInfiniteQuery } from "@/shared/http/hooks/friend-request.hooks";
+import { useFriendRequestsQuery } from "@/shared/http/hooks/friend-request.hooks";
+import { Separator } from '@/shared/components/ui/separator';
 
 export const Route = createFileRoute('/_app/_dashboard/~/settings/requests/')({
   component: Requests,
@@ -21,51 +23,50 @@ function Requests() {
   const { t } = useTranslation();
   const [searchName, setSearchName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 5;
 
-  // Infinite query for friend requests
   const {
     data,
     isLoading,
     isError,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
     refetch,
-  } = useFriendRequestsInfiniteQuery({
+  } = useFriendRequestsQuery({
     name: searchQuery,
-    pageSize: 2,
+    page,
+    pageSize,
     enabled: true,
   });
 
-  // Flatten all pages into single array
-  const allRequests = data?.pages.flatMap((page) => page.data) ?? [];
+  const allRequests = data?.data ?? [];
+  const totalPages = data?.totalPages ?? 1;
+  const totalRecords = data?.totalRecords ?? 0;
 
-  // Handle search - explicit action on button click
+  useEffect(() => {
+    const scrollContainer = document.querySelector('[data-slot="scroll-area-viewport"]');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [page]);
+
   const handleSearch = useCallback(() => {
     setSearchQuery(searchName);
+    setPage(1);
   }, [searchName]);
 
-  // Handle Enter key in input
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   }, [handleSearch]);
 
-  // Handle refetch
   const handleRefetch = useCallback(() => {
     refetch();
   }, [refetch]);
 
-  // Clear search
-  const handleClearSearch = useCallback(() => {
-    setSearchName("");
-    setSearchQuery("");
-  }, []);
-
   return (
-    <div className="space-y-4">
-      {/* Header */}
+    <div className="flex flex-col h-full space-y-4">
+
       <div className="space-y-2">
         <h2 className="text-lg font-semibold">
           {t('friendRequest.title')}
@@ -75,65 +76,75 @@ function Requests() {
         </p>
       </div>
 
-      {/* Search and Actions Bar */}
-      <div className="flex items-center gap-2">
-        {/* Search Input */}
-        <div className="flex-1 flex items-center gap-2">
+      <div className="flex w-full items-center gap-2">
+        <div className="relative flex-1 max-w-full">
           <Input
             type="text"
             placeholder={t('friendRequest.search.placeholder')}
             value={searchName}
             onChange={(e) => setSearchName(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="max-w-sm"
+            className="w-full pr-10"
           />
-          <Button
-            onClick={handleSearch}
-            variant="default"
-            size="sm"
-            className="gap-2"
-          >
-            <Search className="size-4" />
-          </Button>
-          {searchQuery && (
-            <Button
-              onClick={handleClearSearch}
-              variant="ghost"
-              size="sm"
+
+          {searchName && (
+            <button
+              onClick={() => {
+                setSearchName("");
+                setSearchQuery("");
+                setPage(1);
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
             >
-              {t('friendRequest.search.clear')}
-            </Button>
+              ×
+            </button>
           )}
         </div>
 
-        {/* Refetch Button */}
+        <Button
+          onClick={handleSearch}
+          variant="default"
+          size="sm"
+          className="gap-2 shrink-0"
+        >
+          <Search className="size-4" />
+        </Button>
+
         <Button
           onClick={handleRefetch}
           variant="outline"
           size="sm"
-          className="gap-2"
+          className="gap-2 shrink-0"
         >
           <RefreshCw className="size-4" />
         </Button>
       </div>
 
-      {/* Active Search Indicator */}
+
       {searchQuery && (
         <div className="text-xs text-muted-foreground">
           {t('friendRequest.search.active', { query: searchQuery })}
         </div>
       )}
 
-      {/* Friend Requests List */}
-      <FriendRequestList
-        allRequests={allRequests}
-        isLoading={isLoading}
-        isError={isError}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        fetchNextPage={fetchNextPage}
-        searchQuery={searchQuery}
-      />
+      <div className="flex-1 min-h-0">
+        <FriendRequestList
+          allRequests={allRequests}
+          isLoading={isLoading}
+          isError={isError}
+          searchQuery={searchQuery}
+        />
+      </div>
+
+      {allRequests.length > 0 && (
+        <DataTablePagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalRecords={totalRecords}
+          pageSize={pageSize}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }

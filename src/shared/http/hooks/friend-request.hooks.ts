@@ -1,4 +1,4 @@
-import { queryClient, useMutation, useQuery, useInfiniteQuery } from "@lyra/react-query-config";
+import { keepPreviousData, queryClient, useMutation, useQuery } from "@lyra/react-query-config";
 import { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, checkFriendRequestStatus, getFriendRequest, getFriendRequestPaginated } from "../services/friend-request.service";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -31,6 +31,12 @@ export const useAcceptFriendRequestMutation = () => {
     onSuccess: () => {
       // SignalR handles invalidation of ['chat'] and ['notifications', 'header'] automatically via UpdateListFriend and UpdateFriendRequest events
 
+      // Invalidate query to remove accepted request from list
+      queryClient.invalidateQueries({
+        queryKey: ["friend-requests"],
+        refetchType: "all",
+      });
+
       // Invalidate friend-request status (SignalR event likely only goes to sender, not acceptor)
       queryClient.invalidateQueries({
         queryKey: ["friend-request"],
@@ -57,6 +63,12 @@ export const useCancelFriendRequestMutation = () => {
     mutationFn: (requestId: number) => cancelFriendRequest(requestId),
     onSuccess: () => {
       // SignalR handles invalidation of ['friend-request'] and ['notifications', 'header'] automatically via UpdateFriendRequest event
+
+      // Invalidate query to remove canceled request from list
+      queryClient.invalidateQueries({
+        queryKey: ["friend-requests"],
+        refetchType: "all",
+      });
 
       toast.success(t('toasts.friendRequest.cancelSuccess'));
     },
@@ -99,35 +111,28 @@ export const useGetFriendRequestQuery = (friendRequestId: string | null, enabled
     staleTime: 2 * 60 * 1000,
   });
 
-interface FriendRequestsInfiniteQueryOptions {
+interface FriendRequestsQueryOptions {
   name?: string;
+  page?: number;
   pageSize?: number;
   enabled?: boolean;
 }
 
-export const useFriendRequestsInfiniteQuery = ({
+export const useFriendRequestsQuery = ({
   name = "",
+  page = 1,
   pageSize = 10,
   enabled = true,
-}: FriendRequestsInfiniteQueryOptions) => {
-  return useInfiniteQuery({
-    queryKey: ["friend-requests", "infinite", { name, pageSize }],
-    queryFn: async ({ pageParam = 1 }) => {
-      return await getFriendRequestPaginated({
+}: FriendRequestsQueryOptions) => {
+  return useQuery({
+    queryKey: ["friend-requests", { name, page, pageSize }],
+    queryFn: () =>
+      getFriendRequestPaginated({
         name,
-        pageNumber: pageParam,
+        pageNumber: page,
         pageSize,
-      });
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.pageNumber < lastPage.totalPages) {
-        return lastPage.pageNumber + 1;
-      }
-      return undefined;
-    },
+      }),
+    placeholderData: keepPreviousData,
     enabled,
-    staleTime: 2 * 60 * 1000,
-    refetchOnWindowFocus: false,
   });
 };
