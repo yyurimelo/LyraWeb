@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
@@ -38,6 +39,7 @@ export const DataTablePagination = memo(({
   pageSizeOptions = [10, 20, 50],
   className,
 }: DataTablePaginationProps) => {
+  const { t } = useTranslation();
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
 
@@ -46,9 +48,19 @@ export const DataTablePagination = memo(({
       <div className="flex items-end justify-between">
         {/* Record Counter */}
         <div className="flex flex-col text-sm">
-          <p className="text-muted-foreground">{totalRecords} registro(s)</p>
+          <p className="text-muted-foreground">{totalRecords} {t('pagination.records')}</p>
           <p>
-            Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong>
+            <Trans
+              i18nKey="pagination.pageOf"
+              values={{
+                current: currentPage,
+                total: totalPages
+              }}
+              components={[
+                <strong key="0" />,
+                <strong key="1" />
+              ]}
+            />
           </p>
         </div>
 
@@ -62,7 +74,7 @@ export const DataTablePagination = memo(({
             disabled={isFirstPage}
           >
             <ChevronsLeft className="h-4 w-4" />
-            <span className="sr-only">Primeira página</span>
+            <span className="sr-only">{t('pagination.firstPage')}</span>
           </Button>
 
           {/* Previous Page */}
@@ -73,7 +85,7 @@ export const DataTablePagination = memo(({
             disabled={isFirstPage}
           >
             <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Página anterior</span>
+            <span className="sr-only">{t('pagination.previousPage')}</span>
           </Button>
 
           {/* Next Page */}
@@ -84,7 +96,7 @@ export const DataTablePagination = memo(({
             disabled={isLastPage}
           >
             <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Próxima página</span>
+            <span className="sr-only">{t('pagination.nextPage')}</span>
           </Button>
 
           {/* Last Page */}
@@ -95,14 +107,14 @@ export const DataTablePagination = memo(({
             disabled={isLastPage}
           >
             <ChevronsRight className="h-4 w-4" />
-            <span className="sr-only">Última página</span>
+            <span className="sr-only">{t('pagination.lastPage')}</span>
           </Button>
         </div>
 
         {/* Optional: Page Size Selector */}
         {showPageSizeSelector && onPageSizeChange && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Itens por página:</span>
+            <span className="text-sm text-muted-foreground">{t('pagination.itemsPerPage')}:</span>
             <select
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}

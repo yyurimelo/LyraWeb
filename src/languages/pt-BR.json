@@ -316,5 +316,14 @@
       "description": "Caixa de diálogo de recorte de imagem",
       "apply": "Aplicar"
     }
+  },
+  "pagination": {
+    "records": "registro(s)",
+    "pageOf": "Página <0>{{current}}</0> de <1>{{total}}</1>",
+    "firstPage": "Primeira página",
+    "previousPage": "Página anterior",
+    "nextPage": "Próxima página",
+    "lastPage": "Última página",
+    "itemsPerPage": "Itens por página"
   }
 }
