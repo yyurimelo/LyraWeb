@@ -2,7 +2,7 @@ import GithubIcon from "@/shared/components/logos/github-icon";
 import GoogleIcon from "@/shared/components/logos/google-icon";
 
 interface UserProvidersProps {
-  providers: string[]; // lista de nomes de providers, ex: ["Google", "Credentials"]
+  providers: string[];
   className?: string;
 }
 
@@ -14,7 +14,7 @@ export function UserProviders({ providers, className }: UserProvidersProps) {
       case "github":
         return <GithubIcon />;
       default:
-        return null; // se não tiver ícone, não renderiza nada
+        return null;
     }
   };
 
