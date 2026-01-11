@@ -9,4 +9,5 @@ export type AuthUserDataModel = {
   appearanceTextPrimaryLight?: string;
   avatarUser: string;
   token: string;
+  providers: string[]
 }

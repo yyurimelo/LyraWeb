@@ -27,6 +27,7 @@ import { Check, LoaderCircle, Pencil, X } from "lucide-react"
 import { ColorPicker } from "@/shared/components/ui/color-picker"
 import { useTranslation } from "react-i18next"
 import { ProfileAvatarEditor } from "@/pages/_app/_dashboard/-components/profile-avatar-editor"
+import { UserProviders } from "./-components/user-providers"
 
 export const Route = createFileRoute('/_app/_dashboard/~/settings/profile/')({
   component: Profile,
@@ -153,14 +154,18 @@ function Profile() {
         </p>
       </div>
 
-      <ProfileAvatarEditor
-        currentAvatar={user?.avatarUser}
-        userName={user?.name || ""}
-        isEditable={edit}
-        isAvatarRemoved={shouldRemoveAvatar}
-        onAvatarChange={handleAvatarChange}
-        onAvatarRemove={() => setShouldRemoveAvatar(true)}
-      />
+      <div className="flex items-start justify-between">
+        <ProfileAvatarEditor
+          currentAvatar={user?.avatarUser}
+          userName={user?.name || ""}
+          isEditable={edit}
+          isAvatarRemoved={shouldRemoveAvatar}
+          onAvatarChange={handleAvatarChange}
+          onAvatarRemove={() => setShouldRemoveAvatar(true)}
+        />
+
+        <UserProviders providers={user?.providers ?? []}/>
+      </div>
 
       <Form {...form}>
         <form
