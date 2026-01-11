@@ -19,10 +19,14 @@ export function GoogleAuthButton() {
         });
         const profile = await res.json();
 
-        await loginWithGoogle(profile.email);
-        navigate({
-          to: "/"
-        })
+        await loginWithGoogle({
+          email: profile.email,
+          name: profile.name,
+          image: profile.picture,
+          providerUserId: profile.sub
+        });
+
+        navigate({ to: "/" });
       } catch (err) {
         console.error("Erro ao processar login Google:", err);
       }

@@ -21,11 +21,14 @@ export async function authenticate({
   }
   return response.data;
 }
-export async function googleAuthenticate(email: string): Promise<AuthUserDataModel> {
+export async function googleAuthenticate(payload: { email: string, name: string, image: string, providerUserId: string }): Promise<AuthUserDataModel> {
   let response: any;
   try {
     response = await http.post(API_ENDPOINTS.AUTH.GOOGLE_AUTHENTICATE, {
-      email,
+      email: payload.email,
+      name: payload.name,
+      image: payload.image,
+      providerUserId: payload.providerUserId
     });
   } catch (error) {
     if (isAxiosError(error)) {

@@ -8,13 +8,19 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { queryClient } from '@lyra/react-query-config'
 
+interface GoogleLoginData {
+  email: string;
+  name: string;
+  image: string;
+  providerUserId: string;
+}
 
 interface AuthState {
   isAuthenticated: boolean
   user: AuthUserDataModel | null
   login: (credentials: AuthFormModel) => Promise<void>;
   logout: () => void
-  loginWithGoogle: (googleAccessToken: string) => Promise<void>
+  loginWithGoogle: (data: GoogleLoginData) => Promise<void>
   updateUser: (userData: Partial<AuthUserDataModel>) => void
 }
 
@@ -92,12 +98,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     delete http.defaults.headers.Authorization
   }
 
-  const loginWithGoogle = async (email: string) => {
+  const loginWithGoogle = async (data: GoogleLoginData) => {
     try {
-      // Clear any existing cache BEFORE setting new user data to prevent data leakage
-      queryClient.clear()
+      queryClient.clear();
 
-      const res = await googleAuthenticate(email);
+      const res = await googleAuthenticate(data); // envia todo o objeto
       const response = res;
 
       setUser(response);
@@ -110,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
   };
+
 
   const updateUser = (userData: Partial<AuthUserDataModel>) => {
     setUser((prev) => {
