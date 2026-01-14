@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { useTranslation } from "react-i18next";
 
 // components
 import { ScrollArea } from "@/shared/components/ui/scroll-area";

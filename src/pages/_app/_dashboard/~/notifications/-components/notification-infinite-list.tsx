@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Button } from "@/shared/components/ui/button";
+import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { NotificationItem } from "@/pages/_app/_dashboard/-components/header/notifications/notification-item";
 import { NotificationEmpty } from "@/pages/_app/_dashboard/-components/header/notifications/notification-empty";
@@ -26,6 +26,32 @@ export function NotificationInfiniteList({
   totalRecords,
 }: NotificationInfiniteListProps) {
   const { t } = useTranslation()
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!hasNextPage) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+
+        if (entry.isIntersecting && !isFetchingNextPage) {
+          onLoadMore()
+          observer.unobserve(entry.target) // trava enquanto carrega
+        }
+      },
+      {
+        rootMargin: '200px', // começa antes de encostar
+        threshold: 0,
+      }
+    )
+
+    const current = loadMoreRef.current
+    if (current) observer.observe(current)
+
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, onLoadMore])
+
 
   if (isLoading) {
     return (
@@ -41,7 +67,7 @@ export function NotificationInfiniteList({
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <p className="text-muted-foreground">
-          Erro ao carregar notificações. Tente novamente mais tarde.
+          {t("notifications.error.loading")}
         </p>
       </div>
     )
@@ -64,26 +90,24 @@ export function NotificationInfiniteList({
         ))}
       </div>
 
-      {/* Load More Button */}
-      {hasNextPage && (
-        <div className="flex justify-center pt-4">
-          <Button
-            onClick={onLoadMore}
-            disabled={isFetchingNextPage}
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            {isFetchingNextPage && <Loader2 className="h-4 w-4 animate-spin" />}
-            Carregar mais
-          </Button>
+      {/* Loading indicator at bottom */}
+      {(hasNextPage || isFetchingNextPage) && (
+        <div ref={loadMoreRef} className="flex justify-center pt-4">
+          {isFetchingNextPage && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </div>
+          )}
         </div>
       )}
 
       {/* End of list */}
       {!hasNextPage && notifications.length > 0 && (
         <div className="text-center pt-4 text-sm text-muted-foreground">
-            {notifications.length} de {totalRecords} notificações
+          {t("notifications.list.end", {
+            current: notifications.length,
+            total: totalRecords
+          })}
         </div>
       )}
     </div>

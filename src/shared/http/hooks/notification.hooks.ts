@@ -206,23 +206,31 @@ export const useNotificationClick = (): UseNotificationClickResult => {
 
 // Infinite query para paginação de notificações (scroll infinito)
 export const useNotificationsInfiniteQuery = (filters: {
-  status?: boolean | undefined
+  status?: boolean
   type?: string
 }) => {
   return useInfiniteQuery({
     queryKey: ['notifications', 'infinite', filters],
+
     queryFn: ({ pageParam = 1 }) =>
       getNotificationPaginated({
         status: filters.status,
         type: filters.type || undefined,
         pageNumber: pageParam,
-        pageSize: 20,
+        pageSize: 10,
       }),
+
     initialPageParam: 1,
+
     getNextPageParam: (lastPage) => {
-      if (lastPage.pageNumber * 20 >= lastPage.totalRecords) {
+      if (!lastPage) return undefined
+
+      // Se já chegou na última página → PARA
+      if (lastPage.pageNumber >= lastPage.totalPages) {
         return undefined
       }
+
+      // Próxima página
       return lastPage.pageNumber + 1
     },
   })

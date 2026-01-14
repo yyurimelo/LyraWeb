@@ -256,6 +256,10 @@
     "error": {
       "loading": "Error loading notifications: {{error}}",
       "retry": "Try again"
+    },
+    "list": {
+      "loadingMore": "Loading more notifications...",
+      "end": "{{current}} of {{total}} notifications"
     }
   },
   "toasts": {

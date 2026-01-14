@@ -13,7 +13,7 @@ interface ChatInputProps {
 }
 
 export const ChatInput = forwardRef<HTMLInputElement, ChatInputProps>(
-  ({ onSendMessage, disabled, placeholder, sendButtonText }, ref) => {
+  ({ onSendMessage, disabled, placeholder }, ref) => {
     const { t } = useTranslation()
     const [messageInput, setMessageInput] = useState('')
     const [isSending, setIsSending] = useState(false)

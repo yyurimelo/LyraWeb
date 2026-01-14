@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Bell, UserPlus, UserCheck, MessageSquare, Settings, CheckCheck } from 'lucide-react'
+import { Bell, UserPlus, UserCheck, Settings, CheckCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSignalRNotifications } from "@/signalr/use-signalr-notifications"
 import { useAuth } from "@/contexts/auth-provider"
@@ -10,11 +10,11 @@ import { useAuth } from "@/contexts/auth-provider"
 import { Button } from "@/shared/components/ui/button"
 
 // custom components
-import { NotificationInfiniteList } from "@/pages/_app/_dashboard/-components/notifications/notification-infinite-list"
 
 // hooks
 import { useNotificationsInfiniteQuery, useUnreadNotificationsCountQuery, useMaskAsReadMutation } from "@/shared/http/hooks/notification.hooks"
 import type { ExtendedNotificationDataModel } from '@/@types/notification'
+import { NotificationInfiniteList } from './-components/notification-infinite-list'
 
 export const Route = createFileRoute('/_app/_dashboard/~/notifications/')({
   component: NotificationsPage,

@@ -18,7 +18,7 @@ export async function getNotificationPaginated({
     },
     {
       params: {
-        pageNumber,
+        page: pageNumber,
         pageSize,
       },
     },

@@ -256,6 +256,10 @@
     "error": {
       "loading": "Erro ao carregar notificações",
       "retry": "Tentar novamente"
+    },
+    "list": {
+      "loadingMore": "Carregando mais notificações...",
+      "end": "{{current}} de {{total}} notificações"
     }
   },
   "toasts": {

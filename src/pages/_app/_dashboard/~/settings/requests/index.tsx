@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,7 +13,6 @@ import { FriendRequestList } from "./-components/friend-request-list";
 
 // hooks
 import { useFriendRequestsQuery } from "@/shared/http/hooks/friend-request.hooks";
-import { Separator } from '@/shared/components/ui/separator';
 
 export const Route = createFileRoute('/_app/_dashboard/~/settings/requests/')({
   component: Requests,

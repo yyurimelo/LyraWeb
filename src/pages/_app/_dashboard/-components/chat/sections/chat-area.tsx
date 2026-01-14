@@ -29,7 +29,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile, onUserRemoved }
 
   const lastScrollTopRef = useRef(0)
 
-  const { data: messages, isFetched } = useGetMessagesQuery(
+  const { data: messages } = useGetMessagesQuery(
     selectedUser?.id ?? null
   )
 
