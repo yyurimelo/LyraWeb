@@ -29,14 +29,24 @@ export const useNotificationPaginationQuery = (filters: Record<string, any>) =>
 export const useMaskAsReadMutation = () =>
   useMutation({
     mutationFn: maskAsRead,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["notifications", "count", "unread"],
-      });
+    onSuccess: (_, variables) => {
+      // Atualiza o contador de unread localmente
+      queryClient.setQueryData(['notifications', 'count', 'unread'], (old: any) => {
+        return Math.max(0, (old || 1) - 1)
+      })
 
-      queryClient.invalidateQueries({
-        queryKey: ["notifications", "header"],
-      });
+      // Remove a notificação da lista de unread localmente
+      queryClient.setQueryData(['notifications', 'header', 'unread'], (old: any) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: old.data.filter((n: any) => n.id !== variables),
+          totalRecords: Math.max(0, old.totalRecords - 1)
+        }
+      })
+
+      // Notificações já são atualizadas em tempo real via SignalR
+      // Não precisamos mais invalidar as queries
     },
     onError: (error) => {
       toast.error(error.message);

@@ -59,17 +59,18 @@ export function useSignalRMessages({
 
     const handleUpdateFriendRequest = () => {
       queryClient.invalidateQueries({ queryKey: ['friend-request'] })
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'header'] })
+      // Notificações já são atualizadas em tempo real via SignalR handlers
+      // Não precisamos mais invalidar as queries aqui
     }
 
-    connection.on('ReceiveMessage', handleReceiveMessage)
-    connection.on('UpdateListFriend', handleUpdateListFriend)
-    connection.on('UpdateFriendRequest', handleUpdateFriendRequest)
+    connection.on('receivemessage', handleReceiveMessage)
+    connection.on('updatelistfriend', handleUpdateListFriend)
+    connection.on('updatefriendrequest', handleUpdateFriendRequest)
 
     return () => {
-      connection.off('ReceiveMessage', handleReceiveMessage)
-      connection.off('UpdateListFriend', handleUpdateListFriend)
-      connection.off('UpdateFriendRequest', handleUpdateFriendRequest)
+      connection.off('receivemessage', handleReceiveMessage)
+      connection.off('updatelistfriend', handleUpdateListFriend)
+      connection.off('updatefriendrequest', handleUpdateFriendRequest)
     }
   }, [connection, userId, onMessage])
 
