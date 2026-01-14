@@ -58,7 +58,9 @@ export const NotificationItem = memo(
 
     const { mutateAsync: maskAsReadFn, isPending } = useMaskAsReadMutation()
 
-    async function handleMarkAllAsRead() {
+    async function handleMarkAllAsRead(e: React.MouseEvent) {
+      e.preventDefault()
+      e.stopPropagation() // Impede que o clique se propague para abrir user search
       await maskAsReadFn([Number(notification.id)]);
     }
 
@@ -94,6 +96,7 @@ export const NotificationItem = memo(
                     data-[state=open]:bg-muted
                     transition-opacity
                   "
+                  onClick={(e) => e.stopPropagation()} // Impede propagação
                 >
                   <EllipsisVertical className="h-4 w-4" />
                   <span className="sr-only">Abrir menu</span>
@@ -101,7 +104,15 @@ export const NotificationItem = memo(
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end">
-                <DropdownMenuItem className="flex items-center gap-2" onClick={handleMarkAllAsRead} disabled={isPending}>
+                <DropdownMenuItem
+                  className="flex items-center gap-2"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleMarkAllAsRead(e as any)
+                  }}
+                  disabled={isPending}
+                >
                   <Checks size={16} />
                   <span>Marcar como lida</span>
                 </DropdownMenuItem>
