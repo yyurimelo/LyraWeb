@@ -168,22 +168,31 @@
   },
   "time": {
     "now": "Agora",
-
     "minute_one": "{{count}} minuto",
     "minute_other": "{{count}} minutos",
-
     "hour_one": "{{count}} hora",
     "hour_other": "{{count}} horas",
-
     "day_one": "{{count}} dia",
     "day_other": "{{count}} dias"
   },
   "notifications": {
     "title": "Notificações",
+    "description": "Gerencie suas notificações",
+    "page": {
+      "title": "Notificações",
+      "description": "Gerencie suas notificações"
+    },
+    "filters": {
+      "all": "Todas as Notificações",
+      "friendRequests": "Solicitações de Amizade",
+      "acceptedFriends": "Amizades Aceitas",
+      "messages": "Mensagens",
+      "system": "Sistema"
+    },
     "tabs": {
-      "all": "Todas",
+      "all": "Todos",
       "read": "Lidas",
-      "unread": "Não lidas"
+      "unread": "Não lidos"
     },
     "unknownUser": "Usuário desconhecido",
     "you": "você",
@@ -196,8 +205,19 @@
     "markAsRead": {
       "singular": "Marcar como lida",
       "plural": "Marcar todas como lidas"
-    } ,
+    },
     "delete": "Excluir",
+    "actions": {
+      "markAllAsRead": "Marcar todas como lidas",
+      "loadMore": "Carregar mais"
+    },
+    "count": {
+      "label_one": "{{count}} notificação",
+      "label_other": "{{count}} notificações",
+      "unread_one": "{{count}} não lida",
+      "unread_other": "{{count}} não lidas"
+    },
+    "comingSoon": "Em breve",
     "types": {
       "inviteFriend": {
         "title": "Solicitação de amizade",

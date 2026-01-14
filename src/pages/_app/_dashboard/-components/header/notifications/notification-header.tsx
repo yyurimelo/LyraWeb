@@ -1,8 +1,9 @@
 import { Button } from "@/shared/components/ui/button";
 import { useMaskAsReadMutation } from "@/shared/http/hooks/notification.hooks";
-import { CheckCheck } from "lucide-react";
+import { CheckCheck, ExternalLink } from "lucide-react";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 
 interface NotificationHeaderProps {
   activeTab: 'unread' | 'read';
@@ -38,14 +39,26 @@ export const NotificationHeader = memo(({
       <div>
         <div className="flex items-center justify-between px-4 pt-2 pb-1">
           <div className="text-sm font-semibold">{t("notifications.title")}</div>
-          <Button
-            disabled={isButtonDisabled}
-            onClick={handleMarkAllAsRead}
-            className="text-xs ml-2 flex items-center gap-1 p-0 shadow-none text-secondary-foreground/80 bg-transparent hover:bg-transparent hover:text-secondary-foreground"
-          >
-            <CheckCheck className="size-4" />
-            {t("notifications.markAsRead.plural")}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              asChild
+              variant="ghost"
+              className="text-xs h-7 p-0 text-secondary-foreground/80 hover:text-secondary-foreground"
+            >
+              <Link to="/~/notifications">
+                <ExternalLink className="size-3 mr-1" />
+                Ver todas
+              </Link>
+            </Button>
+            <Button
+              disabled={isButtonDisabled}
+              onClick={handleMarkAllAsRead}
+              className="text-xs h-7 p-0 shadow-none text-secondary-foreground/80 bg-transparent hover:bg-transparent hover:text-secondary-foreground"
+            >
+              <CheckCheck className="size-4" />
+              {t("notifications.markAsRead.plural")}
+            </Button>
+          </div>
         </div>
 
         {/* Tabs */}

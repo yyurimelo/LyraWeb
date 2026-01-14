@@ -1,4 +1,4 @@
-import { keepPreviousData, queryClient, useMutation, useQuery } from "@lyra/react-query-config";
+import { keepPreviousData, queryClient, useMutation, useQuery, useInfiniteQuery } from "@lyra/react-query-config";
 import { getNotificationPaginated, getUnreadNotificationCount, maskAsRead } from "../services/notification.service";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -203,3 +203,27 @@ export const useNotificationClick = (): UseNotificationClickResult => {
     handleNotificationClick,
   };
 };
+
+// Infinite query para paginação de notificações (scroll infinito)
+export const useNotificationsInfiniteQuery = (filters: {
+  status?: boolean | undefined
+  type?: string
+}) => {
+  return useInfiniteQuery({
+    queryKey: ['notifications', 'infinite', filters],
+    queryFn: ({ pageParam = 1 }) =>
+      getNotificationPaginated({
+        status: filters.status,
+        type: filters.type || undefined,
+        pageNumber: pageParam,
+        pageSize: 20,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pageNumber * 20 >= lastPage.totalRecords) {
+        return undefined
+      }
+      return lastPage.pageNumber + 1
+    },
+  })
+}

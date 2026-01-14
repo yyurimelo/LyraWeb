@@ -17,6 +17,7 @@ import { Route as AuthSignInRouteImport } from './pages/_auth/sign-in'
 import { Route as AppDashboardIndexRouteImport } from './pages/_app/_dashboard/index'
 import { Route as AppDashboardChar126SettingsLayoutRouteImport } from './pages/_app/_dashboard/~/settings/layout'
 import { Route as AppDashboardChar126SettingsIndexRouteImport } from './pages/_app/_dashboard/~/settings/index'
+import { Route as AppDashboardChar126NotificationsIndexRouteImport } from './pages/_app/_dashboard/~/notifications/index'
 import { Route as AppDashboardChar126SettingsRequestsIndexRouteImport } from './pages/_app/_dashboard/~/settings/requests/index'
 import { Route as AppDashboardChar126SettingsProfileIndexRouteImport } from './pages/_app/_dashboard/~/settings/profile/index'
 
@@ -59,6 +60,12 @@ const AppDashboardChar126SettingsIndexRoute =
     path: '/',
     getParentRoute: () => AppDashboardChar126SettingsLayoutRoute,
   } as any)
+const AppDashboardChar126NotificationsIndexRoute =
+  AppDashboardChar126NotificationsIndexRouteImport.update({
+    id: '/_dashboard/~/notifications/',
+    path: '/~/notifications/',
+    getParentRoute: () => AppLayoutRoute,
+  } as any)
 const AppDashboardChar126SettingsRequestsIndexRoute =
   AppDashboardChar126SettingsRequestsIndexRouteImport.update({
     id: '/requests/',
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof AuthSignUpRoute
   '/': typeof AppDashboardIndexRoute
   '/~/settings': typeof AppDashboardChar126SettingsLayoutRouteWithChildren
+  '/~/notifications': typeof AppDashboardChar126NotificationsIndexRoute
   '/~/settings/': typeof AppDashboardChar126SettingsIndexRoute
   '/~/settings/profile': typeof AppDashboardChar126SettingsProfileIndexRoute
   '/~/settings/requests': typeof AppDashboardChar126SettingsRequestsIndexRoute
@@ -85,6 +93,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
   '/': typeof AppDashboardIndexRoute
+  '/~/notifications': typeof AppDashboardChar126NotificationsIndexRoute
   '/~/settings': typeof AppDashboardChar126SettingsIndexRoute
   '/~/settings/profile': typeof AppDashboardChar126SettingsProfileIndexRoute
   '/~/settings/requests': typeof AppDashboardChar126SettingsRequestsIndexRoute
@@ -98,6 +107,7 @@ export interface FileRoutesById {
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_app/_dashboard/': typeof AppDashboardIndexRoute
   '/_app/_dashboard/~/settings': typeof AppDashboardChar126SettingsLayoutRouteWithChildren
+  '/_app/_dashboard/~/notifications/': typeof AppDashboardChar126NotificationsIndexRoute
   '/_app/_dashboard/~/settings/': typeof AppDashboardChar126SettingsIndexRoute
   '/_app/_dashboard/~/settings/profile/': typeof AppDashboardChar126SettingsProfileIndexRoute
   '/_app/_dashboard/~/settings/requests/': typeof AppDashboardChar126SettingsRequestsIndexRoute
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/'
     | '/~/settings'
+    | '/~/notifications'
     | '/~/settings/'
     | '/~/settings/profile'
     | '/~/settings/requests'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/'
+    | '/~/notifications'
     | '/~/settings'
     | '/~/settings/profile'
     | '/~/settings/requests'
@@ -129,6 +141,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-up'
     | '/_app/_dashboard/'
     | '/_app/_dashboard/~/settings'
+    | '/_app/_dashboard/~/notifications/'
     | '/_app/_dashboard/~/settings/'
     | '/_app/_dashboard/~/settings/profile/'
     | '/_app/_dashboard/~/settings/requests/'
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardChar126SettingsIndexRouteImport
       parentRoute: typeof AppDashboardChar126SettingsLayoutRoute
     }
+    '/_app/_dashboard/~/notifications/': {
+      id: '/_app/_dashboard/~/notifications/'
+      path: '/~/notifications'
+      fullPath: '/~/notifications'
+      preLoaderRoute: typeof AppDashboardChar126NotificationsIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/_dashboard/~/settings/requests/': {
       id: '/_app/_dashboard/~/settings/requests/'
       path: '/requests'
@@ -239,12 +259,15 @@ const AppDashboardChar126SettingsLayoutRouteWithChildren =
 interface AppLayoutRouteChildren {
   AppDashboardIndexRoute: typeof AppDashboardIndexRoute
   AppDashboardChar126SettingsLayoutRoute: typeof AppDashboardChar126SettingsLayoutRouteWithChildren
+  AppDashboardChar126NotificationsIndexRoute: typeof AppDashboardChar126NotificationsIndexRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppDashboardIndexRoute: AppDashboardIndexRoute,
   AppDashboardChar126SettingsLayoutRoute:
     AppDashboardChar126SettingsLayoutRouteWithChildren,
+  AppDashboardChar126NotificationsIndexRoute:
+    AppDashboardChar126NotificationsIndexRoute,
 }
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
