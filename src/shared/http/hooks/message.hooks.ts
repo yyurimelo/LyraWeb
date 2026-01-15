@@ -20,7 +20,8 @@ const updateFriendLastMessage = (message: MessageResponseDto) => {
           return {
             ...friend,
             lastMessage: message.content,
-            lastMessageAt: message.sentAt
+            lastMessageAt: message.sentAt,
+            lastMessageDeletedAt: null
           }
         }
 

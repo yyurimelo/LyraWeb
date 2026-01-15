@@ -47,6 +47,7 @@
     "typeMessage": "Digite uma mensagem...",
     "noConversations": "Nenhuma conversa, contato ou mensagem encontrada",
     "noMessages": "Sem mensagens",
+    "messageDeleted": "Mensagem apagada",
     "scrollDown": "Rolar para baixo",
     "menu": {
       "selectMessages": "Selecionar mensagens"

@@ -8,4 +8,5 @@ export type UserGetAllFriendsDataModel = {
   appearancePrimaryColor?: string;
   lastMessage?: string;
   lastMessageAt?: string;
+  lastMessageDeletedAt?: string | null;
 }

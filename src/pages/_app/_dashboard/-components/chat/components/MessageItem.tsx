@@ -79,7 +79,7 @@ export function MessageItem({
           <p className="text-sm">{message.content}</p>
         ) : (
           <p className="text-sm italic flex items-center gap-1 opacity-70">
-            Mensagem apagada
+            {t('chat.messageDeleted')}
           </p>
         )}
 

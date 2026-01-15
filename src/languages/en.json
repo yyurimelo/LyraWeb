@@ -47,6 +47,7 @@
     "typeMessage": "Type a message...",
     "noConversations": "No conversations, contacts or messages found",
     "noMessages": "No messages",
+    "messageDeleted": "Message deleted",
     "scrollDown": "Scroll down",
     "menu": {
       "selectMessages": "Select messages"

@@ -167,7 +167,7 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
                   {user.name}
                 </h3>
               </div>
-              {user.lastMessage && (
+              {(user.lastMessage || user.lastMessageDeletedAt) && (
                 <span className="text-xs text-muted-foreground font-medium flex-shrink-0 px-2 py-1">
                   {formatLastMessageTime(user.lastMessageAt!, t, i18n)}
                 </span>
@@ -176,10 +176,13 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
 
             <div className="flex items-center justify-between gap-2 -mt-1">
               <p className="text-sm text-muted-foreground truncate leading-relaxed">
-                {user.lastMessage
-                  ? user.lastMessage.slice(0, 200) + (user.lastMessage.length > 45 ? "..." : "")
-                  : user.description || <span className="text-muted-foreground/60">{t('chat.noMessages')}</span>
-                }
+                {user.lastMessageDeletedAt ? (
+                  <span className="italic opacity-70">{t('chat.messageDeleted')}</span>
+                ) : user.lastMessage ? (
+                  user.lastMessage.slice(0, 45) + (user.lastMessage.length > 45 ? "..." : "")
+                ) : (
+                  user.description || <span className="text-muted-foreground/60">{t('chat.noMessages')}</span>
+                )}
               </p>
             </div>
           </div>
