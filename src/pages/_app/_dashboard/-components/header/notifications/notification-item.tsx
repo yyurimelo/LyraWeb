@@ -82,7 +82,7 @@ export const NotificationItem = memo(
           )}
           onClick={handleClick}
         >
-          {activeTab === "unread" && String(notification.status) !== "Completed" && (
+          {activeTab === "unread" && String(notification.status) !== "Completed" && String(notification.status) !== "Read" && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

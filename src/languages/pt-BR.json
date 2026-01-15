@@ -206,6 +206,7 @@
       "singular": "Marcar como lida",
       "plural": "Marcar todas como lidas"
     },
+    "seeAll": "Ver todas",
     "delete": "Excluir",
     "actions": {
       "markAllAsRead": "Marcar todas como lidas",

@@ -1,5 +1,8 @@
 import { Bell } from "@phosphor-icons/react";
+import { ExternalLink } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 
 // components
 import { Button } from "@/shared/components/ui/button";
@@ -28,6 +31,7 @@ import { useSignalRNotifications } from "@/signalr/use-signalr-notifications";
 
 
 export function Notification() {
+  const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'unread' | 'read'>('unread');
@@ -96,6 +100,20 @@ export function Notification() {
           onNotificationClick={handleNotificationClick}
           isLoadingNotification={isLoadingUser}
         />
+        {currentData && currentData.length > 0 && (
+          <div className="flex items-center justify-center px-4 py-2 border-t border-border">
+            <Button
+              asChild
+              variant="ghost"
+              className="text-xs h-7 p-0 text-secondary-foreground/80 hover:text-secondary-foreground"
+            >
+              <Link to="/~/notifications">
+                <ExternalLink className="size-3 mr-1" />
+                {t("notifications.seeAll")}
+              </Link>
+            </Button>
+          </div>
+        )}
       </PopoverContent>
 
       {selectedUser && (

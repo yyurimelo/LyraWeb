@@ -206,6 +206,7 @@
       "singular": "Mark as read",
       "plural": "Mark all as read"
     },
+    "seeAll": "See all",
     "delete": "Delete",
     "actions": {
       "markAllAsRead": "Mark all as read",
