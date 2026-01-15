@@ -29,10 +29,7 @@ export const useAcceptFriendRequestMutation = () => {
   return useMutation({
     mutationFn: (requestId: number) => acceptFriendRequest(requestId),
     onSuccess: () => {
-      // Invalida lista de amigos para mostrar o novo amigo
-      queryClient.invalidateQueries({
-        queryKey: ["chat"],
-      });
+      // SignalR handles invalidation of ['chat'], ['friend-request'] automatically via UpdateListFriend and UpdateFriendRequest events
 
       // Invalidate query to remove accepted request from list
       queryClient.invalidateQueries({
@@ -40,21 +37,26 @@ export const useAcceptFriendRequestMutation = () => {
         refetchType: "all",
       });
 
-      // Invalidate friend-request status
-      queryClient.invalidateQueries({
-        queryKey: ["friend-request"],
+      // Clear notifications cache to avoid stale data when header opens
+      queryClient.resetQueries({
+        queryKey: ["notifications"],
       });
 
-      queryClient.invalidateQueries({
+      queryClient.resetQueries({
         queryKey: ['notifications', 'infinite'],
       });
 
-      // Invalidate count e notificações
+      // Reset header unread and read cache
+      queryClient.resetQueries({
+        queryKey: ["notifications", "header", "unread"],
+      });
+      queryClient.resetQueries({
+        queryKey: ["notifications", "header", "read"],
+      });
+
+      // Invalidate count
       queryClient.invalidateQueries({
         queryKey: ["notifications", "count", "unread"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["notifications", "header"],
       });
 
       toast.success(t('toasts.friendRequest.acceptSuccess'));
@@ -72,7 +74,7 @@ export const useCancelFriendRequestMutation = () => {
   return useMutation({
     mutationFn: (requestId: number) => cancelFriendRequest(requestId),
     onSuccess: () => {
-      // SignalR handles invalidation of ['friend-request'] and ['notifications', 'header'] automatically via UpdateFriendRequest event
+      // SignalR handles invalidation of ['friend-request'] automatically via UpdateFriendRequest event
 
       // Invalidate query to remove canceled request from list
       queryClient.invalidateQueries({
@@ -80,8 +82,21 @@ export const useCancelFriendRequestMutation = () => {
         refetchType: "all",
       });
 
-      queryClient.invalidateQueries({
+      // Clear notifications cache to avoid stale data when header opens
+      queryClient.resetQueries({
+        queryKey: ["notifications"],
+      });
+
+      queryClient.resetQueries({
         queryKey: ['notifications', 'infinite'],
+      });
+
+      // Reset header unread and read cache
+      queryClient.resetQueries({
+        queryKey: ["notifications", "header", "unread"],
+      });
+      queryClient.resetQueries({
+        queryKey: ["notifications", "header", "read"],
       });
 
       toast.success(t('toasts.friendRequest.cancelSuccess'));

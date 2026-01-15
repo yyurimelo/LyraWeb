@@ -107,8 +107,7 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
 
     try {
       await acceptRequestFn(friendRequest.id);
-      // Força atualização imediata do status
-      await refetchFriendshipStatus();
+      // SignalR handles status update automatically via UpdateFriendRequest event
     } catch (error) {
       console.error("Error accepting friend request:", error);
       toast.error(t('toasts.friendRequest.acceptError'));
