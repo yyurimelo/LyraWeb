@@ -45,6 +45,10 @@ export const useAcceptFriendRequestMutation = () => {
         queryKey: ["friend-request"],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'infinite'],
+      });
+
       // Invalidate count e notificações
       queryClient.invalidateQueries({
         queryKey: ["notifications", "count", "unread"],
@@ -74,6 +78,10 @@ export const useCancelFriendRequestMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ["friend-requests"],
         refetchType: "all",
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'infinite'],
       });
 
       toast.success(t('toasts.friendRequest.cancelSuccess'));
