@@ -6,9 +6,13 @@ import { Button } from '@/shared/components/ui/button'
 import { ChevronDown } from 'lucide-react'
 import { ChatHeader } from './chat-header'
 import { ChatInput } from './chat-input'
-import { useGetMessagesQuery, useSendMessageMutation } from '@/shared/http/hooks/message.hooks'
+import { useGetMessagesQuery, useSendMessageMutation, useRemoveMessagesMutation } from '@/shared/http/hooks/message.hooks'
 import { useAuth } from '@/contexts/auth-provider'
 import { useSignalRMessages } from '@/signalr/use-signalr-messages'
+import { useMessageSelection } from '../hooks/useMessageSelection'
+import { MessageItem } from '../components/MessageItem'
+import { MessageSelectionFooter } from '../components/MessageSelectionFooter'
+import { DeleteConfirmationDialog } from '../components/DeleteConfirmationDialog'
 
 interface ChatAreaProps {
   selectedUser: UserGetAllFriendsDataModel | null
@@ -23,6 +27,7 @@ export function ChatArea({ selectedUser, onBackToList, isMobile, onUserRemoved }
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const { user } = useAuth()
 
   const hasInitialScrollRef = useRef(false)
@@ -32,6 +37,9 @@ export function ChatArea({ selectedUser, onBackToList, isMobile, onUserRemoved }
   const { data: messages } = useGetMessagesQuery(
     selectedUser?.id ?? null
   )
+
+  const messageSelection = useMessageSelection()
+  const removeMessagesMutation = useRemoveMessagesMutation()
 
   const { sendMessage } = useSignalRMessages({
     userId: user?.id || '',
@@ -55,6 +63,41 @@ export function ChatArea({ selectedUser, onBackToList, isMobile, onUserRemoved }
       })
     }
   }
+
+  const handleDeleteMessages = () => {
+    if (!selectedUser || messageSelection.selectedCount === 0) return
+
+    removeMessagesMutation.mutate(
+      {
+        friendId: String(selectedUser.id),
+        messageIds: Array.from(messageSelection.selectedIds),
+      },
+      {
+        onSuccess: () => {
+          setShowDeleteDialog(false)
+          messageSelection.cancelSelection()
+        },
+        onError: () => {
+          setShowDeleteDialog(false)
+          // Keep selection mode active per requirements
+        },
+      }
+    )
+  }
+
+  // Clear selection when changing conversations
+  useEffect(() => {
+    messageSelection.cancelSelection()
+  }, [selectedUser?.id])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (removeMessagesMutation.isPending) {
+        messageSelection.cancelSelection()
+      }
+    }
+  }, [])
 
   const formatMessageTime = (date: string | Date) => {
     // Converte para UTC tratando strings corretamente
@@ -209,31 +252,18 @@ export function ChatArea({ selectedUser, onBackToList, isMobile, onUserRemoved }
         className="flex-1 overflow-y-auto p-4 bg-background no-scrollbar relative"
       >
         <div className="space-y-4">
-          {messages?.map((message) => {
-            const isFromMe = message.senderId === user?.id
-
-            return (
-              <div
-                key={message.id}
-                className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${isFromMe
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground border'
-                    } break-words`}
-                >
-                  <p className="text-sm">{message.content}</p>
-                  <p
-                    className={`text-xs mt-1 justify-end flex ${isFromMe ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                      }`}
-                  >
-                    {formatMessageTime(message.sentAt)}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
+          {messages?.map((message) => (
+            <MessageItem
+              key={message.id}
+              message={message}
+              currentUserId={user?.id}
+              isSelectionMode={messageSelection.isSelectionMode}
+              isSelected={messageSelection.isSelected(message.id)}
+              onToggleSelect={messageSelection.toggleSelection}
+              onStartSelection={messageSelection.startSelection}
+              formatMessageTime={formatMessageTime}
+            />
+          ))}
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -250,10 +280,27 @@ export function ChatArea({ selectedUser, onBackToList, isMobile, onUserRemoved }
         </Button>
       )}
 
-      <ChatInput
-        ref={inputRef}
-        onSendMessage={handleMessageSend}
-        disabled={!selectedUser}
+      {messageSelection.isSelectionMode ? (
+        <MessageSelectionFooter
+          selectedCount={messageSelection.selectedCount}
+          isDeleting={removeMessagesMutation.isPending}
+          onCancel={messageSelection.cancelSelection}
+          onDelete={() => setShowDeleteDialog(true)}
+        />
+      ) : (
+        <ChatInput
+          ref={inputRef}
+          onSendMessage={handleMessageSend}
+          disabled={!selectedUser}
+        />
+      )}
+
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        messageCount={messageSelection.selectedCount}
+        onConfirm={handleDeleteMessages}
+        isDeleting={removeMessagesMutation.isPending}
       />
     </div>
   )

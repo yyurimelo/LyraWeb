@@ -47,7 +47,23 @@
     "typeMessage": "Digite uma mensagem...",
     "noConversations": "Nenhuma conversa, contato ou mensagem encontrada",
     "noMessages": "Sem mensagens",
-    "scrollDown": "Rolar para baixo"
+    "scrollDown": "Rolar para baixo",
+    "menu": {
+      "selectMessages": "Selecionar mensagens"
+    },
+    "selection": {
+      "count_one": "{{count}} mensagem selecionada",
+      "count_other": "{{count}} mensagens selecionadas",
+      "cancel": "Cancelar",
+      "delete": "Apagar"
+    },
+    "deleteMessages": {
+      "title": "Apagar mensagens?",
+      "description": "Tem certeza que deseja apagar {{count}} mensagem? Esta ação não pode ser desfeita.",
+      "description_plural": "Tem certeza que deseja apagar {{count}} mensagens? Esta ação não pode ser desfeita.",
+      "cancel": "Cancelar",
+      "confirm": "Apagar"
+    }
   },
   "userDetails": {
     "title": "Dados do usuário",
@@ -292,7 +308,9 @@
       "processError": "Erro ao processar notificação"
     },
     "message": {
-      "sendError": "Falha ao enviar mensagem"
+      "sendError": "Falha ao enviar mensagem",
+      "deleteSuccess": "Mensagens apagadas com sucesso",
+      "deleteError": "Falha ao apagar mensagens"
     }
   },
   "userSearch": {

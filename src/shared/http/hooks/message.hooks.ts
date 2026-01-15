@@ -1,5 +1,5 @@
 import { queryClient, useMutation, useQuery } from "@lyra/react-query-config"
-import { sendMessage, getMessagesWithUser } from "../services/message.service"
+import { sendMessage, getMessagesWithUser, removeMessages } from "../services/message.service"
 import type { MessageResponseDto } from "@/@types/message/message-types"
 import type { UserGetAllFriendsDataModel } from "@/@types/user/user-get-all-friends"
 import { toast } from "sonner"
@@ -73,3 +73,41 @@ export const useSendMessageMutation = () => {
     }
   })
 };
+
+export const useRemoveMessagesMutation = () => {
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ friendId, messageIds }: { friendId: string; messageIds: string[] }) =>
+      removeMessages(friendId, messageIds),
+
+    onMutate: async ({ friendId, messageIds }) => {
+      // Cancel ongoing queries to prevent race conditions
+      await queryClient.cancelQueries({ queryKey: ["messages", friendId] })
+
+      // Snapshot previous messages for rollback
+      const previousMessages = queryClient.getQueryData<MessageResponseDto[]>(["messages", friendId])
+
+      // Optimistically remove messages from cache
+      queryClient.setQueryData<MessageResponseDto[]>(
+        ["messages", friendId],
+        (oldMessages = []) => oldMessages.filter(msg => !messageIds.includes(msg.id))
+      )
+
+      return { previousMessages, friendId }
+    },
+
+    onError: (error, _variables, context) => {
+      // Rollback to previous messages on error
+      if (context?.previousMessages) {
+        queryClient.setQueryData(["messages", context.friendId], context.previousMessages)
+      }
+      toast.error(t('toasts.message.deleteError'))
+      console.error("Error deleting messages:", error)
+    },
+
+    onSuccess: () => {
+      toast.success(t('toasts.message.deleteSuccess'))
+    }
+  })
+}

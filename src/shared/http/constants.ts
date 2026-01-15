@@ -17,7 +17,8 @@ export const API_ENDPOINTS = {
   MESSAGE: {
     SEND: "/api/message/send",
     GET_MESSAGES_WITH_USER: "/api/message/get/all",
-    HUB: "/api/hub/message"
+    HUB: "/api/hub/message",
+    REMOVE: "/api/message/remove",
   },
   NOTIFICATION: {
     GET_ALL_PAGINATED: "/api/notification/get/all/paginated",

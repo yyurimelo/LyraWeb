@@ -53,6 +53,37 @@ export function useSignalRMessages({
 
       onMessage?.(message)
     }
+
+    const handleMessageUpdated = (message: MessageResponseDto) => {
+      const chatPartnerId =
+        message.senderId === userId
+          ? message.receiverId
+          : message.senderId
+
+      queryClient.setQueryData<MessageResponseDto[]>(
+        ['messages', chatPartnerId],
+        (old = []) =>
+          old.map(m =>
+            m.id === message.id ? message : m
+          )
+      )
+
+      queryClient.setQueryData<UserGetAllFriendsDataModel[]>(
+        ['chat'],
+        (old = []) =>
+          old.map(friend =>
+            friend.id === message.senderId ||
+              friend.id === message.receiverId
+              ? {
+                ...friend,
+                lastMessage: message.content,
+                lastMessageAt: message.sentAt
+              }
+              : friend
+          )
+      )
+    }
+
     const handleUpdateListFriend = () => {
       queryClient.invalidateQueries({ queryKey: ['chat'] })
     }
@@ -64,11 +95,13 @@ export function useSignalRMessages({
     }
 
     connection.on('receivemessage', handleReceiveMessage)
+    connection.on('messageupdated', handleMessageUpdated)
     connection.on('updatelistfriend', handleUpdateListFriend)
     connection.on('updatefriendrequest', handleUpdateFriendRequest)
 
     return () => {
       connection.off('receivemessage', handleReceiveMessage)
+      connection.off('messageupdated', handleMessageUpdated)
       connection.off('updatelistfriend', handleUpdateListFriend)
       connection.off('updatefriendrequest', handleUpdateFriendRequest)
     }

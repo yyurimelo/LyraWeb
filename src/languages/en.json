@@ -47,7 +47,23 @@
     "typeMessage": "Type a message...",
     "noConversations": "No conversations, contacts or messages found",
     "noMessages": "No messages",
-    "scrollDown": "Scroll down"
+    "scrollDown": "Scroll down",
+    "menu": {
+      "selectMessages": "Select messages"
+    },
+    "selection": {
+      "count_one": "{{count}} message selected",
+      "count_other": "{{count}} messages selected",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "deleteMessages": {
+      "title": "Delete messages?",
+      "description": "Are you sure you want to delete {{count}} message? This action cannot be undone.",
+      "description_plural": "Are you sure you want to delete {{count}} messages? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
   },
   "userDetails": {
     "title": "User data",
@@ -292,7 +308,9 @@
       "processError": "Error processing notification"
     },
     "message": {
-      "sendError": "Failed to send message"
+      "sendError": "Failed to send message",
+      "deleteSuccess": "Messages deleted successfully",
+      "deleteError": "Failed to delete messages"
     }
   },
   "userSearch": {

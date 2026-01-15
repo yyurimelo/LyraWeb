@@ -1,4 +1,4 @@
-import type { MessageResponseDto, SendMessageRequest } from "@/@types/message/message-types";
+import type { MessageResponseDto, SendMessageRequest, RemoveMessagesRequest } from "@/@types/message/message-types";
 import { http, isAxiosError } from "@lyra/axios-config";
 import { API_ENDPOINTS } from "../constants";
 
@@ -37,3 +37,30 @@ export async function getMessagesWithUser(
 
   return response.data;
 }
+
+export async function removeMessages(
+  friendId: string,
+  messageIds: string[]
+): Promise<MessageResponseDto[]> {
+  try {
+    const requestBody: RemoveMessagesRequest = {
+      messageIds: messageIds
+    }
+
+    const response = await http.delete(
+      API_ENDPOINTS.MESSAGE.REMOVE,
+      {
+        params: { friendId },
+        data: requestBody,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? "Failed to remove messages");
+    }
+    throw error;
+  }
+}
+
