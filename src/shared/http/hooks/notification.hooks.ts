@@ -30,7 +30,7 @@ export const useMaskAsReadMutation = () =>
   useMutation({
     mutationFn: maskAsRead,
     onSuccess: () => {
-      // Invalida apenas as queries de paginação de notificações
+      // Invalida as queries de paginação de notificações do header
       queryClient.invalidateQueries({
         queryKey: ['notifications', 'header', 'unread']
       })
@@ -41,6 +41,11 @@ export const useMaskAsReadMutation = () =>
 
       queryClient.invalidateQueries({
         queryKey: ['notifications', 'count', 'unread']
+      })
+
+      // Invalida as queries de infinite scroll da página de notificações
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'infinite']
       })
     },
     onError: (error) => {
