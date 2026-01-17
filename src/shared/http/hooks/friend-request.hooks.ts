@@ -29,7 +29,11 @@ export const useAcceptFriendRequestMutation = () => {
   return useMutation({
     mutationFn: (requestId: number) => acceptFriendRequest(requestId),
     onSuccess: () => {
-      // SignalR handles invalidation of ['chat'], ['friend-request'] automatically via UpdateListFriend and UpdateFriendRequest events
+      // SignalR handles invalidation for the OTHER user via UpdateListFriend
+      // But we need to invalidate OUR own friend list manually
+      queryClient.invalidateQueries({
+        queryKey: ["chat"],
+      });
 
       // Invalidate query to remove accepted request from list
       queryClient.invalidateQueries({
