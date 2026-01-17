@@ -1,6 +1,7 @@
 import * as React from "react"
 import type { UserGetAllFriendsDataModel } from "@/@types/user/user-get-all-friends"
 import { useTranslation } from "react-i18next"
+import { RemoveFriendConfirmationDialog } from "../components/remove-friend-confirmation-dialog"
 import {
   Sheet,
   SheetContent, SheetHeader,
@@ -35,7 +36,13 @@ export function ChatUserDetails({ user, open, setOpen, onUserRemoved }: ChatUser
   const { mutateAsync: removeFriendFn, isPending } =
     useRemoveFriendMutation();
 
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = React.useState(false)
+
   async function handleRemoveFriend() {
+    setIsRemoveDialogOpen(true)
+  }
+
+  async function confirmRemoveFriend() {
     if (!user.userIdentifier) return;
 
     try {
@@ -43,6 +50,7 @@ export function ChatUserDetails({ user, open, setOpen, onUserRemoved }: ChatUser
       await navigate({
         to: "/"
       })
+      setIsRemoveDialogOpen(false)
       setOpen(false)
       onUserRemoved?.() // Limpa o usuário selecionado
     } catch (error) {
@@ -106,6 +114,14 @@ export function ChatUserDetails({ user, open, setOpen, onUserRemoved }: ChatUser
             </Button>
           </div>
         </div>
+
+        <RemoveFriendConfirmationDialog
+          open={isRemoveDialogOpen}
+          onOpenChange={setIsRemoveDialogOpen}
+          friendName={user.name}
+          onConfirm={confirmRemoveFriend}
+          isRemoving={isPending}
+        />
       </SheetContent>
     </Sheet>
   )

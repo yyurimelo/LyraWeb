@@ -8,7 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/shared/comp
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { InputPassword } from "@/shared/components/ui/input-passowrd";
-import { toast } from "sonner";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 
 const fallback = '/' as const

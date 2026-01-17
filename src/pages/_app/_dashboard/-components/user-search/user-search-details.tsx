@@ -1,9 +1,11 @@
 "use client";
 
+import * as React from "react"
 import { formatDistanceToNow } from "date-fns";
 import { enUS, ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { RemoveFriendConfirmationDialog } from "../chat/components/remove-friend-confirmation-dialog"
 
 
 // components
@@ -74,6 +76,8 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
 
   const isPending = isSendingInvite || isAccepting || isRemoving || isRemovingFriend;
 
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = React.useState(false)
+
   async function handleCancelRequest() {
     if (!friendRequest?.id) return;
 
@@ -88,12 +92,17 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
   }
 
   async function handleRemoveFriend() {
+    setIsRemoveDialogOpen(true)
+  }
+
+  async function confirmRemoveFriend() {
     if (!otherUserId) return;
 
     try {
       await removeFriendFn(otherUserId);
       // Força atualização imediata do status antes de fechar
       await refetchFriendshipStatus();
+      setIsRemoveDialogOpen(false)
       setOpen(false);
     } catch (error) {
       console.error("Error removing friend:", error);
@@ -295,6 +304,14 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
             )
           )}
         </section>
+
+        <RemoveFriendConfirmationDialog
+          open={isRemoveDialogOpen}
+          onOpenChange={setIsRemoveDialogOpen}
+          friendName={user.name}
+          onConfirm={confirmRemoveFriend}
+          isRemoving={isRemovingFriend}
+        />
       </DialogContent>
     </Dialog>
   );

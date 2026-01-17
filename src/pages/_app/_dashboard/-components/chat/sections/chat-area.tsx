@@ -9,10 +9,10 @@ import { ChatInput } from './chat-input'
 import { useGetMessagesQuery, useSendMessageMutation, useRemoveMessagesMutation } from '@/shared/http/hooks/message.hooks'
 import { useAuth } from '@/contexts/auth-provider'
 import { useSignalRMessages } from '@/signalr/use-signalr-messages'
-import { useMessageSelection } from '../hooks/useMessageSelection'
-import { MessageItem } from '../components/MessageItem'
-import { MessageSelectionFooter } from '../components/MessageSelectionFooter'
-import { DeleteConfirmationDialog } from '../components/DeleteConfirmationDialog'
+import { useMessageSelection } from '../hooks/use-message-selection'
+import { MessageItem } from '../components/message-item'
+import { MessageSelectionFooter } from '../components/message-selection-footer'
+import { DeleteConfirmationDialog } from '../components/delete-confirmation-dialog'
 
 interface ChatAreaProps {
   selectedUser: UserGetAllFriendsDataModel | null

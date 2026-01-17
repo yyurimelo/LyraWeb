@@ -64,6 +64,12 @@
       "description_plural": "Tem certeza que deseja apagar {{count}} mensagens? Esta ação não pode ser desfeita.",
       "cancel": "Cancelar",
       "confirm": "Apagar"
+    },
+    "removeFriend": {
+      "title": "Remover amigo?",
+      "description": "Tem certeza que deseja remover {{name}} como amigo? Isso também apagará todas as suas conversas com eles e não pode ser desfeito.",
+      "cancel": "Cancelar",
+      "confirm": "Remover"
     }
   },
   "userDetails": {

@@ -64,6 +64,12 @@
       "description_plural": "Are you sure you want to delete {{count}} messages? This action cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete"
+    },
+    "removeFriend": {
+      "title": "Remove friend?",
+      "description": "Are you sure you want to remove {{name}} as a friend? This will also delete all your conversations with them and cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Remove"
     }
   },
   "userDetails": {

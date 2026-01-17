@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/components/ui/button'
-import { Spinner } from '@/shared/components/ui/spinner'
 import { Trash2, X } from 'lucide-react'
 
 interface MessageSelectionFooterProps {
