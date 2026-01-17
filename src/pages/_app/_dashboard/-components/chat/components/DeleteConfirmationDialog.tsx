@@ -45,7 +45,7 @@ export function DeleteConfirmationDialog({
             {t('chat.deleteMessages.cancel')}
           </Button>
           <Button
-            variant="destructive"
+            variant="default"
             onClick={onConfirm}
             disabled={isDeleting}
           >

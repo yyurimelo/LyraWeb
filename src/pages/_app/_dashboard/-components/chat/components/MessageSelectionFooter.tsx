@@ -20,9 +20,6 @@ export function MessageSelectionFooter({
 
   return (
     <div className="p-4 border-t bg-background flex items-center justify-between">
-      <span className="text-sm text-muted-foreground">
-        {t('chat.selection.count', { count: selectedCount })}
-      </span>
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
@@ -31,22 +28,21 @@ export function MessageSelectionFooter({
           disabled={isDeleting}
           aria-label={t('chat.selection.cancel')}
         >
-          <X className="size-4 mr-1" />
-          {t('chat.selection.cancel')}
+          <X className="size-4" />
         </Button>
+      <span className="text-sm text-muted-foreground">
+        {t('chat.selection.count', { count: selectedCount })}
+      </span>
+      </div>
+      <div className="flex items-center gap-2">
         <Button
-          variant="destructive"
+          variant="ghost"
           size="sm"
           onClick={onDelete}
           disabled={isDeleting || selectedCount === 0}
           aria-label={t('chat.selection.delete')}
         >
-          {isDeleting ? (
-            <Spinner className="mr-1" />
-          ) : (
-            <Trash2 className="size-4 mr-1" />
-          )}
-          {t('chat.selection.delete')}
+          <Trash2 className="size-5" />
         </Button>
       </div>
     </div>
