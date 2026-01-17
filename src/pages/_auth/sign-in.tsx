@@ -62,7 +62,7 @@ function SignIn() {
       await auth.login({ ...data })
       await navigate({ to: search.redirect || fallback })
     } catch (err: any) {
-      toast.error(t('auth.errors.invalidCredentials'), err)
+      return null
     } finally {
       setIsLoading(false)
     }

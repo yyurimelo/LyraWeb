@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       http.defaults.headers.Authorization = `Bearer ${response.token}`;
       toast.success(t('toasts.auth.authenticated'))
     } catch (error: any) {
-      toast.error(t('toasts.auth.loginError'), error);
+      toast.error(t('auth.errors.invalidCredentials'), error);
       throw error;
     }
   }
