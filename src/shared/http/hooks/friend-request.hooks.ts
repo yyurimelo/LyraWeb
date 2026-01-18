@@ -41,26 +41,15 @@ export const useAcceptFriendRequestMutation = () => {
         refetchType: "all",
       });
 
-      // Clear notifications cache to avoid stale data when header opens
+      // Clear all notification caches (matches all queries starting with ["notifications", ...])
       queryClient.resetQueries({
         queryKey: ["notifications"],
       });
 
-      queryClient.resetQueries({
-        queryKey: ['notifications', 'infinite'],
-      });
-
-      // Reset header unread and read cache
-      queryClient.resetQueries({
-        queryKey: ["notifications", "header", "unread"],
-      });
-      queryClient.resetQueries({
-        queryKey: ["notifications", "header", "read"],
-      });
-
-      // Invalidate count
+      // Ensure header notifications are refetched immediately
       queryClient.invalidateQueries({
-        queryKey: ["notifications", "count", "unread"],
+        queryKey: ["notifications", "header"],
+        refetchType: "all",
       });
 
       toast.success(t('toasts.friendRequest.acceptSuccess'));
@@ -86,21 +75,15 @@ export const useCancelFriendRequestMutation = () => {
         refetchType: "all",
       });
 
-      // Clear notifications cache to avoid stale data when header opens
+      // Clear all notification caches (matches all queries starting with ["notifications", ...])
       queryClient.resetQueries({
         queryKey: ["notifications"],
       });
 
-      queryClient.resetQueries({
-        queryKey: ['notifications', 'infinite'],
-      });
-
-      // Reset header unread and read cache
-      queryClient.resetQueries({
-        queryKey: ["notifications", "header", "unread"],
-      });
-      queryClient.resetQueries({
-        queryKey: ["notifications", "header", "read"],
+      // Ensure header notifications are refetched immediately
+      queryClient.invalidateQueries({
+        queryKey: ["notifications", "header"],
+        refetchType: "all",
       });
 
       toast.success(t('toasts.friendRequest.cancelSuccess'));
