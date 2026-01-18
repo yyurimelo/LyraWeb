@@ -5,7 +5,7 @@ import { NotificationItem } from "@/pages/_app/_dashboard/-components/header/not
 import { NotificationEmpty } from "@/pages/_app/_dashboard/-components/header/notifications/notification-empty";
 import { NotificationSkeleton } from "@/pages/_app/_dashboard/-components/header/notifications/notification-skeleton";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
-import { normalizeNotificationStatus } from "@/lib/notifications/notification.helpers";
+import { normalizeNotificationStatus } from "@/shared/helpers/notification.helpers";
 
 interface NotificationInfiniteListProps {
   notifications: ExtendedNotificationDataModel[]

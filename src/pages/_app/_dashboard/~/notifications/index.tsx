@@ -13,7 +13,7 @@ import { Button } from "@/shared/components/ui/button"
 
 // hooks
 import { useNotificationsInfiniteQuery, useUnreadNotificationsCountQuery, useMaskAsReadMutation } from "@/shared/http/hooks/notification.hooks"
-import { isNotificationUnread } from "@/lib/notifications/notification.helpers"
+import { isNotificationUnread } from "@/shared/helpers/notification.helpers";
 import type { ExtendedNotificationDataModel } from '@/@types/notification'
 import { NotificationInfiniteList } from './-components/notification-infinite-list'
 

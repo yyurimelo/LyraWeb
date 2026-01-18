@@ -10,10 +10,12 @@ import type { ExtendedNotificationDataModel } from "@/@types/notification";
 import { notificationTypeIconMap } from "@/shared/mappers/notification-type-icon-map";
 
 // hooks
-import { useNotificationMessage } from "@/lib/notifications/notification-message.service";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { isNotificationUnread, normalizeNotificationStatus } from "@/lib/notifications/notification.helpers";
+
+// services
+import { useNotificationMessage } from "@/shared/http/services/notification-message.service";
+import { isNotificationUnread } from "@/shared/helpers/notification.helpers";
 
 // ui
 import {
