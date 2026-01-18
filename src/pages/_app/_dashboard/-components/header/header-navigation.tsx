@@ -34,6 +34,8 @@ export function HeaderNavigation() {
     const activeLink = containerRef.current?.querySelector('[data-status="active"]') as HTMLElement
     if (activeLink) {
       updateActive(activeLink)
+    } else {
+      setActiveStyle(prev => ({ ...prev, opacity: 0 }))
     }
   }, [location.pathname])
 
