@@ -49,7 +49,7 @@ export function RemoveFriendConfirmationDialog({
             onClick={onConfirm}
             disabled={isRemoving}
           >
-            {isRemoving ? <Spinner className="mr-2" /> : t('chat.removeFriend.confirm')}
+            {isRemoving ? <Spinner /> : t('chat.removeFriend.confirm')}
             
           </Button>
         </DialogFooter>

@@ -49,8 +49,8 @@ export function DeleteConfirmationDialog({
             onClick={onConfirm}
             disabled={isDeleting}
           >
-            {isDeleting && <Spinner className="mr-2" />}
-            {t('chat.deleteMessages.confirm')}
+            {isDeleting ? <Spinner /> : t('chat.deleteMessages.confirm')}
+           
           </Button>
         </DialogFooter>
       </DialogContent>
