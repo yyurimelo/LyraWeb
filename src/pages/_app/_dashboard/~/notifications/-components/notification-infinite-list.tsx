@@ -5,6 +5,7 @@ import { NotificationItem } from "@/pages/_app/_dashboard/-components/header/not
 import { NotificationEmpty } from "@/pages/_app/_dashboard/-components/header/notifications/notification-empty";
 import { NotificationSkeleton } from "@/pages/_app/_dashboard/-components/header/notifications/notification-skeleton";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
+import { normalizeNotificationStatus } from "@/lib/notifications/notification.helpers";
 
 interface NotificationInfiniteListProps {
   notifications: ExtendedNotificationDataModel[]
@@ -85,7 +86,7 @@ export function NotificationInfiniteList({
           <NotificationItem
             key={notification.id}
             notification={notification}
-            activeTab={String(notification.status) === 'read' ? 'read' : 'unread'}
+            activeTab={normalizeNotificationStatus(notification.status)}
           />
         ))}
       </div>

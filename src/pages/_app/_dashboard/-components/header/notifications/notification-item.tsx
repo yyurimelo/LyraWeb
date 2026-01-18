@@ -13,6 +13,7 @@ import { notificationTypeIconMap } from "@/shared/mappers/notification-type-icon
 import { useNotificationMessage } from "@/lib/notifications/notification-message.service";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { isNotificationUnread, normalizeNotificationStatus } from "@/lib/notifications/notification.helpers";
 
 // ui
 import {
@@ -77,12 +78,12 @@ export const NotificationItem = memo(
         <div
           className={cn(
             "hover:bg-accent/40 rounded-sm relative p-3 group",
-            onClick && notification.type === "InviteFriend" && notification.id && String(notification.status) !== "Completed" && "cursor-pointer",
+            onClick && notification.type === "InviteFriend" && notification.id && isNotificationUnread(notification.status) && "cursor-pointer",
             isLoading && "opacity-50 pointer-events-none"
           )}
           onClick={handleClick}
         >
-          {activeTab === "unread" && String(notification.status) !== "Completed" && String(notification.status) !== "Read" && (
+          {activeTab === "unread" && isNotificationUnread(notification.status) && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -126,7 +127,7 @@ export const NotificationItem = memo(
               size={21}
               className={cn(
                 "flex-shrink-0 mt-[2px]",
-                String(notification.status) === "Read" || String(notification.status) === "Completed"
+                !isNotificationUnread(notification.status)
                   ? "text-muted-foreground"
                   : "text-primary"
               )}
@@ -137,7 +138,7 @@ export const NotificationItem = memo(
                 <span
                   className={cn(
                     "text-[11px]",
-                    String(notification.status) === "Read" || String(notification.status) === "Completed"
+                    !isNotificationUnread(notification.status)
                       ? "text-muted-foreground"
                       : "text-primary"
                   )}

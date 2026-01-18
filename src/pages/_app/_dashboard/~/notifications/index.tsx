@@ -13,6 +13,7 @@ import { Button } from "@/shared/components/ui/button"
 
 // hooks
 import { useNotificationsInfiniteQuery, useUnreadNotificationsCountQuery, useMaskAsReadMutation } from "@/shared/http/hooks/notification.hooks"
+import { isNotificationUnread } from "@/lib/notifications/notification.helpers"
 import type { ExtendedNotificationDataModel } from '@/@types/notification'
 import { NotificationInfiniteList } from './-components/notification-infinite-list'
 
@@ -103,8 +104,9 @@ function NotificationsPage() {
   const totalRecords = data?.pages[0]?.totalRecords ?? 0
 
   const handleMarkAllAsRead = async () => {
+    // Filtra notificações não lidas usando o helper robusto
     const unreadIds = notifications
-      .filter(n => String(n.status) === 'unread')
+      .filter(n => isNotificationUnread(n.status))
       .map(n => Number(n.id))
 
     if (unreadIds.length === 0) return
