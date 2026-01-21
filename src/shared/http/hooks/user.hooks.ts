@@ -1,4 +1,4 @@
-import { queryClient, useMutation, useQuery } from "@lyra/react-query-config";
+import { keepPreviousData, queryClient, useMutation, useQuery } from "@lyra/react-query-config";
 import { createUser, getAllFriends, getUser, getUserByName, getUserPublicId, removeFriend, updateUser } from "../services/user.service";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -54,6 +54,7 @@ export const useGetAllFriendsQuery = () =>
   useQuery({
     queryKey: ["chat"],
     queryFn: () => getAllFriends(),
+    placeholderData: keepPreviousData
   })
 
 export const useGetUserQuery = (userId: string) => useQuery({
