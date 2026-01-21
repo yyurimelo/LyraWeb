@@ -4,6 +4,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/pt-br'
 import { useTranslation } from 'react-i18next'
 
+
 // Configure dayjs
 dayjs.extend(relativeTime)
 dayjs.locale('pt-br')
@@ -83,6 +84,9 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
     dayjs.locale('en')
   }
 
+  // NOTE: Backend handles sorting by lastInteractionAt (most recent first)
+  // Frontend respects this ordering and does NOT re-sort the data
+
   if (isLoading) {
     return (
       <UserListSkeleton count={6} />
@@ -109,32 +113,10 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
     )
   }
 
-  const sortedUsers = [...users].sort((a, b) => {
-    if (!a.lastMessageAt && !b.lastMessageAt) return 0;
-    if (!a.lastMessageAt) return 1;
-    if (!b.lastMessageAt) return -1;
-
-    // Função auxiliar para converter data UTC para timestamp
-    const getUtcTimestamp = (dateStr: string) => {
-      // Verifica se já tem timezone
-      const finalDateStr = dateStr.includes('Z') || dateStr.includes('+') || (dateStr.includes('-', 10) && dateStr.length > 10)
-        ? dateStr
-        : dateStr + 'Z';
-      return new Date(finalDateStr).getTime();
-    };
-
-    try {
-      const dateA = getUtcTimestamp(a.lastMessageAt);
-      const dateB = getUtcTimestamp(b.lastMessageAt);
-      return dateB - dateA;
-    } catch {
-      return 0;
-    }
-  });
 
   return (
     <div className="overflow-y-auto h-full space-y-1 px-4 dark:[color-scheme:dark]">
-      {sortedUsers.map((user) => (
+      {users.map((user) => (
         <div
           key={user.id}
           onClick={() => onUserSelect(user)}
@@ -179,7 +161,12 @@ export function UserList({ users, selectedUser, onUserSelect, isLoading, error }
                 {user.lastMessageDeletedAt ? (
                   <span className="italic opacity-70">{t('chat.messageDeleted')}</span>
                 ) : user.lastMessage ? (
-                  user.lastMessage.slice(0, 45) + (user.lastMessage.length > 45 ? "..." : "")
+                  <>
+                    {user.isLastMessageSentByMe && (
+                      <span className="font-medium">{t('chat.you')}: </span>
+                    )}
+                    {user.lastMessage.slice(0, 45) + (user.lastMessage.length > 45 ? "..." : "")}
+                  </>
                 ) : (
                   user.description || <span className="text-muted-foreground/60">{t('chat.noMessages')}</span>
                 )}

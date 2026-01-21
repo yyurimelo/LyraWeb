@@ -140,12 +140,12 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
   if (!user) return null;
 
   // Format friendship time
-  const friendshipTime = friendRequest?.createdAt
+  const friendshipTime = friendRequest?.updatedAt
     ? (() => {
       const dateStr =
-        typeof friendRequest.createdAt === "string"
-          ? friendRequest.createdAt
-          : friendRequest.createdAt.toISOString();
+        typeof friendRequest.updatedAt === "string"
+          ? friendRequest.updatedAt
+          : friendRequest.updatedAt.toISOString();
 
       const finalDateStr =
         dateStr.includes("Z") ||

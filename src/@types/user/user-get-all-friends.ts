@@ -9,4 +9,6 @@ export type UserGetAllFriendsDataModel = {
   lastMessage?: string;
   lastMessageAt?: string;
   lastMessageDeletedAt?: string | null;
+  lastInteractionAt?: string;
+  isLastMessageSentByMe?: boolean;
 }

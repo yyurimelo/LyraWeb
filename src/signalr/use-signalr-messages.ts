@@ -36,20 +36,38 @@ export function useSignalRMessages({
           old.some(m => m.id === message.id) ? old : [...old, message]
       )
 
+      // Update friend in list and MOVE TO TOP (most recent interaction)
       queryClient.setQueryData<UserGetAllFriendsDataModel[]>(
         ['chat'],
-        (old = []) =>
-          old.map(friend =>
+        (old = []) => {
+          // Find and update the friend with new message
+          const updatedList = old.map(friend =>
             friend.id === message.senderId ||
               friend.id === message.receiverId
               ? {
                 ...friend,
                 lastMessage: message.content,
                 lastMessageAt: message.sentAt,
-                lastMessageDeletedAt: null
+                lastMessageDeletedAt: null,
+                isLastMessageSentByMe: message.isLastMessageSentByMe
               }
               : friend
           )
+
+          // Move the updated friend to the top of the list
+          const updatedFriend = updatedList.find(friend =>
+            friend.id === message.senderId || friend.id === message.receiverId
+          )
+
+          if (!updatedFriend) return updatedList
+
+          // Filter out the updated friend and put him first
+          const otherFriends = updatedList.filter(friend =>
+            friend.id !== message.senderId && friend.id !== message.receiverId
+          )
+
+          return [updatedFriend, ...otherFriends]
+        }
       )
 
       onMessage?.(message)
@@ -123,6 +141,41 @@ export function useSignalRMessages({
       )
     }
 
+    const handleUpdateFriendLastMessage = (message: MessageResponseDto) => {
+      queryClient.setQueryData<UserGetAllFriendsDataModel[]>(
+        ['chat'],
+        (old = []) => {
+          // Find and update the friend with new message
+          const updatedList = old.map(friend =>
+            friend.id === message.senderId ||
+              friend.id === message.receiverId
+              ? {
+                ...friend,
+                lastMessage: message.content,
+                lastMessageAt: message.sentAt,
+                lastMessageDeletedAt: null,
+                isLastMessageSentByMe: message.isLastMessageSentByMe
+              }
+              : friend
+          )
+
+          // Move the updated friend to the top of the list
+          const updatedFriend = updatedList.find(friend =>
+            friend.id === message.senderId || friend.id === message.receiverId
+          )
+
+          if (!updatedFriend) return updatedList
+
+          // Filter out the updated friend and put him first
+          const otherFriends = updatedList.filter(friend =>
+            friend.id !== message.senderId && friend.id !== message.receiverId
+          )
+
+          return [updatedFriend, ...otherFriends]
+        }
+      )
+    }
+
     const handleUpdateListFriend = () => {
       queryClient.invalidateQueries({ queryKey: ['chat'] })
     }
@@ -137,12 +190,14 @@ export function useSignalRMessages({
     connection.on('messageupdated', handleMessageUpdated)
     connection.on('updatelistfriend', handleUpdateListFriend)
     connection.on('updatefriendrequest', handleUpdateFriendRequest)
+    connection.on('UpdateFriendLastMessage', handleUpdateFriendLastMessage)
 
     return () => {
       connection.off('receivemessage', handleReceiveMessage)
       connection.off('messageupdated', handleMessageUpdated)
       connection.off('updatelistfriend', handleUpdateListFriend)
       connection.off('updatefriendrequest', handleUpdateFriendRequest)
+      connection.off('UpdateFriendLastMessage', handleUpdateFriendLastMessage)
     }
   }, [connection, userId, onMessage])
 

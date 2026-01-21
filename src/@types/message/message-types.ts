@@ -7,6 +7,7 @@ export interface MessageResponseDto {
   content: string
   sentAt: string
   deletedAt?: string | null
+  isLastMessageSentByMe?: boolean
 }
 
 export interface SendMessageRequest {

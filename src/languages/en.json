@@ -41,6 +41,7 @@
   "chat": {
     "title": "Chats",
     "search": "Search...",
+    "you": "You",
     "welcome": "Welcome to Lyra",
     "selectConversation": "Select a conversation from the list to start chatting.",
     "sendMessage": "Send",

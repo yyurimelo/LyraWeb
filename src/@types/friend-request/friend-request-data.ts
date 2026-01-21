@@ -8,4 +8,6 @@ export type FriendRequestDataModel = {
   receiverName: string;
   status: "Pending" | "Accepted";
   createdAt: Date;
+  updatedAt: Date;
+  lastInteractionAt: Date;
 };
