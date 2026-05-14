@@ -1,23 +1,32 @@
-import { useState } from 'react'
-import type { UserGetAllFriendsDataModel } from '@/@types/user/user-get-all-friends'
-import { Button } from '@/shared/components/ui/button'
-import { ChevronLeft } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar'
-import { getInitialName } from '@/lib/get-initial-name'
-import { ChatUserDetails } from './chat-user-details'
+import { useState } from "react";
+import type { UserGetAllFriendsDataModel } from "@/@types/user/user-get-all-friends";
+import { Button } from "@/shared/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/components/ui/avatar";
+import { getInitialName } from "@/lib/get-initial-name";
+import { ChatUserDetails } from "./chat-user-details";
 
 interface ChatHeaderProps {
-  selectedUser: UserGetAllFriendsDataModel
-  onBackToList?: () => void
-  isMobile?: boolean
-  onUserRemoved?: () => void
+  selectedUser: UserGetAllFriendsDataModel;
+  onBackToList?: () => void;
+  isMobile?: boolean;
+  onUserRemoved?: () => void;
 }
 
-export function ChatHeader({ selectedUser, onBackToList, isMobile, onUserRemoved }: ChatHeaderProps) {
-  const [open, setOpen] = useState(false)
+export function ChatHeader({
+  selectedUser,
+  onBackToList,
+  isMobile,
+  onUserRemoved,
+}: ChatHeaderProps) {
+  const [open, setOpen] = useState(false);
 
   function openUserDetails() {
-    setOpen(true)
+    setOpen(true);
   }
 
   return (
@@ -30,8 +39,8 @@ export function ChatHeader({ selectedUser, onBackToList, isMobile, onUserRemoved
           {isMobile && onBackToList && (
             <Button
               onClick={(e) => {
-                onBackToList()
-                e.stopPropagation()
+                onBackToList();
+                e.stopPropagation();
               }}
               size="icon"
               className="bg-transparent hover:bg-transparent shadow-none"
@@ -49,7 +58,7 @@ export function ChatHeader({ selectedUser, onBackToList, isMobile, onUserRemoved
             <AvatarFallback
               style={{
                 backgroundColor:
-                  selectedUser.appearancePrimaryColor || 'hsl(var(--primary))'
+                  selectedUser.appearancePrimaryColor || "hsl(var(--primary))",
               }}
               className="text-secondary-foreground font-semibold text-sm"
             >
@@ -63,7 +72,12 @@ export function ChatHeader({ selectedUser, onBackToList, isMobile, onUserRemoved
         </div>
       </div>
 
-      <ChatUserDetails open={open} setOpen={setOpen} user={selectedUser} onUserRemoved={onUserRemoved} />
+      <ChatUserDetails
+        open={open}
+        setOpen={setOpen}
+        user={selectedUser}
+        onUserRemoved={onUserRemoved}
+      />
     </>
-  )
+  );
 }

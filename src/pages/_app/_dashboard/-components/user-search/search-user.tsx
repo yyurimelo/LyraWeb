@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { SearchIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
 import {
   CommandDialog,
   CommandGroup,
@@ -16,9 +15,8 @@ import { Button } from "@/shared/components/ui/button";
 import {
   UserSearchResultItem,
   UserSearchDetails,
-  UserSearchSkeleton
+  UserSearchSkeleton,
 } from "@/pages/_app/_dashboard/-components/user-search";
-
 import { useDebounce } from "@/shared/hooks/use-debounce";
 import type { UserDataModel } from "@/@types/user/user-data-model";
 import { useGetUserWithNameQuery } from "@/shared/http/hooks/user.hooks";
@@ -29,9 +27,7 @@ export function SearchUser() {
   const [openDialog, setOpenDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserDataModel | null>(null);
-
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-
   const {
     data: users = [],
     isPending,
@@ -45,7 +41,6 @@ export function SearchUser() {
         setOpen((prev) => !prev);
       }
     };
-
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
@@ -69,7 +64,7 @@ export function SearchUser() {
         />
         <span className="hidden sm:flex grow items-center ms-3">
           <span className="text-muted-foreground/70 font-normal">
-            {t('userSearch.button')}
+            {t("userSearch.button")}
           </span>
         </span>
         <kbd className="hidden sm:inline bg-background text-muted-foreground/70 ms-auto h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
@@ -80,7 +75,7 @@ export function SearchUser() {
       <CommandDialog open={open} onOpenChange={setOpen}>
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder={t('userSearch.placeholder')}
+            placeholder={t("userSearch.placeholder")}
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
@@ -88,7 +83,7 @@ export function SearchUser() {
           <CommandList>
             {!searchQuery ? (
               <CommandEmpty>
-                {t('userSearch.emptyStates.enterName')}
+                {t("userSearch.emptyStates.enterName")}
               </CommandEmpty>
             ) : isPending ? (
               <CommandGroup>
@@ -96,10 +91,10 @@ export function SearchUser() {
               </CommandGroup>
             ) : error ? (
               <CommandEmpty>
-                {t('userSearch.emptyStates.searchError')}
+                {t("userSearch.emptyStates.searchError")}
               </CommandEmpty>
             ) : users.length > 0 ? (
-              <CommandGroup heading={t('userSearch.emptyStates.usersFound')}>
+              <CommandGroup heading={t("userSearch.emptyStates.usersFound")}>
                 {users.map((user) => (
                   <div className="mt-1">
                     <UserSearchResultItem
@@ -112,7 +107,7 @@ export function SearchUser() {
               </CommandGroup>
             ) : (
               <CommandEmpty>
-                {t('userSearch.emptyStates.noUsersFound')}
+                {t("userSearch.emptyStates.noUsersFound")}
               </CommandEmpty>
             )}
           </CommandList>

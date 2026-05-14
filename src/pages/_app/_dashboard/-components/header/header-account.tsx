@@ -1,4 +1,3 @@
-// components
 import { Avatar } from "@/shared/components/ui/avatar";
 import { AvatarImageUser } from "@/pages/_app/_dashboard/-components/avatar-image-user";
 import { Button } from "@/shared/components/ui/button";
@@ -11,25 +10,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-
-// icons
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/auth-provider";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 export function HeaderAccount() {
-  const { t } = useTranslation()
-  const { user, logout } = useAuth()
-
-  const navigate = useNavigate()
+  const { t } = useTranslation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout()
+    logout();
     navigate({
-      to: "/sign-in"
-    })
-  }
+      to: "/sign-in",
+    });
+  };
 
   return (
     <DropdownMenu>
@@ -61,9 +57,7 @@ export function HeaderAccount() {
             </Avatar>
 
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">
-                {user?.name}
-              </span>
+              <span className="truncate font-semibold">{user?.name}</span>
               <span className="truncate text-xs">{user?.email}</span>
             </div>
           </div>
@@ -73,9 +67,7 @@ export function HeaderAccount() {
 
         <DropdownMenuGroup>
           <Link to="/~/settings">
-            <DropdownMenuItem>
-              {t('account.accountSettings')}
-            </DropdownMenuItem>
+            <DropdownMenuItem>{t("account.accountSettings")}</DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
 
@@ -83,7 +75,7 @@ export function HeaderAccount() {
 
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut />
-          {t('account.logOut')}
+          {t("account.logOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

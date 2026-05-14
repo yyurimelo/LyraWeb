@@ -1,14 +1,11 @@
 "use client";
 
-import * as React from "react"
+import * as React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { enUS, ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { RemoveFriendConfirmationDialog } from "../chat/components/remove-friend-confirmation-dialog"
-
-
-// components
+import { RemoveFriendConfirmationDialog } from "../chat/components/remove-friend-confirmation-dialog";
 import {
   Dialog,
   DialogContent,
@@ -17,27 +14,25 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { Separator } from "@/shared/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
-import { Button } from "@/shared/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip";
-
-// icons
 import {
-  UserRoundCheck,
-  UserRoundPlus,
-  UserRoundX,
-} from "lucide-react";
-
-// hooks
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/components/ui/avatar";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
+import { UserRoundCheck, UserRoundPlus, UserRoundX } from "lucide-react";
 import { useAuth } from "@/contexts/auth-provider";
 import {
   useSendFriendRequestMutation,
   useAcceptFriendRequestMutation,
   useCancelFriendRequestMutation,
-  useCheckFriendshipStatus
+  useCheckFriendshipStatus,
 } from "@/shared/http/hooks/friend-request.hooks";
-
-// types
 import type { UserDataModel } from "@/@types/user/user-data-model";
 import { getInitialName } from "@/lib/get-initial-name";
 import { useRemoveFriendMutation } from "@/shared/http/hooks/user.hooks";
@@ -48,51 +43,44 @@ interface UserSearchDetailsProps {
   user: UserDataModel | null;
 }
 
-export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProps) {
+export function UserSearchDetails({
+  open,
+  setOpen,
+  user,
+}: UserSearchDetailsProps) {
   const { t, i18n } = useTranslation();
   const { user: loggedUser } = useAuth();
   const loggedUserId = loggedUser?.userIdentifier;
-
   const loggedUserIsMe = loggedUserId === user?.userIdentifier;
   const otherUserId = user?.userIdentifier || "";
-
-  const { friendRequest, refetch: refetchFriendshipStatus } = useCheckFriendshipStatus(
-    otherUserId,
-    open
-  );
-
+  const { friendRequest, refetch: refetchFriendshipStatus } =
+    useCheckFriendshipStatus(otherUserId, open);
   const { mutateAsync: sendInviteFriendFn, isPending: isSendingInvite } =
     useSendFriendRequestMutation();
-
   const { mutateAsync: acceptRequestFn, isPending: isAccepting } =
     useAcceptFriendRequestMutation();
-
   const { mutateAsync: cancelRequestFn, isPending: isRemoving } =
     useCancelFriendRequestMutation();
-
   const { mutateAsync: removeFriendFn, isPending: isRemovingFriend } =
     useRemoveFriendMutation();
-
-
-  const isPending = isSendingInvite || isAccepting || isRemoving || isRemovingFriend;
-
-  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = React.useState(false)
+  const isPending =
+    isSendingInvite || isAccepting || isRemoving || isRemovingFriend;
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = React.useState(false);
 
   async function handleCancelRequest() {
     if (!friendRequest?.id) return;
 
     try {
       await cancelRequestFn(friendRequest.id);
-      // Força atualização imediata do status
       await refetchFriendshipStatus();
     } catch (error) {
       console.error("Error canceling friend request:", error);
-      toast.error(t('toasts.friendRequest.cancelError'));
+      toast.error(t("toasts.friendRequest.cancelError"));
     }
   }
 
   async function handleRemoveFriend() {
-    setIsRemoveDialogOpen(true)
+    setIsRemoveDialogOpen(true);
   }
 
   async function confirmRemoveFriend() {
@@ -100,75 +88,66 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
 
     try {
       await removeFriendFn(otherUserId);
-      // Força atualização imediata do status antes de fechar
       await refetchFriendshipStatus();
-      setIsRemoveDialogOpen(false)
+      setIsRemoveDialogOpen(false);
       setOpen(false);
     } catch (error) {
       console.error("Error removing friend:", error);
-      toast.error(t('toasts.friendRequest.removeError'));
+      toast.error(t("toasts.friendRequest.removeError"));
     }
   }
 
-  // Aceitar solicitação de amizade
   async function handleAcceptRequest() {
     if (!friendRequest?.id) return;
 
     try {
       await acceptRequestFn(friendRequest.id);
-      // SignalR handles status update automatically via UpdateFriendRequest event
     } catch (error) {
       console.error("Error accepting friend request:", error);
-      toast.error(t('toasts.friendRequest.acceptError'));
+      toast.error(t("toasts.friendRequest.acceptError"));
     }
   }
 
-  // Enviar solicitação de amizade
   async function handleInviteFriend() {
     if (!otherUserId) return;
 
     try {
       await sendInviteFriendFn({ userIdentifier: otherUserId });
-      // Força atualização imediata do status
       await refetchFriendshipStatus();
     } catch (error) {
       console.error("Error sending friend request:", error);
-      toast.error(t('toasts.friendRequest.sendError'));
+      toast.error(t("toasts.friendRequest.sendError"));
     }
   }
 
   if (!user) return null;
 
-  // Format friendship time
   const friendshipTime = friendRequest?.updatedAt
     ? (() => {
-      const dateStr =
-        typeof friendRequest.updatedAt === "string"
-          ? friendRequest.updatedAt
-          : friendRequest.updatedAt.toISOString();
-
-      const finalDateStr =
-        dateStr.includes("Z") ||
+        const dateStr =
+          typeof friendRequest.updatedAt === "string"
+            ? friendRequest.updatedAt
+            : friendRequest.updatedAt.toISOString();
+        const finalDateStr =
+          dateStr.includes("Z") ||
           dateStr.includes("+") ||
           (dateStr.includes("-", 10) && dateStr.length > 10)
-          ? dateStr
-          : dateStr + "Z";
-
-      return formatDistanceToNow(new Date(finalDateStr), {
-        locale: i18n.language === "en" ? enUS : ptBR,
-        addSuffix: true,
-      });
-    })()
+            ? dateStr
+            : dateStr + "Z";
+        return formatDistanceToNow(new Date(finalDateStr), {
+          locale: i18n.language === "en" ? enUS : ptBR,
+          addSuffix: true,
+        });
+      })()
     : "";
-
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('userSearch.details.title')}</DialogTitle>
+          <DialogTitle>{t("userSearch.details.title")}</DialogTitle>
           <DialogDescription>
-            {t('userSearch.details.description')}
+            {t("userSearch.details.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -183,7 +162,10 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                 className="object-cover"
               />
               <AvatarFallback
-                style={{ backgroundColor: user.appearancePrimaryColor || 'hsl(var(--primary))' }}
+                style={{
+                  backgroundColor:
+                    user.appearancePrimaryColor || "hsl(var(--primary))",
+                }}
                 className="text-secondary-foreground font-semibold"
               >
                 {getInitialName(user.name)}
@@ -191,10 +173,11 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
             </Avatar>
             <div className="flex flex-col ml-4 space-y-1">
               <h1 className="text-xl font-semibold">
-                {user.name ?? t('userSearch.details.nameNotAvailable')}
+                {user.name ?? t("userSearch.details.nameNotAvailable")}
               </h1>
               <p className="text-secondary-foreground/80 text-xs">
-                {user.description ?? t('userSearch.details.descriptionNotAvailable')}
+                {user.description ??
+                  t("userSearch.details.descriptionNotAvailable")}
               </p>
             </div>
           </div>
@@ -218,10 +201,11 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                           <UserRoundX className="w-4 h-4 text-red-500" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>{t('userSearch.details.tooltips.cancelRequest')}</TooltipContent>
+                      <TooltipContent>
+                        {t("userSearch.details.tooltips.cancelRequest")}
+                      </TooltipContent>
                     </Tooltip>
                   ) : (
-                    // Eu recebi e posso aceitar ou rejeitar
                     <>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -235,7 +219,9 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                             <UserRoundCheck className="w-4 h-4 text-emerald-500" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>{t('userSearch.details.tooltips.acceptRequest')}</TooltipContent>
+                        <TooltipContent>
+                          {t("userSearch.details.tooltips.acceptRequest")}
+                        </TooltipContent>
                       </Tooltip>
 
                       <Tooltip>
@@ -250,7 +236,9 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                             <UserRoundX className="w-4 h-4 text-red-500" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>{t('userSearch.details.tooltips.rejectRequest')}</TooltipContent>
+                        <TooltipContent>
+                          {t("userSearch.details.tooltips.rejectRequest")}
+                        </TooltipContent>
                       </Tooltip>
                     </>
                   )}
@@ -271,7 +259,9 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                           <UserRoundX className="w-4 h-4 text-red-500" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>{t('userSearch.details.tooltips.removeFriend')}</TooltipContent>
+                      <TooltipContent>
+                        {t("userSearch.details.tooltips.removeFriend")}
+                      </TooltipContent>
                     </Tooltip>
                   </div>
 
@@ -279,7 +269,9 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
 
                   <div className="flex w-full justify-end">
                     <span className="text-muted-foreground/80 text-[11px]">
-                      {t('userSearch.details.friendshipStatus', { time: friendshipTime })}
+                      {t("userSearch.details.friendshipStatus", {
+                        time: friendshipTime,
+                      })}
                     </span>
                   </div>
                 </section>
@@ -299,7 +291,9 @@ export function UserSearchDetails({ open, setOpen, user }: UserSearchDetailsProp
                     <UserRoundPlus className="w-4 h-4 text-emerald-500" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{t('userSearch.details.tooltips.sendRequest')}</TooltipContent>
+                <TooltipContent>
+                  {t("userSearch.details.tooltips.sendRequest")}
+                </TooltipContent>
               </Tooltip>
             )
           )}

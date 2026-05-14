@@ -1,16 +1,21 @@
 "use client";
 
 import {
-  ArrowLeftIcon, CircleUserRoundIcon,
-  ImagePlus, XIcon,
+  ArrowLeftIcon,
+  CircleUserRoundIcon,
+  ImagePlus,
+  XIcon,
   ZoomInIcon,
-  ZoomOutIcon
+  ZoomOutIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-
 import { useFileUpload } from "@/shared/hooks/use-file-upload";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/components/ui/avatar";
 import { getInitialName } from "@/lib/get-initial-name";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -29,23 +34,26 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Slider } from "@/shared/components/ui/slider";
 
-// Define type for pixel crop area
-type Area = { x: number; y: number; width: number; height: number };
+type Area = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
-// Helper function to create a cropped image blob
 const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const image = new Image();
     image.addEventListener("load", () => resolve(image));
     image.addEventListener("error", (error) => reject(error));
-    image.setAttribute("crossOrigin", "anonymous"); // Needed for canvas Tainted check
+    image.setAttribute("crossOrigin", "anonymous");
     image.src = url;
   });
 
 async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
-  outputWidth: number = pixelCrop.width, // Optional: specify output size
+  outputWidth: number = pixelCrop.width,
   outputHeight: number = pixelCrop.height,
 ): Promise<Blob | null> {
   try {
@@ -57,11 +65,8 @@ async function getCroppedImg(
       return null;
     }
 
-    // Set canvas size to desired output size
     canvas.width = outputWidth;
     canvas.height = outputHeight;
-
-    // Draw the cropped image onto the canvas
     ctx.drawImage(
       image,
       pixelCrop.x,
@@ -70,15 +75,14 @@ async function getCroppedImg(
       pixelCrop.height,
       0,
       0,
-      outputWidth, // Draw onto the output size
+      outputWidth,
       outputHeight,
     );
 
-    // Convert canvas to blob
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
         resolve(blob);
-      }, "image/jpeg"); // Specify format and quality if needed
+      }, "image/jpeg");
     });
   } catch (error) {
     console.error("Error in getCroppedImg:", error);
@@ -90,7 +94,7 @@ interface ProfileAvatarEditorProps {
   currentAvatar?: string | null;
   userName: string;
   isEditable: boolean;
-  isAvatarRemoved?: boolean; // New prop to track if avatar was marked for removal
+  isAvatarRemoved?: boolean;
   onAvatarChange?: (blob: Blob | null) => void;
   onAvatarRemove?: () => void;
 }
@@ -104,7 +108,6 @@ export function ProfileAvatarEditor({
   onAvatarRemove,
 }: ProfileAvatarEditorProps) {
   const { t } = useTranslation();
-
   const [
     { files, isDragging },
     {
@@ -119,80 +122,48 @@ export function ProfileAvatarEditor({
   ] = useFileUpload({
     accept: "image/*",
   });
-
-  // Store the cropped blob for later upload
   const [_croppedBlob, setCroppedBlob] = useState<Blob | null>(null);
-
   const previewUrl = files[0]?.preview || null;
   const fileId = files[0]?.id;
-
   const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  // Ref to track the previous file ID to detect new uploads
   const previousFileIdRef = useRef<string | undefined | null>(null);
-
-  // State to store the desired crop area in pixels
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-
-  // State for zoom level
   const [zoom, setZoom] = useState(1);
-
-  // Callback for Cropper to provide crop data - Wrap with useCallback
   const handleCropChange = useCallback((pixels: Area | null) => {
     setCroppedAreaPixels(pixels);
   }, []);
 
   const handleApply = async () => {
-    // Check if we have the necessary data
     if (!previewUrl || !fileId || !croppedAreaPixels) {
       console.error("Missing data for apply:", {
         croppedAreaPixels,
         fileId,
         previewUrl,
       });
-      // Remove file if apply is clicked without crop data?
       if (fileId) {
         removeFile(fileId);
         setCroppedAreaPixels(null);
       }
       return;
     }
-
     try {
-      // 1. Get the cropped image blob using the helper
       const blob = await getCroppedImg(previewUrl, croppedAreaPixels);
-
       if (!blob) {
         throw new Error("Failed to generate cropped image blob.");
       }
-
-      // 2. Store the blob for later upload
       setCroppedBlob(blob);
-
-      // 3. Create a NEW object URL from the cropped blob for display
       const newFinalUrl = URL.createObjectURL(blob);
-
-      // 4. Revoke the OLD finalImageUrl if it exists
       if (finalImageUrl) {
         URL.revokeObjectURL(finalImageUrl);
       }
-
-      // 5. Set the final avatar state to the NEW URL
       setFinalImageUrl(newFinalUrl);
-
-      // 6. Notify parent component about the new blob
       onAvatarChange?.(blob);
-
-      // 7. Remove the temporary file
       removeFile(fileId);
       setCroppedAreaPixels(null);
-
-      // 8. Close the dialog
       setIsDialogOpen(false);
     } catch (error) {
       console.error("Error during apply:", error);
-      // Keep dialog open on error so user can retry
     }
   };
 
@@ -206,38 +177,28 @@ export function ProfileAvatarEditor({
     onAvatarRemove?.();
   };
 
-  // Cleanup function called when edit mode is cancelled
   const handleCleanup = useCallback(() => {
-    // Revoke all blob URLs
     if (finalImageUrl && finalImageUrl.startsWith("blob:")) {
       URL.revokeObjectURL(finalImageUrl);
     }
     if (previewUrl && previewUrl.startsWith("blob:")) {
       URL.revokeObjectURL(previewUrl);
     }
-
-    // Reset state
     setFinalImageUrl(null);
     setCroppedAreaPixels(null);
     setCroppedBlob(null);
-
-    // Notify parent component that avatar was cancelled
     onAvatarChange?.(null);
-
-    // Remove any files
     if (fileId) {
       removeFile(fileId);
     }
   }, [finalImageUrl, previewUrl, fileId, removeFile, onAvatarChange]);
 
-  // Call cleanup when onCleanup is triggered (when edit mode is cancelled)
   useEffect(() => {
     if (!isEditable) {
       handleCleanup();
     }
   }, [isEditable, handleCleanup]);
 
-  // Cleanup on unmount
   useEffect(() => {
     const currentFinalUrl = finalImageUrl;
     return () => {
@@ -247,33 +208,26 @@ export function ProfileAvatarEditor({
     };
   }, [finalImageUrl]);
 
-  // Effect to open dialog when a *new* file is ready
   useEffect(() => {
-    // Check if fileId exists and is different from the previous one
     if (fileId && fileId !== previousFileIdRef.current) {
-      setIsDialogOpen(true); // Open dialog for the new file
-      setCroppedAreaPixels(null); // Reset crop area for the new file
-      setZoom(1); // Reset zoom for the new file
+      setIsDialogOpen(true);
+      setCroppedAreaPixels(null);
+      setZoom(1);
     }
-    // Update the ref to the current fileId for the next render
     previousFileIdRef.current = fileId;
-  }, [fileId]); // Depend only on fileId
+  }, [fileId]);
 
-  // Display image: either the newly cropped one, or current avatar (unless removed)
-  const displayImage = isAvatarRemoved ? null : (finalImageUrl || currentAvatar);
+  const displayImage = isAvatarRemoved ? null : finalImageUrl || currentAvatar;
 
   return (
     <div className="flex items-center gap-4">
-      {/* Avatar Display / Upload Button */}
       <div className="relative inline-flex">
         {isEditable ? (
-          // Edit mode: show upload button
           <button
             aria-label={displayImage ? "Change image" : "Upload image"}
             className="relative flex size-25 items-center justify-center overflow-hidden rounded-full border border-input border-dashed outline-none transition-colors hover:bg-accent/50 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-disabled:pointer-events-none has-[img]:border-none has-disabled:opacity-50 data-[dragging=true]:bg-accent/50"
             data-dragging={isDragging || undefined}
             onClick={(e) => {
-              // Prevent opening file input if clicking on remove button
               if ((e.target as HTMLElement).closest('button[type="button"]')) {
                 return;
               }
@@ -295,13 +249,15 @@ export function ProfileAvatarEditor({
                 width={80}
               />
             ) : (
-              <div aria-hidden="true" className="flex items-center justify-center">
+              <div
+                aria-hidden="true"
+                className="flex items-center justify-center"
+              >
                 <CircleUserRoundIcon className="size-8 opacity-60" />
               </div>
             )}
           </button>
         ) : (
-          // View mode: show regular Avatar component with fallback
           <Avatar className="w-25 h-25">
             <AvatarImage src={currentAvatar ?? ""} alt={userName} />
             <AvatarFallback className="text-lg bg-primary text-primary-foreground">
@@ -310,7 +266,6 @@ export function ProfileAvatarEditor({
           </Avatar>
         )}
 
-        {/* Camera icon indicator - only shows in edit mode */}
         {isEditable && (
           <Button
             aria-label="Change avatar"
@@ -326,7 +281,6 @@ export function ProfileAvatarEditor({
           </Button>
         )}
 
-        {/* Remove button - shows when there's a current avatar or cropped image */}
         {isEditable && (finalImageUrl || currentAvatar) && (
           <Button
             aria-label="Remove image"
@@ -342,7 +296,6 @@ export function ProfileAvatarEditor({
           </Button>
         )}
 
-        {/* Hidden file input */}
         {isEditable && (
           <input
             {...getInputProps()}
@@ -353,11 +306,10 @@ export function ProfileAvatarEditor({
         )}
       </div>
 
-      {/* Cropper Dialog - Only enabled in edit mode */}
       <Dialog onOpenChange={setIsDialogOpen} open={isDialogOpen}>
         <DialogContent className="gap-0 p-0 sm:max-w-140 *:[button]:hidden">
           <DialogDescription className="sr-only">
-            {t('cropper.dialog.description')}
+            {t("cropper.dialog.description")}
           </DialogDescription>
           <DialogHeader className="contents space-y-0 text-left">
             <DialogTitle className="flex items-center justify-between border-b p-4 text-base">
@@ -378,7 +330,7 @@ export function ProfileAvatarEditor({
                 >
                   <ArrowLeftIcon aria-hidden="true" />
                 </Button>
-                <span>{t('cropper.dialog.title')}</span>
+                <span>{t("cropper.dialog.title")}</span>
               </div>
               <Button
                 autoFocus
@@ -386,7 +338,7 @@ export function ProfileAvatarEditor({
                 disabled={!previewUrl}
                 onClick={handleApply}
               >
-                {t('cropper.dialog.apply')}
+                {t("cropper.dialog.apply")}
               </Button>
             </DialogTitle>
           </DialogHeader>

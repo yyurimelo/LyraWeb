@@ -8,13 +8,13 @@ import type { ExtendedNotificationDataModel } from "@/@types/notification";
 import { normalizeNotificationStatus } from "@/shared/helpers/notification.helpers";
 
 interface NotificationInfiniteListProps {
-  notifications: ExtendedNotificationDataModel[]
-  isLoading: boolean
-  isError: boolean
-  hasNextPage: boolean
-  isFetchingNextPage: boolean
-  onLoadMore: () => void
-  totalRecords: number
+  notifications: ExtendedNotificationDataModel[];
+  isLoading: boolean;
+  isError: boolean;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  onLoadMore: () => void;
+  totalRecords: number;
 }
 
 export function NotificationInfiniteList({
@@ -26,33 +26,28 @@ export function NotificationInfiniteList({
   onLoadMore,
   totalRecords,
 }: NotificationInfiniteListProps) {
-  const { t } = useTranslation()
-  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!hasNextPage) return
-
+    if (!hasNextPage) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        const [entry] = entries
-
+        const [entry] = entries;
         if (entry.isIntersecting && !isFetchingNextPage) {
-          onLoadMore()
-          observer.unobserve(entry.target) // trava enquanto carrega
+          onLoadMore();
+          observer.unobserve(entry.target);
         }
       },
       {
-        rootMargin: '200px', // começa antes de encostar
+        rootMargin: "200px",
         threshold: 0,
-      }
-    )
-
-    const current = loadMoreRef.current
-    if (current) observer.observe(current)
-
-    return () => observer.disconnect()
-  }, [hasNextPage, isFetchingNextPage, onLoadMore])
-
+      },
+    );
+    const current = loadMoreRef.current;
+    if (current) observer.observe(current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, onLoadMore]);
 
   if (isLoading) {
     return (
@@ -61,7 +56,7 @@ export function NotificationInfiniteList({
         <NotificationSkeleton />
         <NotificationSkeleton />
       </div>
-    )
+    );
   }
 
   if (isError) {
@@ -71,16 +66,15 @@ export function NotificationInfiniteList({
           {t("notifications.error.loading")}
         </p>
       </div>
-    )
+    );
   }
 
   if (notifications.length === 0) {
-    return <NotificationEmpty />
+    return <NotificationEmpty />;
   }
 
   return (
     <div className="space-y-4 pb-6">
-      {/* Notifications List */}
       <div className="space-y-1">
         {notifications.map((notification) => (
           <NotificationItem
@@ -91,7 +85,6 @@ export function NotificationInfiniteList({
         ))}
       </div>
 
-      {/* Loading indicator at bottom */}
       {(hasNextPage || isFetchingNextPage) && (
         <div ref={loadMoreRef} className="flex justify-center pt-4">
           {isFetchingNextPage && (
@@ -102,15 +95,14 @@ export function NotificationInfiniteList({
         </div>
       )}
 
-      {/* End of list */}
       {!hasNextPage && notifications.length > 0 && (
         <div className="text-center pt-4 text-sm text-muted-foreground">
           {t("notifications.list.end", {
             current: notifications.length,
-            total: totalRecords
+            total: totalRecords,
           })}
         </div>
       )}
     </div>
-  )
+  );
 }

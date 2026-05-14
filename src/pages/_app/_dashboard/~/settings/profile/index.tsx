@@ -1,11 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { useAuth } from "@/contexts/auth-provider"
-import z from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useUpdateUserProfileMutation, useUploadAvatarMutation } from "@/shared/http/hooks/user.hooks"
-import { useEffect, useId, useState, useCallback } from "react"
-import { oklchToHex, hexToOKLCH } from "@/shared/utils/color"
+import { createFileRoute } from "@tanstack/react-router";
+import { useAuth } from "@/contexts/auth-provider";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  useUpdateUserProfileMutation,
+  useUploadAvatarMutation,
+} from "@/shared/http/hooks/user.hooks";
+import { useEffect, useId, useState, useCallback } from "react";
+import { oklchToHex, hexToOKLCH } from "@/shared/utils/color";
 import {
   Form,
   FormControl,
@@ -13,26 +16,24 @@ import {
   FormField,
   FormItem,
   FormLabel,
-} from "@/shared/components/ui/form"
-import { Input } from "@/shared/components/ui/input"
-import { Textarea } from "@/shared/components/ui/textarea"
-import { Button } from "@/shared/components/ui/button"
-import { Combo } from "@/shared/components/ui/combo"
+} from "@/shared/components/ui/form";
+import { Input } from "@/shared/components/ui/input";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { Button } from "@/shared/components/ui/button";
+import { Combo } from "@/shared/components/ui/combo";
+import { ClickCopy } from "@/shared/components/ui/click-copy";
+import { formatHexInput } from "@/lib/hex-format";
+import { abbreviateUserIdentifier } from "@/shared/utils/abbreviate-user-identifier";
+import { Separator } from "@/shared/components/ui/separator";
+import { Check, LoaderCircle, Pencil, X } from "lucide-react";
+import { ColorPicker } from "@/shared/components/ui/color-picker";
+import { useTranslation } from "react-i18next";
+import { ProfileAvatarEditor } from "@/pages/_app/_dashboard/-components/profile-avatar-editor";
+import { UserProviders } from "./-components/user-providers";
 
-import { ClickCopy } from "@/shared/components/ui/click-copy"
-import { formatHexInput } from "@/lib/hex-format"
-import { abbreviateUserIdentifier } from "@/shared/utils/abbreviate-user-identifier"
-import { Separator } from "@/shared/components/ui/separator"
-import { Check, LoaderCircle, Pencil, X } from "lucide-react"
-import { ColorPicker } from "@/shared/components/ui/color-picker"
-import { useTranslation } from "react-i18next"
-import { ProfileAvatarEditor } from "@/pages/_app/_dashboard/-components/profile-avatar-editor"
-import { UserProviders } from "./-components/user-providers"
-
-export const Route = createFileRoute('/_app/_dashboard/~/settings/profile/')({
+export const Route = createFileRoute("/_app/_dashboard/~/settings/profile/")({
   component: Profile,
-})
-
+});
 const profileFormSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional(),
@@ -47,8 +48,7 @@ function Profile() {
   const { t } = useTranslation();
   const id = useId();
   const [edit, setEdit] = useState(false);
-  const { user, updateUser } = useAuth()
-
+  const { user, updateUser } = useAuth();
   const form = useForm<ProfileFormSchema>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -59,28 +59,18 @@ function Profile() {
       appearanceTextPrimaryLight: "",
     },
   });
-
   const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
-
   const [shouldRemoveAvatar, setShouldRemoveAvatar] = useState(false);
-
   const handleAvatarChange = useCallback((blob: Blob | null) => {
     if (blob) {
       setShouldRemoveAvatar(false);
     }
     setAvatarBlob(blob);
   }, []);
-
-  const updateUserMutation = useUpdateUserProfileMutation(
-    setEdit,
-    updateUser,
-  );
-
+  const updateUserMutation = useUpdateUserProfileMutation(setEdit, updateUser);
   const uploadAvatarMutation = useUploadAvatarMutation(updateUser);
-
   const resetFormToUserData = useCallback(() => {
     if (!user) return;
-
     form.reset({
       name: user.name || "",
       description: user.description || "",
@@ -107,7 +97,8 @@ function Profile() {
     resetFormToUserData();
   }
 
-  const isPending = updateUserMutation.isPending || uploadAvatarMutation.isPending;
+  const isPending =
+    updateUserMutation.isPending || uploadAvatarMutation.isPending;
 
   async function handleSubmit(data: ProfileFormSchema) {
     if (updateUserMutation.isPending) return;
@@ -148,9 +139,11 @@ function Profile() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2">{t('settings.profile.title')}</h3>
+        <h3 className="text-lg font-semibold mb-2">
+          {t("settings.profile.title")}
+        </h3>
         <p className="text-sm text-muted-foreground">
-          {t('settings.profile.subtitle')}
+          {t("settings.profile.subtitle")}
         </p>
       </div>
 
@@ -164,7 +157,7 @@ function Profile() {
           onAvatarRemove={() => setShouldRemoveAvatar(true)}
         />
 
-        <UserProviders providers={user?.providers ?? []}/>
+        <UserProviders providers={user?.providers ?? []} />
       </div>
 
       <Form {...form}>
@@ -177,7 +170,7 @@ function Profile() {
             {!edit && (
               <Button variant="ghost" type="button" onClick={handleEdit}>
                 <Pencil className="w-4 h-4" />
-                {t('settings.profile.edit')}
+                {t("settings.profile.edit")}
               </Button>
             )}
 
@@ -188,17 +181,16 @@ function Profile() {
                   variant="ghost"
                   className="text-emerald-500 hover:text-emerald-500"
                   type="submit"
-                // disabled={isPending}
                 >
                   {isPending ? (
                     <span className="flex items-center gap-2">
                       <LoaderCircle className="w-4 h-4 animate-spin" />
-                      {t('settings.profile.updating')}
+                      {t("settings.profile.updating")}
                     </span>
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      {t('settings.profile.confirm')}
+                      {t("settings.profile.confirm")}
                     </>
                   )}
                 </Button>
@@ -211,7 +203,7 @@ function Profile() {
                     type="button"
                   >
                     <X className="w-4 h-4" />
-                    {t('settings.profile.cancel')}
+                    {t("settings.profile.cancel")}
                   </Button>
                 )}
               </>
@@ -223,14 +215,9 @@ function Profile() {
           <section className=" space-y-2">
             <div className="flex items-center w-full justify-between">
               <div className="flex items-center gap-2">
-                ID:{" "}
-                {abbreviateUserIdentifier(
-                  user?.userIdentifier || ""
-                )}
+                ID: {abbreviateUserIdentifier(user?.userIdentifier || "")}
                 <ClickCopy
-                  content={abbreviateUserIdentifier(
-                    user?.userIdentifier || ""
-                  )}
+                  content={abbreviateUserIdentifier(user?.userIdentifier || "")}
                   variant={"ghost"}
                 />
               </div>
@@ -243,13 +230,15 @@ function Profile() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('settings.profile.name')}</FormLabel>
+                  <FormLabel>{t("settings.profile.name")}</FormLabel>
                   <FormControl>
                     <Input
                       className="w-full"
                       {...field}
                       disabled={!edit}
-                      placeholder={!edit ? t('settings.profile.namePlaceholder') : ""}
+                      placeholder={
+                        !edit ? t("settings.profile.namePlaceholder") : ""
+                      }
                       autoComplete="name"
                     />
                   </FormControl>
@@ -262,12 +251,16 @@ function Profile() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('settings.profile.description')}</FormLabel>
+                  <FormLabel>{t("settings.profile.description")}</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
                       disabled={!edit}
-                      placeholder={!edit ? t('settings.profile.descriptionPlaceholder') : ""}
+                      placeholder={
+                        !edit
+                          ? t("settings.profile.descriptionPlaceholder")
+                          : ""
+                      }
                       autoComplete="description"
                     />
                   </FormControl>
@@ -285,8 +278,10 @@ function Profile() {
               render={({ field }) => (
                 <FormItem>
                   <div>
-                    <FormLabel>{t('settings.profile.fontColor')}</FormLabel>
-                    <FormDescription>{t('settings.profile.themeWhite')}</FormDescription>
+                    <FormLabel>{t("settings.profile.fontColor")}</FormLabel>
+                    <FormDescription>
+                      {t("settings.profile.themeWhite")}
+                    </FormDescription>
                   </div>
                   <FormControl>
                     <Combo
@@ -297,10 +292,13 @@ function Profile() {
                       }}
                       itens={[
                         {
-                          label: t('settings.profile.white'),
+                          label: t("settings.profile.white"),
                           value: "oklch(1.000 0.000 89.876)",
                         },
-                        { label: t('settings.profile.black'), value: "oklch(0.000 0.000 0.000)" },
+                        {
+                          label: t("settings.profile.black"),
+                          value: "oklch(0.000 0.000 0.000)",
+                        },
                       ]}
                       disabled={!edit}
                     />
@@ -315,8 +313,10 @@ function Profile() {
               render={({ field }) => (
                 <FormItem>
                   <div>
-                    <FormLabel>{t('settings.profile.fontColor')}</FormLabel>
-                    <FormDescription>{t('settings.profile.themeDark')}</FormDescription>
+                    <FormLabel>{t("settings.profile.fontColor")}</FormLabel>
+                    <FormDescription>
+                      {t("settings.profile.themeDark")}
+                    </FormDescription>
                   </div>
                   <FormControl>
                     <Combo
@@ -327,10 +327,13 @@ function Profile() {
                       }}
                       itens={[
                         {
-                          label: t('settings.profile.white'),
+                          label: t("settings.profile.white"),
                           value: "oklch(1.000 0.000 89.876)",
                         },
-                        { label: t('settings.profile.black'), value: "oklch(0.000 0.000 0.000)" },
+                        {
+                          label: t("settings.profile.black"),
+                          value: "oklch(0.000 0.000 0.000)",
+                        },
                       ]}
                       disabled={!edit}
                     />
@@ -345,14 +348,16 @@ function Profile() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <div>
-                    <FormLabel>{t('settings.profile.primaryColor')}</FormLabel>
-                    <FormDescription>{t('settings.profile.hexValue')}</FormDescription>
+                    <FormLabel>{t("settings.profile.primaryColor")}</FormLabel>
+                    <FormDescription>
+                      {t("settings.profile.hexValue")}
+                    </FormDescription>
                   </div>
                   <FormControl>
                     <div className="flex gap-3 w-full">
                       <Input
                         className="w-full"
-                        placeholder={t('settings.profile.hexPlaceholder')}
+                        placeholder={t("settings.profile.hexPlaceholder")}
                         type="text"
                         {...field}
                         onChange={(e) => {
@@ -376,7 +381,6 @@ function Profile() {
           </section>
         </form>
       </Form>
-
     </div>
-  )
+  );
 }

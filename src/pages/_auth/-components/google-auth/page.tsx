@@ -9,41 +9,39 @@ import { LoaderCircle } from "lucide-react";
 export function GoogleAuthButton() {
   const { t } = useTranslation();
   const { loginWithGoogle } = useAuth();
-  const navigate = useNavigate()
-  const [isPending, setIsPending] = useState(false)
-
+  const navigate = useNavigate();
+  const [isPending, setIsPending] = useState(false);
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      setIsPending(true)
-
+      setIsPending(true);
       try {
-        const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-          headers: {
-            Authorization: `Bearer ${tokenResponse.access_token}`,
+        const res = await fetch(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${tokenResponse.access_token}`,
+            },
           },
-        });
+        );
         const profile = await res.json();
-
         await loginWithGoogle({
           email: profile.email,
           name: profile.name,
           image: profile.picture,
-          providerUserId: profile.sub
+          providerUserId: profile.sub,
         });
-
         navigate({ to: "/" });
       } catch (err) {
         console.error("Erro ao processar login Google:", err);
       } finally {
-        setIsPending(false)
+        setIsPending(false);
       }
     },
     onError: (err) => {
-      setIsPending(false)
-      console.error("Erro no Google Login:", err)
+      setIsPending(false);
+      console.error("Erro no Google Login:", err);
     },
   });
-
 
   return (
     <Button
@@ -65,7 +63,7 @@ export function GoogleAuthButton() {
               fill="currentColor"
             />
           </svg>
-          {t('auth.signIn.googleSignIn')}
+          {t("auth.signIn.googleSignIn")}
         </>
       )}
     </Button>

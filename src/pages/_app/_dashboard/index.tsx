@@ -1,11 +1,10 @@
+import { Chat } from "@/pages/_app/_dashboard/-components/chat";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { Chat } from '@/pages/_app/_dashboard/-components/chat'
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/_app/_dashboard/')({
+export const Route = createFileRoute("/_app/_dashboard/")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <Chat />
+  return <Chat />;
 }

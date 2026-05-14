@@ -22,7 +22,7 @@ export function UserProviders({ providers, className }: UserProvidersProps) {
     <div className={`flex gap-2 items-center flex-col ${className}`}>
       {providers.map((provider) => {
         const icon = renderIcon(provider);
-        if (!icon) return null; // ignora providers sem ícone
+        if (!icon) return null;
         return (
           <div
             key={provider}

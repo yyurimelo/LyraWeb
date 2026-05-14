@@ -1,5 +1,15 @@
-import { keepPreviousData, queryClient, useMutation, useQuery, useInfiniteQuery } from "@lyra/react-query-config";
-import { getNotificationPaginated, getUnreadNotificationCount, maskAsRead } from "../services/notification.service";
+import {
+  keepPreviousData,
+  queryClient,
+  useMutation,
+  useQuery,
+  useInfiniteQuery,
+} from "@lyra/react-query-config";
+import {
+  getNotificationPaginated,
+  getUnreadNotificationCount,
+  maskAsRead,
+} from "../services/notification.service";
 import { toast } from "sonner";
 import { useState } from "react";
 import { isAxiosError } from "@lyra/axios-config";
@@ -15,11 +25,8 @@ export const useNotificationPaginationQuery = (filters: Record<string, any>) =>
     queryKey: ["notifications", filters],
     queryFn: () =>
       getNotificationPaginated({
-        status:
-          filters.status !== "all"
-            ? filters.status
-            : undefined, // Changed from null to undefined
-        type: filters.type ? filters.type : undefined, // Changed from null to undefined
+        status: filters.status !== "all" ? filters.status : undefined,
+        type: filters.type ? filters.type : undefined,
         pageNumber: Number(filters.page),
         pageSize: Number(filters.pageSize),
       }),
@@ -30,29 +37,23 @@ export const useMaskAsReadMutation = () =>
   useMutation({
     mutationFn: maskAsRead,
     onSuccess: () => {
-      // Invalida as queries de paginação de notificações do header
       queryClient.invalidateQueries({
-        queryKey: ['notifications', 'header', 'unread']
-      })
-
+        queryKey: ["notifications", "header", "unread"],
+      });
       queryClient.invalidateQueries({
-        queryKey: ['notifications', 'header', 'read']
-      })
-
+        queryKey: ["notifications", "header", "read"],
+      });
       queryClient.invalidateQueries({
-        queryKey: ['notifications', 'count', 'unread']
-      })
-
-      // Invalida as queries de infinite scroll da página de notificações
+        queryKey: ["notifications", "count", "unread"],
+      });
       queryClient.invalidateQueries({
-        queryKey: ['notifications', 'infinite']
-      })
+        queryKey: ["notifications", "infinite"],
+      });
     },
     onError: (error) => {
       toast.error(error.message);
     },
   });
-
 
 export const useAllNotificationsQuery = (enabled: boolean = true) =>
   useQuery({
@@ -82,13 +83,12 @@ export const useUnreadNotificationsQuery = (enabled: boolean = true) =>
     enabled: enabled,
   });
 
-// Hook for read notifications (max 5) - LAZY LOADING
 export const useReadNotificationsQuery = (enabled: boolean = true) =>
   useQuery({
     queryKey: ["notifications", "header", "read"],
     queryFn: () =>
       getNotificationPaginated({
-        status: true, // true means read
+        status: true,
         pageNumber: 1,
         pageSize: 3,
       }),
@@ -103,20 +103,22 @@ export const useUnreadNotificationsCountQuery = () =>
     queryFn: () => getUnreadNotificationCount(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5, // 5 minutos - considera os dados frescos por 5 min
-    gcTime: 1000 * 60 * 10, // 10 minutos - mantém no cache por 10 min
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 
-export const useNotificationsAdaptiveQuery = (isOpen: boolean, activeTab: 'all' | 'unread' | 'read') =>
+export const useNotificationsAdaptiveQuery = (
+  isOpen: boolean,
+  activeTab: "all" | "unread" | "read",
+) =>
   useQuery({
     queryKey: ["notifications", "header", activeTab],
     queryFn: () => {
       const statusMap = {
         all: undefined,
         unread: false,
-        read: true
+        read: true,
       };
-
       return getNotificationPaginated({
         status: statusMap[activeTab],
         pageNumber: 1,
@@ -144,7 +146,9 @@ interface UseNotificationClickResult {
   userDetailsDialogOpen: boolean;
   isLoadingUser: boolean;
   setUserDetailsDialogOpen: (open: boolean) => void;
-  handleNotificationClick: (notification: ExtendedNotificationDataModel) => Promise<void>;
+  handleNotificationClick: (
+    notification: ExtendedNotificationDataModel,
+  ) => Promise<void>;
 }
 
 export const useNotificationClick = (): UseNotificationClickResult => {
@@ -153,47 +157,42 @@ export const useNotificationClick = (): UseNotificationClickResult => {
   const [userDetailsDialogOpen, setUserDetailsDialogOpen] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(false);
 
-  const handleNotificationClick = async (notification: ExtendedNotificationDataModel) => {
+  const handleNotificationClick = async (
+    notification: ExtendedNotificationDataModel,
+  ) => {
     if (notification.type !== NotificationTypeEnum.INVITE_FRIEND) {
       return;
     }
-
-    // Completed notifications are inactive - do nothing
     if (String(notification.status) === "Completed") {
       return;
     }
-
     if (!notification.referenceId) {
       return;
     }
-
     setIsLoadingUser(true);
-
     try {
       const friendRequest = await getFriendRequest(notification.referenceId);
       const senderId = friendRequest.senderId;
-
       if (!senderId) {
-        console.error('Friend request has no senderId');
-        toast.error(t('toasts.notification.notFound'));
+        console.error("Friend request has no senderId");
+        toast.error(t("toasts.notification.notFound"));
         return;
       }
-
       const userData = await getUserPublicId(senderId);
-
       setSelectedUser(userData);
       setUserDetailsDialogOpen(true);
-
     } catch (error) {
-      console.error('Error handling notification click:', error);
+      console.error("Error handling notification click:", error);
       if (isAxiosError(error)) {
         if (error.response?.status === 404) {
-          toast.error(t('toasts.notification.notFound'));
+          toast.error(t("toasts.notification.notFound"));
         } else {
-          toast.error(error.response?.data || t('toasts.notification.loadDataError'));
+          toast.error(
+            error.response?.data || t("toasts.notification.loadDataError"),
+          );
         }
       } else {
-        toast.error(t('toasts.notification.processError'));
+        toast.error(t("toasts.notification.processError"));
       }
     } finally {
       setIsLoadingUser(false);
@@ -209,14 +208,12 @@ export const useNotificationClick = (): UseNotificationClickResult => {
   };
 };
 
-// Infinite query para paginação de notificações (scroll infinito)
 export const useNotificationsInfiniteQuery = (filters: {
-  status?: boolean
-  type?: string
+  status?: boolean;
+  type?: string;
 }) => {
   return useInfiniteQuery({
-    queryKey: ['notifications', 'infinite', filters],
-
+    queryKey: ["notifications", "infinite", filters],
     queryFn: ({ pageParam = 1 }) =>
       getNotificationPaginated({
         status: filters.status,
@@ -224,19 +221,13 @@ export const useNotificationsInfiniteQuery = (filters: {
         pageNumber: pageParam,
         pageSize: 10,
       }),
-
     initialPageParam: 1,
-
     getNextPageParam: (lastPage) => {
-      if (!lastPage) return undefined
-
-      // Se já chegou na última página → PARA
+      if (!lastPage) return undefined;
       if (lastPage.pageNumber >= lastPage.totalPages) {
-        return undefined
+        return undefined;
       }
-
-      // Próxima página
-      return lastPage.pageNumber + 1
+      return lastPage.pageNumber + 1;
     },
-  })
-}
+  });
+};

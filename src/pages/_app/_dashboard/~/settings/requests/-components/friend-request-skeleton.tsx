@@ -28,14 +28,16 @@ function FriendRequestItemSkeleton() {
   );
 }
 
-export const FriendRequestSkeleton = memo(({ count = 5 }: FriendRequestSkeletonProps) => {
-  return (
-    <div className="space-y-0">
-      {Array.from({ length: count }).map((_, index) => (
-        <FriendRequestItemSkeleton key={index} />
-      ))}
-    </div>
-  );
-});
+export const FriendRequestSkeleton = memo(
+  ({ count = 5 }: FriendRequestSkeletonProps) => {
+    return (
+      <div className="space-y-0">
+        {Array.from({ length: count }).map((_, index) => (
+          <FriendRequestItemSkeleton key={index} />
+        ))}
+      </div>
+    );
+  },
+);
 
 FriendRequestSkeleton.displayName = "FriendRequestSkeleton";

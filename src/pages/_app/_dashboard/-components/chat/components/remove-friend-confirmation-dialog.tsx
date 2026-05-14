@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -6,16 +6,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog'
-import { Button } from '@/shared/components/ui/button'
-import { Spinner } from '@/shared/components/ui/spinner'
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Spinner } from "@/shared/components/ui/spinner";
 
 interface RemoveFriendConfirmationDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  friendName: string
-  onConfirm: () => void
-  isRemoving: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  friendName: string;
+  onConfirm: () => void;
+  isRemoving: boolean;
 }
 
 export function RemoveFriendConfirmationDialog({
@@ -25,15 +25,15 @@ export function RemoveFriendConfirmationDialog({
   onConfirm,
   isRemoving,
 }: RemoveFriendConfirmationDialogProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>{t('chat.removeFriend.title')}</DialogTitle>
+          <DialogTitle>{t("chat.removeFriend.title")}</DialogTitle>
           <DialogDescription>
-            {t('chat.removeFriend.description', { name: friendName })}
+            {t("chat.removeFriend.description", { name: friendName })}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -42,18 +42,13 @@ export function RemoveFriendConfirmationDialog({
             onClick={() => onOpenChange(false)}
             disabled={isRemoving}
           >
-            {t('chat.removeFriend.cancel')}
+            {t("chat.removeFriend.cancel")}
           </Button>
-          <Button
-            variant="default"
-            onClick={onConfirm}
-            disabled={isRemoving}
-          >
-            {isRemoving ? <Spinner /> : t('chat.removeFriend.confirm')}
-            
+          <Button variant="default" onClick={onConfirm} disabled={isRemoving}>
+            {isRemoving ? <Spinner /> : t("chat.removeFriend.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

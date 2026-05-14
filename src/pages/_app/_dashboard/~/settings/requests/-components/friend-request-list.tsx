@@ -1,15 +1,9 @@
 import { memo } from "react";
-
-// components
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import { CloudAlert } from "lucide-react";
-
-// custom components
 import { FriendRequestItem } from "./friend-request-item";
 import { FriendRequestSkeleton } from "./friend-request-skeleton";
 import { FriendRequestEmpty } from "./friend-request-empty";
-
-// types
 import type { FriendRequestDataModel } from "@/@types/friend-request/friend-request-data";
 
 interface FriendRequestListProps {
@@ -20,44 +14,42 @@ interface FriendRequestListProps {
   onActionSuccess?: () => void;
 }
 
-export const FriendRequestList = memo(({
-  allRequests,
-  isLoading,
-  isError,
-  onActionSuccess,
-}: FriendRequestListProps) => {
-
-  if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-        <div className="flex flex-col items-center gap-2">
-          <CloudAlert className='text-destructive' />
+export const FriendRequestList = memo(
+  ({
+    allRequests,
+    isLoading,
+    isError,
+    onActionSuccess,
+  }: FriendRequestListProps) => {
+    if (isError) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+          <div className="flex flex-col items-center gap-2">
+            <CloudAlert className="text-destructive" />
+          </div>
         </div>
-      </div>
+      );
+    }
+    if (isLoading && !allRequests) {
+      return <FriendRequestSkeleton count={10} />;
+    }
+    if (!allRequests || allRequests.length === 0) {
+      return <FriendRequestEmpty />;
+    }
+    return (
+      <ScrollArea className="h-full">
+        <div className="space-y-2">
+          {allRequests.map((request) => (
+            <FriendRequestItem
+              key={request.id}
+              request={request}
+              onActionSuccess={onActionSuccess}
+            />
+          ))}
+        </div>
+      </ScrollArea>
     );
-  }
-
-  if (isLoading && !allRequests) {
-    return <FriendRequestSkeleton count={10} />;
-  }
-
-  if (!allRequests || allRequests.length === 0) {
-    return <FriendRequestEmpty />;
-  }
-
-  return (
-    <ScrollArea className="h-full">
-      <div className="space-y-2">
-        {allRequests.map((request) => (
-          <FriendRequestItem
-            key={request.id}
-            request={request}
-            onActionSuccess={onActionSuccess}
-          />
-        ))}
-      </div>
-    </ScrollArea>
-  );
-});
+  },
+);
 
 FriendRequestList.displayName = "FriendRequestList";

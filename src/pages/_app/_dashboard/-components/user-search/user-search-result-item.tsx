@@ -1,12 +1,12 @@
 import type { UserDataModel } from "@/@types/user/user-data-model";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-
-// components
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/components/ui/avatar";
 import { CommandItem } from "@/shared/components/ui/command";
-
-// helpers
 import { getInitialName } from "@/lib/get-initial-name";
 
 interface UserSearchResultItemProps {
@@ -29,7 +29,7 @@ export function UserSearchResultItem({
       className={cn(
         "group relative flex items-center p-3 rounded-lg cursor-pointer transition-colors",
         "border border-transparent hover:bg-primary/20 hover:border hover:border-primary/30",
-        isSelected && "bg-primary/20 border border-primary/30"
+        isSelected && "bg-primary/20 border border-primary/30",
       )}
     >
       <Avatar className="size-10 rounded-full transition-transform">
@@ -39,7 +39,10 @@ export function UserSearchResultItem({
           className="object-cover"
         />
         <AvatarFallback
-          style={{ backgroundColor: user.appearancePrimaryColor || 'hsl(var(--primary))' }}
+          style={{
+            backgroundColor:
+              user.appearancePrimaryColor || "hsl(var(--primary))",
+          }}
           className="text-secondary-foreground font-semibold"
         >
           {getInitialName(user.name)}
@@ -55,7 +58,7 @@ export function UserSearchResultItem({
 
         <div className="flex items-center justify-between gap-2 -mt-1">
           <p className="text-xs text-muted-foreground truncate leading-relaxed">
-            {user.description || t('userSearch.details.noDescription')}
+            {user.description || t("userSearch.details.noDescription")}
           </p>
         </div>
       </div>

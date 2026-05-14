@@ -3,8 +3,6 @@ import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
-
-// components
 import { Button } from "@/shared/components/ui/button";
 import {
   Popover,
@@ -12,13 +10,9 @@ import {
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { Badge } from "@/shared/components/ui/badge";
-
-// sections
 import { NotificationHeader } from "./notification-header";
 import { NotificationList } from "./notification-list";
 import { UserSearchDetails } from "@/pages/_app/_dashboard/-components/user-search";
-
-// hooks
 import {
   useUnreadNotificationsQuery,
   useReadNotificationsQuery,
@@ -29,32 +23,38 @@ import { useAuth } from "@/contexts/auth-provider";
 import type { ExtendedNotificationDataModel } from "@/@types/notification";
 import { useSignalRNotifications } from "@/signalr/use-signalr-notifications";
 
-
 export function Notification() {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'unread' | 'read'>('unread');
+  const [activeTab, setActiveTab] = useState<"unread" | "read">("unread");
 
   useSignalRNotifications({
-    userId: user?.userIdentifier ?? '',
+    userId: user?.userIdentifier ?? "",
     enabled: isAuthenticated,
   });
 
-  const { data: unreadNotifications, isLoading: isLoadingUnread, error: unreadError } =
-    useUnreadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'unread');
-
-  const { data: readNotifications, isLoading: isLoadingRead, error: readError } =
-    useReadNotificationsQuery(isAuthenticated && isOpen && activeTab === 'read');
-
+  const {
+    data: unreadNotifications,
+    isLoading: isLoadingUnread,
+    error: unreadError,
+  } = useUnreadNotificationsQuery(
+    isAuthenticated && isOpen && activeTab === "unread",
+  );
+  const {
+    data: readNotifications,
+    isLoading: isLoadingRead,
+    error: readError,
+  } = useReadNotificationsQuery(
+    isAuthenticated && isOpen && activeTab === "read",
+  );
   const { data: unreadCountData } = useUnreadNotificationsCountQuery();
   const unreadCount = unreadCountData ?? 0;
-
-  const currentData = activeTab === 'unread' ? unreadNotifications : readNotifications;
-  const currentLoading = activeTab === 'unread' ? isLoadingUnread : isLoadingRead;
-  const currentError = activeTab === 'unread' ? unreadError : readError;
-
-  // Hook para clique em notificação
+  const currentData =
+    activeTab === "unread" ? unreadNotifications : readNotifications;
+  const currentLoading =
+    activeTab === "unread" ? isLoadingUnread : isLoadingRead;
+  const currentError = activeTab === "unread" ? unreadError : readError;
   const {
     selectedUser,
     userDetailsDialogOpen,
@@ -87,7 +87,9 @@ export function Notification() {
         sideOffset={12}
       >
         <NotificationHeader
-          unreadNotificationsIds={unreadNotifications?.map((x) => Number(x.id)) ?? []}
+          unreadNotificationsIds={
+            unreadNotifications?.map((x) => Number(x.id)) ?? []
+          }
           activeTab={activeTab}
           onTabChange={setActiveTab}
           unreadCount={unreadCount}

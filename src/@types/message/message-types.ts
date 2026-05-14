@@ -4,7 +4,7 @@ export interface MessageResponseDto {
   senderName: string
   receiverId: string
   receiverName: string
-  content: string
+  content: string | null
   sentAt: string
   deletedAt?: string | null
   isLastMessageSentByMe?: boolean

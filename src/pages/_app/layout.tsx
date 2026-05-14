@@ -1,27 +1,31 @@
+import { useAuth } from "@/contexts/auth-provider";
+import {
+  createFileRoute,
+  Navigate,
+  Outlet,
+  redirect,
+} from "@tanstack/react-router";
+import { Header } from "./_dashboard/-components/header";
 
-import { useAuth } from '@/contexts/auth-provider'
-import { createFileRoute, Navigate, Outlet, redirect } from '@tanstack/react-router'
-import { Header } from './_dashboard/-components/header'
-
-export const Route = createFileRoute('/_app')({
+export const Route = createFileRoute("/_app")({
   beforeLoad: ({ context, location }) => {
     if (!context.auth.isAuthenticated) {
       throw redirect({
-        to: '/sign-in',
+        to: "/sign-in",
         search: {
           redirect: location.href,
         },
-      })
+      });
     }
   },
   component: AuthenticatedLayout,
-})
+});
 
 export function AuthenticatedLayout() {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   if (user === null) {
-    return <Navigate to='/sign-in' replace />
+    return <Navigate to="/sign-in" replace />;
   }
 
   return (
@@ -31,7 +35,5 @@ export function AuthenticatedLayout() {
         <Outlet />
       </main>
     </div>
-  )
-
-
+  );
 }

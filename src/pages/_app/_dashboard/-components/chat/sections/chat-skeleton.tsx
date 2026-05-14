@@ -1,9 +1,8 @@
-import { ChevronDown, MoreVertical } from 'lucide-react'
+import { ChevronDown, MoreVertical } from "lucide-react";
 
 export function ChatSkeleton() {
   return (
     <div className="flex-1 flex flex-col h-full max-h-full no-scrollbar">
-      {/* Header Skeleton */}
       <div className="p-4 border-b bg-background">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-muted rounded-full animate-pulse"></div>
@@ -20,9 +19,7 @@ export function ChatSkeleton() {
         </div>
       </div>
 
-      {/* Messages Area Skeleton */}
       <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-        {/* Received message skeleton */}
         <div className="flex gap-3 max-w-[80%]">
           <div className="w-8 h-8 bg-muted rounded-full animate-pulse flex-shrink-0"></div>
           <div className="flex-1 space-y-2">
@@ -35,7 +32,6 @@ export function ChatSkeleton() {
           </div>
         </div>
 
-        {/* Sent message skeleton */}
         <div className="flex gap-3 justify-end max-w-[80%] ml-auto">
           <div className="flex-1 space-y-2">
             <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-3">
@@ -47,7 +43,6 @@ export function ChatSkeleton() {
           <div className="w-8 h-8 bg-muted rounded-full animate-pulse flex-shrink-0"></div>
         </div>
 
-        {/* More message skeletons for realistic feel */}
         <div className="flex gap-3 max-w-[80%]">
           <div className="w-8 h-8 bg-muted rounded-full animate-pulse flex-shrink-0"></div>
           <div className="flex-1 space-y-2">
@@ -70,7 +65,6 @@ export function ChatSkeleton() {
         </div>
       </div>
 
-      {/* Input Area Skeleton */}
       <div className="p-4 border-t bg-background">
         <div className="flex gap-2">
           <div className="flex-1 h-10 bg-muted rounded-full animate-pulse"></div>
@@ -80,5 +74,5 @@ export function ChatSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

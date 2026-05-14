@@ -1,8 +1,5 @@
-
 import { getInitialName } from "@/lib/get-initial-name";
 import { AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
-
-
 import { cn } from "@/lib/utils";
 import { oklchToHex } from "@/shared/utils/color";
 
@@ -22,10 +19,10 @@ export function AvatarImageUser({
   appearancePrimaryColor,
 }: Props) {
   const initialName = getInitialName(name);
-
   const colorUserPublic = appearancePrimaryColor
     ? oklchToHex(appearancePrimaryColor)
     : null;
+
   return (
     <>
       <AvatarImage
